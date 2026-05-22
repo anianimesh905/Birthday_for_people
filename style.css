@@ -1,0 +1,1273 @@
+/* ============================================================
+   BIRTHDAY — Sealed Envelope — God-Tier Stylesheet
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@200;300;400;500&family=Herr+Von+Muellerhoff&display=swap');
+
+
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --gold:         #f5c842;
+  --coral:        #e8643a;
+  --amber:        #e8a020;
+  --text-dark:    #2a1a0a;
+  --text-mid:     #6b3f1f;
+  --scroll-bg:    #fef8e8;
+
+  /* Envelope palette — aged cream with warm shadows */
+  --env-face:     #f2e8d0;
+  --env-deep:     #d4c49a;
+  --env-shadow:   #b8a070;
+  --env-dark:     #a08040;
+  --env-flap:     #e8dcc0;
+  --env-flap2:    #d8cc9a;
+  --env-inner:    #ede0b8;
+
+  /* Wax seal */
+  --seal-red:     #c82010;
+  --seal-light:   #e84030;
+
+  --vh: 1vh;
+  --sat: env(safe-area-inset-top,    0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sar: env(safe-area-inset-right,  0px);
+  --sal: env(safe-area-inset-left,   0px);
+
+  /* Parallax values */
+  --mx: 0;
+  --my: 0;
+}
+
+html { overscroll-behavior: none; height: 100%; }
+
+body {
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  overflow: hidden;
+  overscroll-behavior: none;
+  height: calc(var(--vh) * 100);
+  height: 100dvh;
+  width: 100%;
+  background: #0d1b2a;
+  user-select: none;
+  -webkit-user-select: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+/* Film grain */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  animation: grain 4s steps(3) infinite;
+}
+@keyframes grain {
+  0%   { background-position: 0 0; }
+  33%  { background-position: -8% -12%; }
+  66%  { background-position: 12% 8%; }
+  100% { background-position: 0 0; }
+}
+
+/* ══════════════════════════════════════════
+   VIDEO BACKGROUND
+   ══════════════════════════════════════════ */
+#video-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+#bg-video, .bg-video {
+  width: 108%; height: 108%;
+  left: -4%; top: -4%;
+  position: absolute;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(calc(var(--mx) * 0.02px), calc(var(--my) * 0.02px), 0);
+  transition: opacity 1.5s ease, transform 0.1s ease-out;
+}
+#bg-video.loaded, .bg-video.loaded { opacity: 1; }
+
+#video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.32) 0%,
+    rgba(0,0,0,0.15) 45%,
+    rgba(0,0,0,0.4)  100%
+  );
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   SCROLL-REVEAL
+   ══════════════════════════════════════════ */
+.reveal {
+  opacity: 0; transform: translateY(36px);
+  transition: opacity 1.3s cubic-bezier(0.16,1,0.3,1), transform 1.3s cubic-bezier(0.16,1,0.3,1);
+  will-change: opacity, transform;
+}
+.reveal.revealed { opacity: 1; transform: translateY(0); }
+
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.22s; }
+.reveal-delay-3 { transition-delay: 0.40s; }
+.reveal-delay-4 { transition-delay: 0.58s; }
+.reveal-delay-5 { transition-delay: 0.78s; }
+
+.reveal-scale {
+  opacity: 0; transform: scale(0.84) translateY(24px);
+  transition: opacity 1.5s cubic-bezier(0.16,1,0.3,1), transform 1.5s cubic-bezier(0.16,1,0.3,1);
+  will-change: opacity, transform;
+}
+.reveal-scale.revealed { opacity: 1; transform: scale(1) translateY(0); }
+
+.reveal-glow {
+  opacity: 0; filter: blur(20px); transform: scale(0.94);
+  transition: opacity 2s cubic-bezier(0.16,1,0.3,1), filter 2s cubic-bezier(0.16,1,0.3,1), transform 2s cubic-bezier(0.16,1,0.3,1);
+  will-change: opacity, filter, transform;
+}
+.reveal-glow.revealed { opacity: 1; filter: blur(0); transform: scale(1); }
+
+/* ══════════════════════════════════════════
+   LAYOUT
+   ══════════════════════════════════════════ */
+#main-content {
+  position: relative;
+  z-index: 20;
+  height: calc(var(--vh) * 100);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding:
+    calc(1.4rem + var(--sat))
+    calc(1.4rem + var(--sar))
+    calc(1.4rem + var(--sab))
+    calc(1.4rem + var(--sal));
+  overflow: hidden;
+}
+
+/* ── Hero ── */
+#hero {
+  text-align: center;
+  position: relative;
+  margin-bottom: clamp(0.5rem, 2vh, 1.2rem);
+  transform: translate3d(calc(var(--mx) * -0.04px), calc(var(--my) * -0.04px), 0);
+  transition: transform 0.1s ease-out;
+}
+
+#hero::after {
+  content: '';
+  position: absolute;
+  width: min(360px, 82vw); height: min(360px, 82vw);
+  border-radius: 50%;
+  border: 1px solid rgba(245,200,66,0.1);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -52%);
+  pointer-events: none;
+  animation: ring-pulse 7s ease-in-out infinite;
+}
+@keyframes ring-pulse {
+  0%,100% { transform: translate(-50%,-52%) scale(1);    opacity: 0.3; }
+  50%      { transform: translate(-50%,-52%) scale(1.06); opacity: 0.75; }
+}
+
+#greeting-label {
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.56rem, 2.4vw, 0.8rem);
+  letter-spacing: 0.46em;
+  text-transform: uppercase;
+  color: var(--coral);
+  text-shadow: 0 0 20px rgba(232,100,58,0.9), 0 0 50px rgba(232,100,58,0.4);
+  margin-bottom: clamp(0.35rem, 1.4vh, 0.75rem);
+}
+
+#friend-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(3rem, 17vw, 8.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-shadow:
+    0 0 80px rgba(255,185,0,0.65),
+    0 0 160px rgba(255,120,0,0.28),
+    0 6px 30px rgba(0,0,0,0.65);
+}
+
+#birthday-date {
+  font-family: 'Jost', sans-serif;
+  font-weight: 200;
+  font-size: clamp(0.65rem, 2.6vw, 0.95rem);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.85);
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  margin-top: clamp(0.35rem, 1.4vh, 0.75rem);
+}
+
+#tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(0.88rem, 3.8vw, 1.25rem);
+  color: rgba(255,255,255,0.86);
+  text-shadow: 0 2px 16px rgba(0,0,0,0.5);
+  text-align: center;
+  margin: 0 auto clamp(1rem, 3.5vh, 2rem);
+  max-width: 86vw;
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════════════════
+   ENVELOPE — Full CSS 3D Construction
+   ══════════════════════════════════════════════════════
+
+   Dimensions: 260×180px base
+   Built from layered divs using clip-path triangles:
+
+   ┌─────────────────────┐
+   │   ╲  top flap  ╱   │  ← #env-flap-top  (rotates back to open)
+   │    ╲          ╱    │
+   │─────────────────────│  ← fold line
+   │  ╱  │        │  ╲  │  ← left/right flaps (static triangles)
+   │ ╱   │  body  │   ╲ │
+   │╱    │        │    ╲│
+   │     │        │     │
+   │  ╲                ╱ │  ← bottom flap triangle
+   │   ╲            ╱   │
+   └─────────────────────┘
+
+   ══════════════════════════════════════════════════════ */
+
+#envelope-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#envelope-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transform: translate3d(calc(var(--mx) * 0.08px), calc(var(--my) * 0.08px), 0);
+  transition: transform 0.1s ease-out;
+}
+
+/* Wrapper handles float + tap/click */
+#envelope-wrapper {
+  position: relative;
+  cursor: pointer;
+  padding: 14px;
+  -webkit-user-select: none;
+  user-select: none;
+  animation: env-float 6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  /* Enable 3D transforms for child elements */
+  perspective: 600px;
+}
+
+#envelope-wrapper:active #envelope {
+  transform: scale(0.96);
+}
+
+@keyframes env-float {
+  0%   { transform: translateY(0px)   rotate(-1.5deg); }
+  25%  { transform: translateY(-8px)  rotate(-0.3deg); }
+  50%  { transform: translateY(-15px) rotate(1.8deg);  }
+  75%  { transform: translateY(-6px)  rotate(0.5deg);  }
+  100% { transform: translateY(0px)   rotate(-1.5deg); }
+}
+
+/* ── Outer envelope container ── */
+#envelope {
+  position: relative;
+  width:  clamp(200px, 52vw, 280px);
+  height: clamp(138px, 36vw, 193px);
+  transition: transform 0.2s ease;
+}
+
+/* ── Soft drop shadow beneath ── */
+#env-shadow {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85%;
+  height: 20px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.45) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: shadow-pulse 6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+@keyframes shadow-pulse {
+  0%,100% { transform: translateX(-50%) scaleX(0.85); opacity: 0.45; }
+  50%      { transform: translateX(-50%) scaleX(0.7);  opacity: 0.28; }
+}
+
+/* ── Back panel (base of envelope) ── */
+#env-back {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, var(--env-face) 0%, var(--env-flap) 100%);
+  border-radius: 3px 3px 4px 4px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.4),
+    0 2px 8px  rgba(0,0,0,0.3),
+    inset 0 0 0 1px rgba(180,150,80,0.35);
+  overflow: hidden;
+}
+
+/* Paper texture lines on back */
+#env-back::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 14px,
+    rgba(180,150,80,0.06) 14px,
+    rgba(180,150,80,0.06) 15px
+  );
+  pointer-events: none;
+}
+
+/* ── Letter peeking out ── */
+#env-letter {
+  position: absolute;
+  bottom: 12%;
+  left: 12%;
+  right: 12%;
+  height: 65%;
+  background: linear-gradient(160deg, #fff9ee 0%, #fef3d0 100%);
+  border-radius: 2px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(210,170,80,0.3);
+  transform: translateY(100%);
+  transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Letter lines */
+#env-letter-content {
+  padding: 18% 14% 10%;
+}
+.letter-line {
+  height: 2px;
+  background: rgba(160,120,60,0.3);
+  border-radius: 2px;
+  margin-bottom: 10%;
+}
+.l1 { width: 80%; }
+.l2 { width: 65%; }
+.l3 { width: 72%; }
+.l4 { width: 50%; }
+.letter-heart {
+  color: rgba(220,80,80,0.55);
+  font-size: clamp(1rem, 4vw, 1.4rem);
+  text-align: right;
+  margin-top: 8%;
+}
+
+/* Envelope open state — letter peeks up */
+#envelope.open #env-letter {
+  transform: translateY(-28%);
+}
+
+/* ── Bottom triangle flap ── */
+#env-flap-bottom {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 55%;
+  clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+  background: linear-gradient(170deg, var(--env-flap2) 0%, var(--env-deep) 100%);
+  z-index: 2;
+}
+
+/* ── Left side flap ── */
+#env-flap-left {
+  position: absolute;
+  top: 0; left: 0;
+  width: 52%; height: 100%;
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+  background: linear-gradient(100deg, var(--env-shadow) 0%, var(--env-deep) 60%, var(--env-flap) 100%);
+  z-index: 3;
+}
+
+/* ── Right side flap ── */
+#env-flap-right {
+  position: absolute;
+  top: 0; right: 0;
+  width: 52%; height: 100%;
+  clip-path: polygon(100% 0%, 0% 50%, 100% 100%);
+  background: linear-gradient(260deg, var(--env-shadow) 0%, var(--env-deep) 60%, var(--env-flap) 100%);
+  z-index: 3;
+}
+
+/* ── Top flap (the opening lid) ── */
+#env-flap-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55%;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  background: linear-gradient(180deg, var(--env-flap) 0%, var(--env-deep) 100%);
+  transform-origin: top center;
+  transform: rotateX(0deg);
+  transition: transform 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
+  z-index: 5;
+  /* Enable 3D flip */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Inner face of top flap (shows when flipping) */
+#env-flap-top-inner {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  background: linear-gradient(180deg, var(--env-inner) 0%, var(--env-flap2) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease 0.2s;
+}
+
+/* Crease line at bottom of top flap */
+#env-flap-crease {
+  position: absolute;
+  bottom: 0;
+  left: 22%; right: 22%;
+  height: 1.5px;
+  background: rgba(140,100,40,0.3);
+  border-radius: 2px;
+}
+
+/* Envelope open state — top flap flips back */
+#envelope.open #env-flap-top {
+  transform: rotateX(-180deg);
+}
+#envelope.open #env-flap-top-inner {
+  opacity: 1;
+}
+
+/* ── Wax Seal ── */
+#env-seal {
+  position: absolute;
+  top: calc(55% - 22px);  /* sits right at the fold line */
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(40px, 11vw, 54px);
+  height: clamp(40px, 11vw, 54px);
+  z-index: 6;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+}
+
+#env-seal-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 32%,
+    var(--seal-light) 0%,
+    var(--seal-red)   45%,
+    #7a0808           100%
+  );
+  box-shadow:
+    0 3px 14px rgba(180,10,10,0.65),
+    0 1px 4px  rgba(0,0,0,0.5),
+    inset 0 2px 4px rgba(255,100,80,0.3),
+    inset 0 -2px 4px rgba(80,0,0,0.4);
+  overflow: hidden;
+}
+
+#env-seal-ring::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -150%;
+  width: 150%; height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+  animation: seal-shimmer 3.5s ease-in-out infinite;
+}
+
+@keyframes seal-shimmer {
+  0% { left: -150%; }
+  35% { left: 150%; }
+  100% { left: 150%; }
+}
+
+/* Decorative ring edge on seal */
+#env-seal-ring::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,120,80,0.3);
+}
+
+#env-seal-symbol {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,220,200,0.85);
+  font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  letter-spacing: 0;
+}
+
+/* Seal pulse glow */
+#env-seal::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(220,30,20,0.35) 0%, transparent 70%);
+  animation: seal-glow 2.8s ease-in-out infinite;
+}
+
+@keyframes seal-glow {
+  0%,100% { transform: scale(1);    opacity: 0.6; }
+  50%      { transform: scale(1.18); opacity: 1; }
+}
+
+/* Seal breaks apart when opened */
+#envelope.open #env-seal {
+  transform: translateX(-50%) scale(0) rotate(25deg);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.55, 0, 1, 0.45), opacity 0.4s ease;
+}
+
+/* ── Envelope glow aura ── */
+#env-glow {
+  position: absolute;
+  inset: -30px;
+  border-radius: 16px;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 55%,
+    rgba(245,200,66,0.14) 0%,
+    rgba(232,100,58,0.08) 50%,
+    transparent 75%
+  );
+  pointer-events: none;
+  animation: env-aura 4s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes env-aura {
+  0%,100% { opacity: 0.7; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.06); }
+}
+
+/* ── Floating shimmer particles ── */
+.env-particle {
+  position: absolute;
+  width:  var(--ps, 4px);
+  height: var(--ps, 4px);
+  left: var(--px, 50%);
+  top:  var(--py, 50%);
+  border-radius: 50%;
+  background: rgba(245,200,66,0.8);
+  box-shadow: 0 0 6px rgba(245,200,66,0.8);
+  pointer-events: none;
+  animation: particle-float var(--pd, 3s) var(--pdd, 0s) ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes particle-float {
+  0%,100% { transform: translate(0,  0)   scale(1);   opacity: 0.3; }
+  33%      { transform: translate(5px, -12px) scale(1.3); opacity: 0.9; }
+  66%      { transform: translate(-4px, -6px) scale(0.8); opacity: 0.6; }
+}
+
+/* ── Hint text ── */
+#envelope-hint {
+  font-family: 'Jost', sans-serif;
+  font-weight: 200;
+  font-size: clamp(0.6rem, 2.4vw, 0.7rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+  margin-top: clamp(0.7rem, 2.2vh, 1.2rem);
+  animation: pulse-hint 3.4s ease-in-out infinite;
+}
+
+@keyframes pulse-hint {
+  0%,100% { opacity: 0.4; }
+  50%      { opacity: 0.95; }
+}
+
+#scroll-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,3,1,0.72);
+  backdrop-filter: blur(16px) saturate(0.7);
+  -webkit-backdrop-filter: blur(16px) saturate(0.7);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    calc(1.2rem + var(--sat))
+    calc(1.2rem + var(--sar))
+    calc(1.2rem + var(--sab))
+    calc(1.2rem + var(--sal));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s ease;
+  overflow: hidden;
+  perspective: 1500px;
+}
+
+#scroll-overlay.open { opacity: 1; pointer-events: all; }
+
+/* ── Container for Scroll and Polaroids ── */
+#scroll-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 460px;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+/* ── Polaroid Scrapbook Cluster ── */
+#polaroid-cluster {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.polaroid-card {
+  position: absolute;
+  width: 180px;
+  background: #fdfdfa;
+  padding: 12px 12px 28px 12px;
+  box-shadow: 
+    0 12px 35px rgba(0,0,0,0.35),
+    0 2px 10px rgba(0,0,0,0.2),
+    inset 0 0 15px rgba(180,150,80,0.05);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 2px;
+  /* Centered base */
+  top: 50%;
+  left: 50%;
+  margin-top: -112px; /* half height of 225px */
+  margin-left: -90px; /* half width of 180px */
+  
+  /* Initial state: slightly hidden behind/spread out */
+  opacity: 0;
+  pointer-events: auto;
+  
+  /* Transform calculation with parallax */
+  transform: translate3d(
+    calc(var(--dx) + var(--mx) * var(--px-factor) * 1px),
+    calc(var(--dy) + var(--my) * var(--px-factor) * 1px),
+    -100px
+  ) rotate(var(--rot)) scale(0.6);
+  
+  transition: 
+    transform 0.6s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    opacity 0.8s ease;
+  z-index: 0;
+}
+
+/* Slide in polaroids when modal is opened */
+#scroll-overlay.open .polaroid-card {
+  opacity: 1;
+  transform: translate3d(
+    calc(var(--dx) + var(--mx) * var(--px-factor) * 1px),
+    calc(var(--dy) + var(--my) * var(--px-factor) * 1px),
+    -20px
+  ) rotate(var(--rot)) scale(var(--ds));
+}
+
+@media (hover: hover) {
+  .polaroid-card:hover {
+    transform: translate3d(
+      var(--dx),
+      var(--dy),
+      50px
+    ) rotate(0deg) scale(1.15) !important;
+    z-index: 10;
+    box-shadow: 
+      0 25px 50px rgba(245, 200, 66, 0.35),
+      0 4px 15px rgba(245, 200, 66, 0.15);
+    border-color: rgba(245, 200, 66, 0.4);
+  }
+}
+
+@media (hover: none) {
+  .polaroid-card:active {
+    transform: translate3d(
+      var(--dx),
+      var(--dy),
+      30px
+    ) rotate(0deg) scale(1.1) !important;
+    z-index: 10;
+    box-shadow: 
+      0 15px 30px rgba(245, 200, 66, 0.25),
+      0 2px 10px rgba(245, 200, 66, 0.1);
+    border-color: rgba(245, 200, 66, 0.3);
+  }
+}
+
+.polaroid-tape {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-4deg);
+  width: 50px;
+  height: 20px;
+  background: rgba(245, 230, 200, 0.45);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  border-left: 1px dashed rgba(0,0,0,0.1);
+  border-right: 1px dashed rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.polaroid-img-wrapper {
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #2a2015;
+  border: 1px solid rgba(0,0,0,0.08);
+  margin-bottom: 10px;
+}
+
+.polaroid-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: sepia(0.08) contrast(1.04) saturate(0.95);
+}
+
+.polaroid-caption {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-mid);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+/* ── The 3D Scroll Paper ── */
+#scroll-paper {
+  width: min(460px, 92vw);
+  max-height: calc(var(--vh) * 80);
+  max-height: 80dvh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transform-style: preserve-3d;
+  background: transparent;
+  
+  /* Starts folded / tilted away, unrolls into face view */
+  transform: perspective(1000px) rotateX(25deg) scale(0.65) translateY(120px);
+  opacity: 0;
+  transition:
+    transform 1.3s cubic-bezier(0.25, 1.25, 0.35, 1.05),
+    opacity   0.8s ease;
+  z-index: 2;
+}
+
+#scroll-overlay.open #scroll-paper {
+  transform: perspective(1000px) rotateX(0deg) scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Deckle Edge Background page */
+#scroll-paper-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--scroll-bg);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 31px,
+    rgba(180,150,80,0.08) 31px,
+    rgba(180,150,80,0.08) 32px
+  );
+  filter: url(#deckle-edge);
+  z-index: 1;
+  box-shadow:
+    0 35px 80px rgba(0,0,0,0.5),
+    0 10px 30px rgba(0,0,0,0.3),
+    inset 0 0 50px rgba(180, 150, 80, 0.14);
+  pointer-events: none;
+}
+
+/* Left red margin line (layered on the bg) */
+#scroll-paper-bg::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 44px;
+  width: 1.5px;
+  height: 100%;
+  background: rgba(220,80,80,0.18);
+}
+
+/* 3D Flaps (Rolling Scrolls) */
+#scroll-flap-top, #scroll-flap-bottom {
+  position: absolute;
+  left: 0; right: 0;
+  height: 38px;
+  background: var(--scroll-bg);
+  filter: url(#deckle-edge);
+  z-index: 3;
+  transition: transform 1.4s cubic-bezier(0.25, 1, 0.3, 1);
+}
+
+#scroll-flap-top {
+  top: 0;
+  transform-origin: top center;
+  box-shadow: 
+    inset 0 -12px 20px rgba(180, 150, 80, 0.15),
+    0 6px 12px rgba(0,0,0,0.06);
+}
+
+#scroll-flap-bottom {
+  bottom: 0;
+  transform-origin: bottom center;
+  box-shadow: 
+    inset 0 12px 20px rgba(180, 150, 80, 0.15),
+    0 -6px 12px rgba(0,0,0,0.06);
+}
+
+/* Folded states before unrolling */
+#scroll-paper:not(.unfolded) #scroll-flap-top {
+  transform: rotateX(115deg);
+}
+
+#scroll-paper:not(.unfolded) #scroll-flap-bottom {
+  transform: rotateX(-115deg);
+}
+
+/* Postage stamp decoration */
+#letter-stamp {
+  position: absolute;
+  top: 22px; right: 22px;
+  width: 36px; height: 36px;
+  background: rgba(180,150,80,0.15);
+  border: 1.5px solid rgba(180,150,80,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 3px var(--scroll-bg),
+    0 0 0 4px rgba(180,150,80,0.25);
+  z-index: 5;
+  animation: stamp-arrive 0.5s 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes stamp-arrive {
+  from { transform: scale(0) rotate(15deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);  opacity: 1; }
+}
+
+/* Close button */
+#scroll-close {
+  position: absolute;
+  top: 0.7rem; right: 0.7rem;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none;
+  font-size: 1.25rem;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), color 0.2s;
+  z-index: 10; opacity: 0.6;
+  -webkit-tap-highlight-color: transparent;
+}
+#scroll-close:active { transform: rotate(90deg) scale(1.3); color: var(--coral); opacity: 1; }
+
+#scroll-inner {
+  padding: 2.6rem 2.2rem 2.6rem 3.4rem;
+  max-height: calc(var(--vh) * 80 - 10px);
+  max-height: calc(80dvh - 10px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  z-index: 5;
+}
+
+#scroll-decoration {
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(160,120,60,0.65);
+  letter-spacing: 0.5em;
+  margin-bottom: 1.2rem;
+}
+
+#scroll-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+  font-weight: 600;
+  font-style: italic;
+  color: var(--text-dark);
+  text-align: center;
+  margin-bottom: 1.2rem;
+  line-height: 1.2;
+}
+
+#scroll-divider {
+  text-align: center;
+  color: rgba(180,130,50,0.6);
+  font-size: 0.8rem;
+  letter-spacing: 0.6em;
+  margin-bottom: 1.6rem;
+}
+
+#scroll-message {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(0.98rem, 4vw, 1.15rem);
+  line-height: 2;
+  color: var(--text-dark);
+  white-space: pre-wrap;
+  min-height: 2em;
+}
+
+#scroll-message.typing::after {
+  content: '|';
+  animation: blink 0.85s step-end infinite;
+  color: var(--amber);
+  font-style: normal;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+#scroll-signature {
+  font-family: 'Herr Von Muellerhoff', cursive;
+  font-weight: 400;
+  font-size: clamp(1.8rem, 7.5vw, 2.8rem);
+  color: #8c2010;
+  text-shadow: 0 0 1px rgba(140, 32, 16, 0.15);
+  text-align: right;
+  margin-top: 1.5rem;
+  opacity: 0;
+  display: block;
+  white-space: nowrap;
+}
+
+#scroll-signature.show {
+  opacity: 1;
+  animation: ink-bleed 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes ink-bleed {
+  from {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    filter: saturate(0.5) contrast(1.4);
+  }
+  to {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    filter: saturate(1) contrast(1);
+  }
+}
+
+/* ── Mobile Layout Adjustments for Scrapbook ── */
+@media (max-width: 768px) {
+  #scroll-container {
+    max-width: 350px;
+  }
+  
+  #scroll-paper {
+    width: min(350px, 90vw);
+  }
+  
+  #scroll-inner {
+    padding: 2.2rem 1.6rem 2.2rem 2.8rem;
+  }
+  
+  .polaroid-card {
+    width: 115px;
+    padding: 8px 8px 18px 8px;
+    margin-top: -70px;
+    margin-left: -58px;
+  }
+  
+  .polaroid-card:nth-child(1) {
+    --dx: -110px !important;
+    --dy: -180px !important;
+    --rot: -8deg !important;
+    --ds: 0.85 !important;
+  }
+  
+  .polaroid-card:nth-child(2) {
+    --dx: 110px !important;
+    --dy: -180px !important;
+    --rot: 8deg !important;
+    --ds: 0.88 !important;
+  }
+  
+  .polaroid-card:nth-child(3) {
+    --dx: -80px !important;
+    --dy: 190px !important;
+    --rot: 5deg !important;
+    --ds: 0.85 !important;
+  }
+  
+  .polaroid-card:hover {
+    transform: translate3d(
+      var(--dx),
+      var(--dy),
+      20px
+    ) rotate(0deg) scale(1.18) !important;
+  }
+  
+  .polaroid-caption {
+    font-size: 0.65rem;
+    margin-top: 2px;
+  }
+  
+  .polaroid-tape {
+    width: 32px;
+    height: 12px;
+    top: -8px;
+  }
+}
+
+@media (max-width: 360px) {
+  #scroll-container {
+    max-width: 300px;
+  }
+  #scroll-paper {
+    width: min(300px, 88vw);
+  }
+  .polaroid-card:nth-child(1) {
+    --dx: -90px !important;
+    --dy: -160px !important;
+  }
+  .polaroid-card:nth-child(2) {
+    --dx: 90px !important;
+    --dy: -160px !important;
+  }
+  .polaroid-card:nth-child(3) {
+    --dx: -60px !important;
+    --dy: 160px !important;
+  }
+}
+
+/* ══════════════════════════════════════════
+   MUSIC BUTTON
+   ══════════════════════════════════════════ */
+#music-btn {
+  position: fixed;
+  bottom: calc(1.2rem + var(--sab));
+  right:  calc(1.2rem + var(--sar));
+  z-index: 50;
+  min-height: 44px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px;
+  padding: 0.65rem 1.2rem;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.82);
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: background 0.3s ease, transform 0.2s ease;
+  opacity: 0;
+  animation: btn-arrive 1.5s 1.2s ease-out forwards;
+  -webkit-tap-highlight-color: transparent;
+}
+@keyframes btn-arrive {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+#music-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.96); }
+#music-btn.playing {
+  background: rgba(245,200,66,0.18);
+  border-color: rgba(245,200,66,0.5);
+  color: #ffd770;
+  box-shadow: 0 0 20px rgba(245,200,66,0.2);
+}
+
+/* ══════════════════════════════════════════
+   CONFETTI
+   ══════════════════════════════════════════ */
+.confetti-piece {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9990;
+  animation: confetti-fall var(--cf-dur,3s) var(--cf-delay,0s) cubic-bezier(0.22,0.61,0.36,1) forwards;
+  border-radius: var(--cf-radius,50%);
+  will-change: transform, opacity;
+}
+@keyframes confetti-fall {
+  0%   { opacity:1; transform:translate(0,0) rotate(0deg) scale(1); }
+  60%  { opacity:1; }
+  100% { opacity:0; transform:translate(var(--cf-tx,0px),var(--cf-ty,420px)) rotate(var(--cf-rot,540deg)) scale(0.3); }
+}
+
+/* ══════════════════════════════════════════
+   SEAL CRACK PARTICLES (on open)
+   ══════════════════════════════════════════ */
+.seal-crack {
+  position: fixed;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--seal-red);
+  box-shadow: 0 0 8px rgba(220,30,20,0.8);
+  pointer-events: none;
+  z-index: 9985;
+  animation: seal-crack-fly var(--sc-dur,0.8s) ease-out forwards;
+}
+@keyframes seal-crack-fly {
+  0%   { opacity:1; transform:translate(0,0) scale(1); }
+  100% { opacity:0; transform:translate(var(--sc-tx,0px),var(--sc-ty,0px)) scale(0.2); }
+}
+
+/* ══════════════════════════════════════════
+   SCROLLBAR
+   ══════════════════════════════════════════ */
+#scroll-inner::-webkit-scrollbar { width: 3px; }
+#scroll-inner::-webkit-scrollbar-track { background: transparent; }
+#scroll-inner::-webkit-scrollbar-thumb { background: rgba(180,140,60,0.3); border-radius: 4px; }
+
+/* ══════════════════════════════════════════
+   LANDSCAPE / SMALL SCREENS
+   ══════════════════════════════════════════ */
+@media (max-width: 360px) {
+  #friend-name { font-size: clamp(2.6rem, 17vw, 3.8rem); }
+  #envelope { width: 185px; height: 128px; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  #main-content { flex-direction: row; gap: 1.8rem; padding: 0.8rem 2rem; }
+  #hero { margin-bottom: 0; }
+  #friend-name { font-size: clamp(2.2rem, 10vh, 3.5rem); }
+  #tagline { display: none; }
+  #envelope { width: 160px; height: 110px; }
+  #envelope-hint { font-size: 0.55rem; margin-top: 0.5rem; }
+}
+
+@media (max-height: 550px) and (orientation: landscape) {
+  #polaroid-cluster { display: none; }
+  #scroll-paper { max-height: 85dvh; }
+  #scroll-inner { max-height: calc(85dvh - 10px); padding-top: 1.8rem; padding-bottom: 1.8rem; }
+}
+
+/* ══════════════════════════════════════════
+   THEME SWITCHER PANEL
+   ══════════════════════════════════════════ */
+#theme-switcher-panel {
+  position: fixed;
+  bottom: calc(1.2rem + var(--sab));
+  left: calc(1.2rem + var(--sal));
+  z-index: 50;
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 6px;
+  border-radius: 50px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  opacity: 0;
+  animation: btn-arrive 1.5s 1.2s ease-out forwards;
+}
+
+.theme-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 
+    background-color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.3s ease;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-btn::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+  pointer-events: none;
+}
+
+.theme-btn:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: scale(1.08);
+}
+
+.theme-btn:active {
+  transform: scale(0.92);
+}
+
+.theme-btn.active {
+  background-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+.theme-btn.active::after {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* ══════════════════════════════════════════
+   SPARKLE CANVAS
+   ══════════════════════════════════════════ */
+#sparkle-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 150;
+  pointer-events: none;
+}

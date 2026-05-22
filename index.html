@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0,
+                 user-scalable=no, viewport-fit=cover,
+                 interactive-widget=resizes-content" />
+  <meta name="theme-color" content="#0d1b2a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="A beautiful, interactive birthday scrapbook and letter sealed with love, carried across the sea." />
+  <title>Happy Birthday 🌅</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="style.css" />
+  <script src="content.js"></script>
+</head>
+<body>
+
+  <!-- SVG Deckle Edge Filter (Applied to scroll background) -->
+  <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="deckle-edge">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Video Background -->
+  <div id="video-bg" aria-hidden="true">
+    <video id="bg-video" autoplay muted loop playsinline
+           disablePictureInPicture disableRemotePlayback x-webkit-airplay="deny">
+    </video>
+    <div id="video-overlay"></div>
+  </div>
+
+  <!-- Main Content -->
+  <main id="main-content">
+
+    <section id="hero">
+      <p id="greeting-label" class="reveal reveal-delay-1">✦ Happy Birthday ✦</p>
+      <h1 id="friend-name"   class="reveal-glow reveal-delay-2">Sofia</h1>
+      <p id="birthday-date"  class="reveal reveal-delay-3">20 July</p>
+    </section>
+
+    <p id="tagline" class="reveal reveal-delay-4">A letter sealed with love, carried across the sea…</p>
+
+    <!-- Sealed Envelope -->
+    <div id="envelope-area" class="reveal-scale reveal-delay-5">
+      <div id="envelope-scene">
+
+        <div id="envelope-wrapper" role="button" aria-label="Open birthday letter" tabindex="0">
+
+          <!-- Glow behind envelope -->
+          <div id="env-glow"></div>
+
+          <!-- Floating dust/shimmer particles -->
+          <div class="env-particle" style="--px:12%;  --py:18%; --ps:4px;  --pd:2.4s; --pdd:0s;"></div>
+          <div class="env-particle" style="--px:88%;  --py:12%; --ps:3px;  --pd:3.1s; --pdd:0.5s;"></div>
+          <div class="env-particle" style="--px:20%;  --py:80%; --ps:5px;  --pd:2.8s; --pdd:1.1s;"></div>
+          <div class="env-particle" style="--px:78%;  --py:75%; --ps:3px;  --pd:3.6s; --pdd:0.3s;"></div>
+          <div class="env-particle" style="--px:50%;  --py:5%;  --ps:4px;  --pd:2.2s; --pdd:1.8s;"></div>
+          <div class="env-particle" style="--px:5%;   --py:50%; --ps:3px;  --pd:4.0s; --pdd:0.8s;"></div>
+          <div class="env-particle" style="--px:95%;  --py:45%; --ps:5px;  --pd:2.6s; --pdd:2.2s;"></div>
+          <div class="env-particle" style="--px:35%;  --py:92%; --ps:3px;  --pd:3.3s; --pdd:1.4s;"></div>
+
+          <!-- The Envelope -->
+          <div id="envelope">
+
+            <!-- Shadow beneath envelope -->
+            <div id="env-shadow"></div>
+
+            <!-- Envelope back (always visible base) -->
+            <div id="env-back"></div>
+
+            <!-- Letter peeking out (visible when open) -->
+            <div id="env-letter">
+              <div id="env-letter-content">
+                <div class="letter-line l1"></div>
+                <div class="letter-line l2"></div>
+                <div class="letter-line l3"></div>
+                <div class="letter-line l4"></div>
+                <div class="letter-heart">♥</div>
+              </div>
+            </div>
+
+            <!-- Bottom triangle flap -->
+            <div id="env-flap-bottom"></div>
+
+            <!-- Left side flap -->
+            <div id="env-flap-left"></div>
+
+            <!-- Right side flap -->
+            <div id="env-flap-right"></div>
+
+            <!-- Top flap — rotates open on click -->
+            <div id="env-flap-top">
+              <!-- Inner face of top flap (slightly different shade) -->
+              <div id="env-flap-top-inner"></div>
+              <!-- Fold crease line along bottom edge of top flap -->
+              <div id="env-flap-crease"></div>
+            </div>
+
+            <!-- Wax seal (on top of fold) -->
+            <div id="env-seal">
+              <div id="env-seal-ring"></div>
+              <div id="env-seal-symbol">✦</div>
+            </div>
+
+          </div><!-- /envelope -->
+
+        </div><!-- /envelope-wrapper -->
+
+        <p id="envelope-hint">Tap to unseal your letter ✦</p>
+
+      </div><!-- /envelope-scene -->
+    </div><!-- /envelope-area -->
+
+  </main>
+
+  <!-- Letter / Message Modal -->
+  <div id="scroll-overlay" role="dialog" aria-modal="true" aria-label="Birthday letter">
+    <div id="scroll-container">
+      
+      <!-- Polaroid Scrapbook Cluster -->
+      <div id="polaroid-cluster" aria-hidden="true">
+        <div class="polaroid-card" style="--rot: -7deg; --dx: -280px; --dy: -130px; --ds: 0.95; --px-factor: -0.05;">
+          <div class="polaroid-tape"></div>
+          <div class="polaroid-img-wrapper">
+            <img src="polaroid_sunset_sea.png" alt="Sunset over sea" />
+          </div>
+          <div class="polaroid-caption">Golden sunset 🌅</div>
+        </div>
+        
+        <div class="polaroid-card" style="--rot: 9deg; --dx: 295px; --dy: -50px; --ds: 1.05; --px-factor: 0.08;">
+          <div class="polaroid-tape"></div>
+          <div class="polaroid-img-wrapper">
+            <img src="polaroid_golden_hour.png" alt="Golden hour walk" />
+          </div>
+          <div class="polaroid-caption">Summer breeze 🌾</div>
+        </div>
+        
+        <div class="polaroid-card" style="--rot: -4deg; --dx: -290px; --dy: 130px; --ds: 1.0; --px-factor: -0.03;">
+          <div class="polaroid-tape"></div>
+          <div class="polaroid-img-wrapper">
+            <img src="polaroid_beach_bottle.png" alt="Bottle on sand" />
+          </div>
+          <div class="polaroid-caption">Salty air 🐚</div>
+        </div>
+      </div>
+
+      <!-- The 3D Scroll Paper -->
+      <div id="scroll-paper">
+        <!-- Deckled Edge Background -->
+        <div id="scroll-paper-bg"></div>
+        
+        <!-- 3D Unfolding Flaps/Rolls -->
+        <div id="scroll-flap-top"></div>
+        <div id="scroll-flap-bottom"></div>
+        
+        <div id="letter-stamp" aria-hidden="true">🌊</div>
+        <button id="scroll-close" aria-label="Close letter">✕</button>
+        
+        <div id="scroll-inner">
+          <div id="scroll-decoration">· · · ✦ · · ·</div>
+          <h2 id="scroll-title">Happy Birthday!</h2>
+          <div id="scroll-divider">— ✦ —</div>
+          <p id="scroll-message"></p>
+          <p id="scroll-signature"></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Music Button -->
+  <button id="music-btn" aria-label="Toggle background music">🎵 Play Birthday Song</button>
+
+  <!-- Glassmorphic Theme Switcher -->
+  <div id="theme-switcher-panel" role="radiogroup" aria-label="Choose background theme">
+    <button class="theme-btn active" data-theme="morning" role="radio" aria-checked="true" aria-label="Sunrise">🌅</button>
+    <button class="theme-btn" data-theme="afternoon" role="radio" aria-checked="false" aria-label="Afternoon">☀️</button>
+    <button class="theme-btn" data-theme="sunset" role="radio" aria-checked="false" aria-label="Sunset">🌇</button>
+    <button class="theme-btn" data-theme="night" role="radio" aria-checked="false" aria-label="Night">🌌</button>
+  </div>
+
+  <!-- Sparkle Canvas Overlay -->
+  <canvas id="sparkle-canvas"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>
