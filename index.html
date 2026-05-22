@@ -127,29 +127,67 @@
       
       <!-- Polaroid Scrapbook Cluster -->
       <div id="polaroid-cluster" aria-hidden="true">
-        <div class="polaroid-card" style="--rot: -7deg; --dx: -280px; --dy: -130px; --ds: 0.95; --px-factor: -0.05;">
-          <div class="polaroid-tape"></div>
-          <div class="polaroid-img-wrapper">
-            <img src="polaroid_sunset_sea.png" alt="Sunset over sea" />
+        
+        <!-- Polaroid Card 1 -->
+        <div class="polaroid-card" style="--rot: -7deg; --dx: -280px; --dy: -130px; --ds: 0.95; --px-factor: -0.05;" tabindex="0" role="button" aria-label="Photo card: Golden sunset. Press space or enter to flip">
+          <div class="polaroid-card-inner">
+            <div class="polaroid-card-front">
+              <div class="polaroid-tape"></div>
+              <div class="polaroid-img-wrapper">
+                <img src="polaroid_sunset_sea.png" alt="Sunset over sea" />
+              </div>
+              <div class="polaroid-caption">Golden sunset 🌅</div>
+            </div>
+            <div class="polaroid-card-back">
+              <div class="polaroid-tape"></div>
+              <div class="polaroid-back-content">
+                <p class="polaroid-note-date">July 2025</p>
+                <p class="polaroid-note-text">We sat by the shoreline, watching the sky melt into gold. The ocean breeze was warm, and the waves made time stand still. ✨</p>
+              </div>
+            </div>
           </div>
-          <div class="polaroid-caption">Golden sunset 🌅</div>
         </div>
         
-        <div class="polaroid-card" style="--rot: 9deg; --dx: 295px; --dy: -50px; --ds: 1.05; --px-factor: 0.08;">
-          <div class="polaroid-tape"></div>
-          <div class="polaroid-img-wrapper">
-            <img src="polaroid_golden_hour.png" alt="Golden hour walk" />
+        <!-- Polaroid Card 2 -->
+        <div class="polaroid-card" style="--rot: 9deg; --dx: 295px; --dy: -50px; --ds: 1.05; --px-factor: 0.08;" tabindex="0" role="button" aria-label="Photo card: Summer breeze. Press space or enter to flip">
+          <div class="polaroid-card-inner">
+            <div class="polaroid-card-front">
+              <div class="polaroid-tape"></div>
+              <div class="polaroid-img-wrapper">
+                <img src="polaroid_golden_hour.png" alt="Golden hour walk" />
+              </div>
+              <div class="polaroid-caption">Summer breeze 🌾</div>
+            </div>
+            <div class="polaroid-card-back">
+              <div class="polaroid-tape"></div>
+              <div class="polaroid-back-content">
+                <p class="polaroid-note-date">July 2025</p>
+                <p class="polaroid-note-text">A perfect afternoon lost in laughter, eating fresh peaches under the shade of the dunes. I hope your new year brings this warmth. 🍑</p>
+              </div>
+            </div>
           </div>
-          <div class="polaroid-caption">Summer breeze 🌾</div>
         </div>
         
-        <div class="polaroid-card" style="--rot: -4deg; --dx: -290px; --dy: 130px; --ds: 1.0; --px-factor: -0.03;">
-          <div class="polaroid-tape"></div>
-          <div class="polaroid-img-wrapper">
-            <img src="polaroid_beach_bottle.png" alt="Bottle on sand" />
+        <!-- Polaroid Card 3 -->
+        <div class="polaroid-card" style="--rot: -4deg; --dx: -290px; --dy: 130px; --ds: 1.0; --px-factor: -0.03;" tabindex="0" role="button" aria-label="Photo card: Salty air. Press space or enter to flip">
+          <div class="polaroid-card-inner">
+            <div class="polaroid-card-front">
+              <div class="polaroid-tape"></div>
+              <div class="polaroid-img-wrapper">
+                <img src="polaroid_beach_bottle.png" alt="Bottle on sand" />
+              </div>
+              <div class="polaroid-caption">Salty air 🐚</div>
+            </div>
+            <div class="polaroid-card-back">
+              <div class="polaroid-tape"></div>
+              <div class="polaroid-back-content">
+                <p class="polaroid-note-date">July 2025</p>
+                <p class="polaroid-note-text">Salty hair, sandy toes, and the search for the perfect seashell. Some memories are in the sand, but this one is sealed forever. ✉️</p>
+              </div>
+            </div>
           </div>
-          <div class="polaroid-caption">Salty air 🐚</div>
         </div>
+        
       </div>
 
       <!-- The 3D Scroll Paper -->
@@ -161,8 +199,32 @@
         <div id="scroll-flap-top"></div>
         <div id="scroll-flap-bottom"></div>
         
+        <!-- Elegant Compass Rose Watermark -->
+        <div id="letter-watermark" aria-hidden="true">
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor">
+            <circle cx="50" cy="50" r="40" stroke-width="0.5" stroke-dasharray="1 3" />
+            <circle cx="50" cy="50" r="38" stroke-width="0.3" />
+            <circle cx="50" cy="50" r="28" stroke-width="0.4" />
+            <path d="M50 8 L52.5 45 L50 47.5 L47.5 45 Z" fill="currentColor" opacity="0.35" />
+            <path d="M50 92 L52.5 55 L50 52.5 L47.5 55 Z" fill="currentColor" opacity="0.35" />
+            <path d="M8 50 L45 52.5 L47.5 50 L45 47.5 Z" fill="currentColor" opacity="0.35" />
+            <path d="M92 50 L55 52.5 L52.5 50 L55 47.5 Z" fill="currentColor" opacity="0.35" />
+            <path d="M20.5 20.5 L47 47 L48 48 L46 49 Z" fill="currentColor" opacity="0.18" />
+            <path d="M79.5 79.5 L53 53 L52 52 L54 51 Z" fill="currentColor" opacity="0.18" />
+            <path d="M79.5 20.5 L53 47 L52 48 L54 49 Z" fill="currentColor" opacity="0.18" />
+            <path d="M20.5 79.5 L47 53 L48 52 L46 51 Z" fill="currentColor" opacity="0.18" />
+            <polygon points="50,46 51.5,48.5 54,50 51.5,51.5 50,54 48.5,51.5 46,50 48.5,48.5" fill="currentColor" opacity="0.8" />
+          </svg>
+        </div>
+        
         <div id="letter-stamp" aria-hidden="true">🌊</div>
-        <button id="scroll-close" aria-label="Close letter">✕</button>
+        
+        <button id="scroll-close" aria-label="Close letter">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
         
         <div id="scroll-inner">
           <div id="scroll-decoration">· · · ✦ · · ·</div>
@@ -177,7 +239,16 @@
   </div>
 
   <!-- Music Button -->
-  <button id="music-btn" aria-label="Toggle background music">🎵 Play Birthday Song</button>
+  <button id="music-btn" aria-label="Toggle background music">
+    <span class="music-icon">🎵</span>
+    <span id="music-btn-text" class="music-text">Play Birthday Song</span>
+    <span class="eq-visualizer" aria-hidden="true">
+      <span class="eq-bar bar1"></span>
+      <span class="eq-bar bar2"></span>
+      <span class="eq-bar bar3"></span>
+      <span class="eq-bar bar4"></span>
+    </span>
+  </button>
 
   <!-- Glassmorphic Theme Switcher -->
   <div id="theme-switcher-panel" role="radiogroup" aria-label="Choose background theme">

@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initParallax();
   initSwipeDismiss();
   initSparkleTrail();
+  initPolaroids();
 
   // Prevent context menu on long-press (Android)
   document.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -118,6 +119,12 @@ function setTheme(themeName) {
   
   const oldTheme = currentTheme;
   currentTheme = themeName;
+
+  const paper = document.getElementById("scroll-paper");
+  if (paper) {
+    paper.classList.remove("theme-morning", "theme-afternoon", "theme-sunset", "theme-night");
+    paper.classList.add(`theme-${themeName}`);
+  }
   
   // Update button active states in panel
   const buttons = document.querySelectorAll(".theme-btn");
@@ -247,6 +254,82 @@ function playCrackSound() {
     }, 300);
   } catch (e) {
     console.warn("Audio synthesis failed:", e);
+  }
+}
+
+/* Procedural Parchment Scroll Unfolding Sound */
+function playScrollSound() {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+
+    const duration = 0.8;
+    const bufferSize = ctx.sampleRate * duration;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    // Pink / Brown noise filter variables
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    let brown = 0.0;
+
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+
+      // Pink noise filter
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      b3 = 0.86650 * b3 + white * 0.3104856;
+      b4 = 0.55000 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.0168980;
+      const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+      b6 = white * 0.115926;
+
+      // Brown noise (integral of white noise)
+      brown = (brown + 0.02 * white) / 1.02;
+
+      // Mix pink and brown noise for paper friction texture
+      let noise = (pink * 0.6 + brown * 12.0) * 0.5;
+
+      // Scroll unfolding profile: quiet start, swelling, then fading
+      const t = i / bufferSize;
+      const envelope = Math.sin(t * Math.PI) * Math.pow(1 - t, 0.5);
+
+      // Add high-frequency organic crackles (simulating paper fiber flexing)
+      let crackle = 0;
+      if (Math.random() < 0.003) {
+        crackle = (Math.random() * 2 - 1) * 0.4;
+      }
+
+      data[i] = (noise * 0.08 + crackle) * envelope;
+    }
+
+    const noiseNode = ctx.createBufferSource();
+    noiseNode.buffer = buffer;
+
+    // Filter to sweeten the paper sound
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(600, ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(350, ctx.currentTime + duration);
+    filter.Q.setValueAtTime(1.5, ctx.currentTime);
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+    noiseNode.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    noiseNode.start();
+
+    setTimeout(() => {
+      try { ctx.close(); } catch (err) {}
+    }, duration * 1000 + 100);
+  } catch (e) {
+    console.warn("Paper scroll sound failed:", e);
   }
 }
 
@@ -682,7 +765,10 @@ function initEnvelope() {
       overlay.classList.add("open");
       startAmbientWaves();
       setTimeout(() => {
-        if (paper) paper.classList.add("unfolded");
+        if (paper) {
+          paper.classList.add("unfolded");
+          playScrollSound();
+        }
       }, 300);
       return;
     }
@@ -722,7 +808,10 @@ function initEnvelope() {
       startAmbientWaves();
       
       setTimeout(() => {
-        if (paper) paper.classList.add("unfolded");
+        if (paper) {
+          paper.classList.add("unfolded");
+          playScrollSound();
+        }
       }, 300);
 
       spawnConfetti();
@@ -802,12 +891,35 @@ function burstSealParticles(cx, cy) {
 /* ── Typewriter ── */
 function typewriterEffect(el, text, sigEl) {
   el.classList.add("typing");
-  el.textContent = "";
-  let i = 0;
+  el.innerHTML = "";
+  if (!text) {
+    el.classList.remove("typing");
+    el.classList.add("done");
+    setTimeout(() => sigEl.classList.add("show"), 400);
+    return;
+  }
 
+  // Create drop cap span
+  const dropCap = document.createElement("span");
+  dropCap.className = "drop-cap";
+  dropCap.style.opacity = "0";
+  dropCap.style.transition = "opacity 0.5s ease";
+  dropCap.textContent = text[0];
+  el.appendChild(dropCap);
+
+  // Trigger reflow & fade in drop cap
+  setTimeout(() => {
+    dropCap.style.opacity = "1";
+  }, 50);
+
+  // Create a span to append the rest of the typing text
+  const bodySpan = document.createElement("span");
+  el.appendChild(bodySpan);
+
+  let i = 1;
   function tick() {
     if (i < text.length) {
-      el.textContent += text[i];
+      bodySpan.textContent += text[i];
       i++;
       const inner = document.getElementById("scroll-inner");
       if (inner) inner.scrollTop = inner.scrollHeight;
@@ -819,7 +931,8 @@ function typewriterEffect(el, text, sigEl) {
     }
   }
 
-  tick();
+  // Start typing after a short delay for drop cap impact
+  setTimeout(tick, 300);
 }
 
 /* ── Confetti burst ── */
@@ -886,7 +999,17 @@ function spawnConfetti() {
    ════════════════════════════════════════════════════════════ */
 function setupMusic(file, label) {
   const btn = document.getElementById("music-btn");
-  btn.textContent = label || "🎵 Happy Birthday";
+  const btnText = document.getElementById("music-btn-text");
+
+  // Clean up label if it contains the emoji, to avoid double emojis next to the music icon
+  let cleanLabel = label || "Play Birthday Song";
+  if (cleanLabel.startsWith("🎵")) {
+    cleanLabel = cleanLabel.replace(/^🎵\s*/, "");
+  }
+
+  if (btnText) {
+    btnText.textContent = cleanLabel;
+  }
 
   const audio = new Audio(file);
   audio.loop = true;
@@ -923,14 +1046,14 @@ function setupMusic(file, label) {
     audio.play()
       .then(() => {
         playing = true;
-        btn.textContent = "♪ Now Playing";
+        if (btnText) btnText.textContent = "Now Playing";
         btn.classList.add("playing");
         fadeInVolume();
       })
       .catch(() => {
         // Autoplay blocked — reset started so it can be retried on interaction
         started = false;
-        btn.textContent = label || "🎵 Happy Birthday";
+        if (btnText) btnText.textContent = cleanLabel;
       });
   }
 
@@ -938,7 +1061,7 @@ function setupMusic(file, label) {
     if (playing) {
       audio.pause();
       playing = false;
-      btn.textContent = label || "🎵 Happy Birthday";
+      if (btnText) btnText.textContent = cleanLabel;
       btn.classList.remove("playing");
       if (fadeInterval) {
         clearInterval(fadeInterval);
@@ -949,7 +1072,7 @@ function setupMusic(file, label) {
         .then(() => {
           playing = true;
           started = true;
-          btn.textContent = "♪ Now Playing";
+          if (btnText) btnText.textContent = "Now Playing";
           btn.classList.add("playing");
           fadeInVolume();
         })
@@ -988,4 +1111,199 @@ function setupMusic(file, label) {
     e.stopPropagation();
     toggleMusic();
   });
+}
+
+/* ════════════════════════════════════════════════════════════
+   POLAROID INTERACTIONS: DRAGGING & FLIPPING
+   ════════════════════════════════════════════════════════════ */
+function initPolaroids() {
+  const cards = document.querySelectorAll(".polaroid-card");
+  
+  cards.forEach((card) => {
+    let startX = 0;
+    let startY = 0;
+    let startTx = 0;
+    let startTy = 0;
+    let isDragging = false;
+    let hasMoved = false;
+    const dragThreshold = 6; // px movement threshold to count as drag
+
+    // Physics state variables for organic drag tilt/roll
+    let animId = null;
+    let currentDragRot = 0;
+    let targetDragRot = 0;
+    let lastX = 0;
+    let lastTime = 0;
+    let lastMoveTime = 0;
+
+    function updatePhysics() {
+      if (isDragging) {
+        // Muffle/decay target rotation if pointer movement has paused
+        const timeSinceLastMove = Date.now() - lastMoveTime;
+        if (timeSinceLastMove > 50) {
+          targetDragRot *= 0.85;
+        }
+        currentDragRot += (targetDragRot - currentDragRot) * 0.15;
+        card.style.setProperty("--drag-rot", currentDragRot.toFixed(2));
+        animId = requestAnimationFrame(updatePhysics);
+      } else {
+        // Smoothly spring back to rest (0) on release
+        currentDragRot += (0 - currentDragRot) * 0.15;
+        if (Math.abs(currentDragRot) < 0.05) {
+          currentDragRot = 0;
+          card.style.setProperty("--drag-rot", 0);
+          animId = null;
+        } else {
+          card.style.setProperty("--drag-rot", currentDragRot.toFixed(2));
+          animId = requestAnimationFrame(updatePhysics);
+        }
+      }
+    }
+
+    card.addEventListener("pointerdown", (e) => {
+      // Prevent bubbling so it doesn't trigger swipe-to-dismiss
+      e.stopPropagation();
+      
+      // Only drag on left click or touch
+      if (e.button !== 0 && e.pointerType === "mouse") return;
+      
+      isDragging = true;
+      hasMoved = false;
+      
+      startX = e.clientX;
+      startY = e.clientY;
+      lastX = e.clientX;
+      lastTime = Date.now();
+      lastMoveTime = Date.now();
+      targetDragRot = 0;
+      
+      // Read current values of translate overrides
+      const txVal = card.style.getPropertyValue("--tx") || "0px";
+      const tyVal = card.style.getPropertyValue("--ty") || "0px";
+      startTx = parseFloat(txVal) || 0;
+      startTy = parseFloat(tyVal) || 0;
+      
+      card.setPointerCapture(e.pointerId);
+      card.classList.add("dragging");
+
+      // Start the physics decay loop
+      if (!animId) {
+        animId = requestAnimationFrame(updatePhysics);
+      }
+    });
+
+    card.addEventListener("pointermove", (e) => {
+      if (!isDragging) return;
+      e.stopPropagation();
+      
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      
+      if (Math.hypot(dx, dy) > dragThreshold) {
+        hasMoved = true;
+      }
+      
+      card.style.setProperty("--tx", `${startTx + dx}px`);
+      card.style.setProperty("--ty", `${startTy + dy}px`);
+
+      // Dynamic tilt velocity calculation
+      const now = Date.now();
+      const dt = Math.max(1, now - lastTime);
+      const moveDx = e.clientX - lastX;
+      const velocity = moveDx / dt; // pixels per ms
+      
+      targetDragRot = velocity * 25; // Scale velocity to degrees
+      targetDragRot = Math.min(25, Math.max(-25, targetDragRot));
+      
+      lastX = e.clientX;
+      lastTime = now;
+      lastMoveTime = now;
+    });
+
+    const endDrag = (e) => {
+      if (!isDragging) return;
+      e.stopPropagation();
+      isDragging = false;
+      
+      card.releasePointerCapture(e.pointerId);
+      card.classList.remove("dragging");
+      
+      // If pointer didn't move beyond threshold, toggle flip state
+      if (!hasMoved) {
+        card.classList.toggle("flipped");
+        playFlipSound();
+      }
+
+      // Ensure spring-back animation continues running
+      if (!animId) {
+        animId = requestAnimationFrame(updatePhysics);
+      }
+    };
+
+    card.addEventListener("pointerup", endDrag);
+    card.addEventListener("pointercancel", endDrag);
+
+    // Keyboard Accessibility: Enter or Space triggers card flipping
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault(); // Prevent page scroll on Space key
+        card.classList.toggle("flipped");
+        playFlipSound();
+      }
+    });
+  });
+}
+
+/* Procedural Card Flipping Sound (Paper/cardstock friction) */
+function playFlipSound() {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    
+    const bufferSize = ctx.sampleRate * 0.22;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    // Generate pink noise approximation for a soft rustle sound
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      b3 = 0.86650 * b3 + white * 0.3104856;
+      b4 = 0.55000 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.0168980;
+      const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+      b6 = white * 0.115926;
+      
+      const decay = Math.exp(-i / (ctx.sampleRate * 0.045));
+      data[i] = pink * 0.04 * decay;
+    }
+    
+    const noiseNode = ctx.createBufferSource();
+    noiseNode.buffer = buffer;
+    
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(900, ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(320, ctx.currentTime + 0.16);
+    
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+    
+    noiseNode.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    
+    noiseNode.start();
+    
+    setTimeout(() => {
+      try { ctx.close(); } catch (err) {}
+    }, 250);
+  } catch (e) {
+    console.warn("Paper flip sound failed:", e);
+  }
 }
