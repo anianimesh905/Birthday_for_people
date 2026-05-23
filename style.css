@@ -687,7 +687,7 @@ body::before {
 
 #scroll-overlay.open { opacity: 1; pointer-events: all; }
 
-/* ── Container for Scroll and Polaroids ── */
+/* ── Container for Scroll ── */
 #scroll-container {
   position: relative;
   display: flex;
@@ -697,215 +697,6 @@ body::before {
   max-width: 460px;
   height: 100%;
   transform-style: preserve-3d;
-}
-
-/* ── Polaroid Scrapbook Cluster ── */
-#polaroid-cluster {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  transform-style: preserve-3d;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.polaroid-card {
-  position: absolute;
-  width: 180px;
-  height: 224px;
-  perspective: 1000px;
-  /* Centered base */
-  top: 50%;
-  left: 50%;
-  margin-top: -112px;
-  margin-left: -90px;
-  
-  opacity: 0;
-  pointer-events: auto;
-  
-  /* Initial state: offset slightly + dragging support */
-  --tx: 0px;
-  --ty: 0px;
-  
-  transform: translate3d(
-    calc(var(--dx) + var(--mx) * var(--px-factor) * 1px + var(--tx)),
-    calc(var(--dy) + var(--my) * var(--px-factor) * 1px + var(--ty)),
-    30px
-  ) rotate(calc(var(--rot) + var(--drag-rot, 0) * 1deg)) scale(0.6);
-  
-  transition: 
-    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.8s ease;
-  z-index: 15; /* Float in front of the letter */
-}
-
-/* Slide in polaroids when modal is opened */
-#scroll-overlay.open .polaroid-card {
-  opacity: 1;
-  transform: translate3d(
-    calc(var(--dx) + var(--mx) * var(--px-factor) * 1px + var(--tx)),
-    calc(var(--dy) + var(--my) * var(--px-factor) * 1px + var(--ty)),
-    30px
-  ) rotate(calc(var(--rot) + var(--drag-rot, 0) * 1deg)) scale(var(--ds));
-}
-
-/* Instant movement tracking during drag */
-.polaroid-card.dragging {
-  transition: opacity 0.3s ease !important;
-  z-index: 50; /* Bring to very top */
-  transform: translate3d(
-    calc(var(--dx) + var(--mx) * var(--px-factor) * 1px + var(--tx)),
-    calc(var(--dy) + var(--my) * var(--px-factor) * 1px + var(--ty)),
-    60px
-  ) rotate(calc(var(--rot) + var(--drag-rot, 0) * 1deg)) scale(1.08) !important;
-}
-
-.polaroid-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  cursor: pointer;
-}
-
-.polaroid-card.flipped .polaroid-card-inner {
-  transform: rotateY(180deg);
-}
-
-.polaroid-card-front, .polaroid-card-back {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border-radius: 2px;
-  box-shadow: 
-    0 12px 35px rgba(0,0,0,0.35),
-    0 2px 10px rgba(0,0,0,0.2),
-    inset 0 0 15px rgba(180,150,80,0.05);
-  border: 1px solid rgba(0,0,0,0.06);
-  display: flex;
-  flex-direction: column;
-}
-
-.polaroid-card-front {
-  background: #fdfdfa;
-  padding: 12px 12px 28px 12px;
-  z-index: 2;
-}
-
-.polaroid-card-back {
-  background: #fcf9f2;
-  padding: 18px 14px;
-  transform: rotateY(180deg);
-  z-index: 1;
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent 0px,
-    transparent 18px,
-    rgba(180, 150, 80, 0.1) 18px,
-    rgba(180, 150, 80, 0.1) 19px
-  );
-  justify-content: center;
-}
-
-.polaroid-back-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  justify-content: space-between;
-}
-
-.polaroid-note-date {
-  font-family: 'Jost', sans-serif;
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-mid);
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-.polaroid-note-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 0.85rem;
-  line-height: 1.45;
-  color: var(--text-dark);
-  font-weight: 500;
-  pointer-events: none;
-}
-
-@media (hover: hover) {
-  .polaroid-card:not(.dragging):hover {
-    transform: translate3d(
-      calc(var(--dx) + var(--tx)),
-      calc(var(--dy) + var(--ty)),
-      70px
-    ) rotate(0deg) scale(1.15) !important;
-    z-index: 45;
-    box-shadow: 
-      0 25px 50px rgba(245, 200, 66, 0.35),
-      0 4px 15px rgba(245, 200, 66, 0.15);
-    border-color: rgba(245, 200, 66, 0.4);
-  }
-}
-
-@media (hover: none) {
-  .polaroid-card:not(.dragging):active {
-    transform: translate3d(
-      calc(var(--dx) + var(--tx)),
-      calc(var(--dy) + var(--ty)),
-      55px
-    ) rotate(0deg) scale(1.1) !important;
-    z-index: 45;
-  }
-}
-
-.polaroid-tape {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-4deg);
-  width: 50px;
-  height: 20px;
-  background: rgba(245, 230, 200, 0.45);
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-  border-left: 1px dashed rgba(0,0,0,0.1);
-  border-right: 1px dashed rgba(0,0,0,0.1);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  pointer-events: none;
-}
-
-.polaroid-img-wrapper {
-  width: 100%;
-  aspect-ratio: 1;
-  overflow: hidden;
-  background: #2a2015;
-  border: 1px solid rgba(0,0,0,0.08);
-  margin-bottom: 10px;
-  pointer-events: none;
-}
-
-.polaroid-img-wrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  filter: sepia(0.08) contrast(1.04) saturate(0.95);
-}
-
-.polaroid-caption {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-mid);
-  text-align: center;
-  letter-spacing: 0.02em;
-  pointer-events: none;
 }
 
 /* ── The 3D Scroll Paper ── */
@@ -1212,101 +1003,7 @@ body::before {
     padding: 2.2rem 1.6rem 2.2rem 2.8rem;
   }
   
-  .polaroid-card {
-    width: 106px;
-    height: 132px;
-    margin-top: -66px;
-    margin-left: -53px;
-    transform: translate3d(
-      calc(var(--dx) + var(--mx) * var(--px-factor) * 1px + var(--tx)),
-      calc(var(--dy) + var(--my) * var(--px-factor) * 1px + var(--ty)),
-      30px
-    ) rotate(var(--rot)) scale(0.6);
-    z-index: 15; /* Front on mobile too */
-  }
-  
-  #scroll-overlay.open .polaroid-card {
-    transform: translate3d(
-      calc(var(--dx) + var(--mx) * var(--px-factor) * 1px + var(--tx)),
-      calc(var(--dy) + var(--my) * var(--px-factor) * 1px + var(--ty)),
-      30px
-    ) rotate(var(--rot)) scale(var(--ds));
-  }
 
-  .polaroid-card.dragging {
-    transform: translate3d(
-      calc(var(--dx) + var(--mx) * var(--px-factor) * 1px + var(--tx)),
-      calc(var(--dy) + var(--my) * var(--px-factor) * 1px + var(--ty)),
-      60px
-    ) rotate(var(--rot)) scale(1.05) !important;
-  }
-  
-  .polaroid-card-front {
-    padding: 6px 6px 16px 6px;
-  }
-  
-  .polaroid-card-back {
-    padding: 10px 8px;
-    background-image: repeating-linear-gradient(
-      0deg,
-      transparent 0px,
-      transparent 11px,
-      rgba(180, 150, 80, 0.1) 11px,
-      rgba(180, 150, 80, 0.1) 12px
-    );
-  }
-  
-  .polaroid-note-text {
-    font-size: 0.54rem;
-    line-height: 1.25;
-  }
-  
-  .polaroid-note-date {
-    font-size: 0.44rem;
-  }
-  
-  .polaroid-card:nth-child(1) {
-    --dx: -115px !important;
-    --dy: -200px !important;
-    --rot: -12deg !important;
-    --ds: 0.90 !important;
-  }
-  
-  .polaroid-card:nth-child(2) {
-    --dx: 115px !important;
-    --dy: -180px !important;
-    --rot: 10deg !important;
-    --ds: 0.90 !important;
-  }
-  
-  .polaroid-card:nth-child(3) {
-    --dx: 90px !important;
-    --dy: 200px !important;
-    --rot: -8deg !important;
-    --ds: 0.95 !important;
-  }
-  
-  @media (hover: none) {
-    .polaroid-card:not(.dragging):active {
-      transform: translate3d(
-        calc(var(--dx) + var(--tx)),
-        calc(var(--dy) + var(--ty)),
-        45px
-      ) rotate(0deg) scale(1.08) !important;
-      z-index: 25;
-    }
-  }
-  
-  .polaroid-caption {
-    font-size: 0.6rem;
-    margin-top: 1px;
-  }
-  
-  .polaroid-tape {
-    width: 28px;
-    height: 12px;
-    top: -7px;
-  }
 }
 
 @media (max-width: 360px) {
@@ -1316,18 +1013,7 @@ body::before {
   #scroll-paper {
     width: min(300px, 88vw);
   }
-  .polaroid-card:nth-child(1) {
-    --dx: -90px !important;
-    --dy: -160px !important;
-  }
-  .polaroid-card:nth-child(2) {
-    --dx: 90px !important;
-    --dy: -160px !important;
-  }
-  .polaroid-card:nth-child(3) {
-    --dx: -60px !important;
-    --dy: 160px !important;
-  }
+
 }
 
 /* ══════════════════════════════════════════
@@ -1433,7 +1119,6 @@ body::before {
 }
 
 @media (max-height: 550px) and (orientation: landscape) {
-  #polaroid-cluster { display: none; }
   #scroll-paper { max-height: 85dvh; }
   #scroll-inner { max-height: calc(85dvh - 10px); padding-top: 1.8rem; padding-bottom: 1.8rem; }
 }
@@ -1526,11 +1211,6 @@ body::before {
    ══════════════════════════════════════════ */
 
 /* Focus visual indicator outline rings */
-.polaroid-card:focus-visible {
-  outline: 3px solid rgba(245, 200, 66, 0.85);
-  outline-offset: 6px;
-  border-radius: 4px;
-}
 #envelope-wrapper:focus-visible {
   outline: 3px solid rgba(245, 200, 66, 0.85);
   outline-offset: 8px;
