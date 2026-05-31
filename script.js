@@ -13,9 +13,175 @@ setVh();
 window.addEventListener("orientationchange", () => setTimeout(setVh, 300));
 
 /* ════════════════════════════════════════════════════════════
-   INIT
+   PRELOADER REGISTRY & ASSETS
+   ════════════════════════════════════════════════════════════ */
+const PRELOADED_ASSETS = {};
+
+const DEFAULT_SIZES = {
+  "morning.mp4": 18330065,
+  "afternoon.mp4": 16717908,
+  "sunset.mp4": 16459212,
+  "night.mp4": 2403039,
+  "birthday.mp3": 4824920
+};
+
+async function startPreloader() {
+  const c = typeof BIRTHDAY_CONTENT !== "undefined" ? BIRTHDAY_CONTENT : {};
+  
+  // Dynamic header updates
+  const friendName = c.friendName || "Sofia";
+  const loadingTitle = document.getElementById("loading-title");
+  if (loadingTitle) {
+    loadingTitle.textContent = `For ${friendName}`;
+  }
+
+  const assets = [
+    { id: 'morningVideo', url: c.morningVideo || 'morning.mp4' },
+    { id: 'afternoonVideo', url: c.afternoonVideo || 'afternoon.mp4' },
+    { id: 'sunsetVideo', url: c.sunsetVideo || 'sunset.mp4' },
+    { id: 'nightVideo', url: c.nightVideo || 'night.mp4' },
+    { id: 'musicFile', url: c.musicFile || 'birthday.mp3' }
+  ].filter(asset => asset.url);
+
+  assets.forEach(asset => {
+    const basename = asset.url.split('/').pop();
+    asset.size = DEFAULT_SIZES[basename] || 15000000;
+  });
+
+  const totalBytes = assets.reduce((sum, asset) => sum + asset.size, 0);
+  let bytesLoaded = {};
+  assets.forEach(asset => bytesLoaded[asset.id] = 0);
+
+  const statusMessages = {
+    morningVideo: "Gathering the morning sun...",
+    afternoonVideo: "Chasing the golden afternoon sands...",
+    sunsetVideo: "Capturing the sunset over the sea...",
+    nightVideo: "Stitching the starry night together...",
+    musicFile: "Tuning the ocean melodies..."
+  };
+
+  let loadedCount = 0;
+  let preloadCompleted = false;
+
+  const fallbackTimeout = setTimeout(() => {
+    if (!preloadCompleted) {
+      console.warn("Preload timeout reached. Falling back to dynamic load.");
+      completePreloading();
+    }
+  }, 15000);
+
+  function updateProgressUI() {
+    const currentTotal = Object.values(bytesLoaded).reduce((a, b) => a + b, 0);
+    const ratio = totalBytes > 0 ? (currentTotal / totalBytes) : 1;
+    const percent = Math.min(99, Math.floor(ratio * 100));
+    
+    const progressBar = document.getElementById("loading-progress-bar");
+    const percentageLabel = document.getElementById("loading-percentage");
+    
+    if (progressBar) progressBar.style.width = `${percent}%`;
+    if (percentageLabel) percentageLabel.textContent = `${percent}%`;
+
+    let currentLoadingAsset = null;
+    for (const asset of assets) {
+      if (bytesLoaded[asset.id] < asset.size) {
+        currentLoadingAsset = asset;
+        break;
+      }
+    }
+    
+    const statusLabel = document.getElementById("loading-status");
+    if (statusLabel && currentLoadingAsset) {
+      const msg = statusMessages[currentLoadingAsset.id] || "Retrieving ocean currents...";
+      if (statusLabel.textContent !== msg) {
+        statusLabel.style.opacity = "0";
+        setTimeout(() => {
+          statusLabel.textContent = msg;
+          statusLabel.style.opacity = "1";
+        }, 150);
+      }
+    }
+  }
+
+  function completePreloading() {
+    if (preloadCompleted) return;
+    preloadCompleted = true;
+    clearTimeout(fallbackTimeout);
+
+    const progressBar = document.getElementById("loading-progress-bar");
+    const percentageLabel = document.getElementById("loading-percentage");
+    const statusLabel = document.getElementById("loading-status");
+
+    if (progressBar) progressBar.style.width = "100%";
+    if (percentageLabel) percentageLabel.textContent = "100%";
+    if (statusLabel) {
+      statusLabel.style.opacity = "0";
+      setTimeout(() => {
+        statusLabel.textContent = "Sealing the bottle with love...";
+        statusLabel.style.opacity = "1";
+      }, 150);
+    }
+
+    setTimeout(() => {
+      const loader = document.getElementById("loading-screen");
+      if (loader) {
+        loader.classList.add("fade-out");
+        setTimeout(() => {
+          loader.style.display = "none";
+          initializeMainApp();
+        }, 800);
+      } else {
+        initializeMainApp();
+      }
+    }, 800);
+  }
+
+  assets.forEach(async (asset) => {
+    try {
+      const response = await fetch(asset.url);
+      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+      
+      const reader = response.body.getReader();
+      const chunks = [];
+      let loaded = 0;
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        chunks.push(value);
+        loaded += value.length;
+        bytesLoaded[asset.id] = loaded;
+        updateProgressUI();
+      }
+      
+      const blob = new Blob(chunks);
+      const objectUrl = URL.createObjectURL(blob);
+      PRELOADED_ASSETS[asset.id] = objectUrl;
+    } catch (err) {
+      console.warn(`Failed to preload asset "${asset.id}" from URL "${asset.url}":`, err);
+      bytesLoaded[asset.id] = asset.size;
+      updateProgressUI();
+    }
+    
+    loadedCount++;
+    if (loadedCount === assets.length) {
+      completePreloading();
+    }
+  });
+
+  if (assets.length === 0) {
+    completePreloading();
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   INIT & MAIN APPLICATION ENTRY POINT
    ════════════════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
+  startPreloader();
+});
+
+function initializeMainApp() {
   if (typeof BIRTHDAY_CONTENT !== "undefined") {
     const c = BIRTHDAY_CONTENT;
     document.getElementById("friend-name").textContent = c.friendName;
@@ -52,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     { passive: false },
   );
-});
+}
 
 /* ══════════════════════════════════════════
    THEME MANAGER & SWITCHER (4-Phase)
@@ -143,6 +309,7 @@ function setTheme(themeName) {
   if (!config) return;
 
   const videoFile = c[config.video];
+  const videoSrc = PRELOADED_ASSETS[config.video] || videoFile;
   const fallbackColor = c[config.color] || "#0d1b2a";
 
   // Transition the fallback background color immediately
@@ -156,7 +323,7 @@ function setTheme(themeName) {
 
   // Handle first load vs subsequent cross-fading
   if (!oldTheme) {
-    activeVideo.src = videoFile;
+    activeVideo.src = videoSrc;
     activeVideo.load();
     activeVideo.oncanplay = () => {
       activeVideo.oncanplay = null;
@@ -171,7 +338,7 @@ function setTheme(themeName) {
   }
 
   // Setup buffer video to load the new theme video
-  bufferVideo.src = videoFile;
+  bufferVideo.src = videoSrc;
   bufferVideo.load();
   
   const playBuffer = () => {
@@ -1010,7 +1177,8 @@ function setupMusic(file, label) {
     btnText.textContent = cleanLabel;
   }
 
-  const audio = new Audio(file);
+  const audioSrc = PRELOADED_ASSETS['musicFile'] || file;
+  const audio = new Audio(audioSrc);
   audio.loop = true;
   audio.volume = 0.5;
   audio.preload = "auto";

@@ -1285,3 +1285,162 @@ body::before {
     transform: scaleY(5);
   }
 }
+
+/* ══════════════════════════════════════════
+   PRELOADING SCREEN (Sofia Edition)
+   ══════════════════════════════════════════ */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), 
+              visibility 0.8s;
+  visibility: visible;
+  opacity: 1;
+}
+
+#loading-screen.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#loading-bg {
+  position: absolute;
+  inset: -20px;
+  background: linear-gradient(135deg, #0d1b2a 0%, #15102a 35%, #2a101b 70%, #0d1b2a 100%);
+  background-size: 400% 400%;
+  animation: loadingSky 16s ease-in-out infinite;
+  filter: blur(10px);
+  z-index: 0;
+}
+
+@keyframes loadingSky {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+#loading-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.6),
+    inset 0 0 20px rgba(255, 255, 255, 0.02);
+  border-radius: 24px;
+  padding: 3.5rem 2.2rem;
+  width: min(390px, 88vw);
+  text-align: center;
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  transform: scale(1) translateY(0);
+}
+
+#loading-screen.fade-out #loading-card {
+  transform: scale(1.08) translateY(-30px);
+}
+
+.loading-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 2.2rem;
+  color: var(--gold);
+  filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.35));
+  animation: loadingSpin 9s linear infinite;
+}
+
+@keyframes loadingSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+#loading-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.6rem, 5.5vw, 2.2rem);
+  font-weight: 500;
+  font-style: italic;
+  color: #fff;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.4rem;
+  text-shadow: 0 0 12px rgba(255,255,255,0.15);
+}
+
+#loading-subtitle {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 300;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+#loading-progress-container {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  margin: 2.4rem auto 0.8rem;
+  position: relative;
+  overflow: visible;
+}
+
+#loading-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold) 0%, #ffd770 100%);
+  border-radius: 10px;
+  position: relative;
+  transition: width 0.25s cubic-bezier(0.1, 0.8, 0.2, 1);
+  box-shadow: 
+    0 0 12px rgba(245, 200, 66, 0.7),
+    0 0 24px rgba(245, 200, 66, 0.3);
+}
+
+#loading-progress-sparkle {
+  position: absolute;
+  right: -6px;
+  top: -4.5px;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 
+    0 0 12px #fff,
+    0 0 25px 4px var(--gold);
+  animation: sparkleScale 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes sparkleScale {
+  0% { transform: scale(0.85); }
+  100% { transform: scale(1.2); }
+}
+
+#loading-percentage {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.02em;
+}
+
+#loading-status {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.75);
+  min-height: 1.5em;
+  transition: opacity 0.3s ease;
+}
