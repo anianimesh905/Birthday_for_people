@@ -689,6 +689,9 @@ function initMagicParticles(opts = {}) {
       p.rotation = rand(0, Math.PI * 2); 
       p.spin = rand(-0.12, 0.12);
     }
+    if (typeof startLoop === 'function') {
+      startLoop();
+    }
   }
 
   function spawnOrb() {
@@ -867,6 +870,14 @@ function initMagicParticles(opts = {}) {
     ctx.restore();
   }
 
+  let isLoopRunning = false;
+  function startLoop() {
+    if (isLoopRunning) return;
+    isLoopRunning = true;
+    lastTime = performance.now();
+    rafId = requestAnimationFrame(loop);
+  }
+
   window.addEventListener('envelopeTapped', (e) => {
     const detail = e.detail || {};
     const bx = typeof detail.x === 'number' ? detail.x : canvas.width / 2;
@@ -894,42 +905,48 @@ function initMagicParticles(opts = {}) {
         emitted++;
       }
     }
+    startLoop();
   });
 
-  window.addEventListener('click', (e) => {
-    spawnSparkCluster(e.clientX, e.clientY, 5, true);
-  }, { passive: true });
-
-  window.addEventListener('touchend', (e) => {
-    if (e.changedTouches && e.changedTouches.length > 0) {
-      spawnSparkCluster(e.changedTouches[0].clientX, e.changedTouches[0].clientY, 4, true);
-    }
-  }, { passive: true });
+  // Removed global click and touch spark spawn animations to optimize Android/mobile scrolling performance
 
   let lastTime = 0;
   let rafId = null;
 
   function loop(now) {
-    rafId = requestAnimationFrame(loop);
     const dt = Math.min((now - lastTime) / 1000, 0.1);
     lastTime = now;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    tickSpawner(now);
+    
+    if (!IS_MOBILE) {
+      tickSpawner(now);
+    }
+    
+    let activeCount = 0;
     for (let i = 0; i < particles.length; i++) {
       if (particles[i].active) {
         updateParticle(particles[i], dt);
         drawParticle(particles[i]);
+        activeCount++;
       }
     }
+
+    if (activeCount === 0 && (IS_MOBILE || !document.hasFocus())) {
+      isLoopRunning = false;
+      rafId = null;
+      return;
+    }
+
+    rafId = requestAnimationFrame(loop);
   }
 
-  rafId = requestAnimationFrame((now) => { 
-    lastTime = now; 
-    loop(now); 
-  });
+  if (!IS_MOBILE) {
+    startLoop();
+  }
 
   window._destroyMagicParticles = function () {
     if (rafId) cancelAnimationFrame(rafId);
+    isLoopRunning = false;
     canvas.remove();
     window.removeEventListener('resize', resizeCanvas);
     delete window._destroyMagicParticles;
@@ -1438,10 +1455,10 @@ function initEnvelope() {
       } catch (err) {}
     }
 
-    // Top flap rotates open, letter rises
+    // Top flap rotates open, letter rises (40ms response delay)
     setTimeout(() => {
       envelope.classList.add("open");
-    }, 120);
+    }, 40);
 
     if (hint) {
       hint.style.transition = "opacity 0.5s ease";
@@ -1458,7 +1475,7 @@ function initEnvelope() {
       }
     }));
 
-    // Scroll open modal sequence
+    // Scroll open modal sequence (snappy 450ms transition instead of 900ms)
     setTimeout(() => {
       overlay.classList.add("open");
       startAmbientWaves();
@@ -1476,7 +1493,7 @@ function initEnvelope() {
             }
           }));
         }
-      }, 300);
+      }, 100);
 
       spawnConfetti();
 
@@ -1490,8 +1507,8 @@ function initEnvelope() {
       const houseCfg = HOUSES[_currentHouse] || HOUSES.gryffindor;
       const msg = c2[houseCfg.message] || c2.slytherinMessage || '';
 
-      setTimeout(() => revealHogwartsLetter(msgEl, msg, sigEl), 600);
-    }, 900);
+      setTimeout(() => revealHogwartsLetter(msgEl, msg, sigEl), 200);
+    }, 450);
   }
 
   function closeModal() {
@@ -1613,11 +1630,22 @@ async function startPreloader() {
     loadingTitle.textContent = `For ${friendName}`;
   }
 
+  // Identify active house to only preload its video on startup (others load on demand)
+  const savedHouse = sessionStorage.getItem('selectedHouse');
+  const defaultHouse = ((c && c.defaultHouse) || 'Slytherin').toLowerCase();
+  const activeHouse = (savedHouse || defaultHouse).toLowerCase();
+
+  const houseVideoMap = {
+    gryffindor: 'gryffindorVideo',
+    slytherin:  'slytherinVideo',
+    ravenclaw:  'ravenclawVideo',
+    hufflepuff: 'hufflepuffVideo'
+  };
+  const activeVideoId = houseVideoMap[activeHouse] || 'slytherinVideo';
+  const activeVideoUrl = c[activeVideoId] || `videos/${activeHouse}.mp4`;
+
   const assets = [
-    { id: 'gryffindorVideo', url: c.gryffindorVideo || 'videos/gryffindor.mp4' },
-    { id: 'slytherinVideo',  url: c.slytherinVideo  || 'videos/slytherin.mp4'  },
-    { id: 'ravenclawVideo',  url: c.ravenclawVideo  || 'videos/ravenclaw.mp4'  },
-    { id: 'hufflepuffVideo', url: c.hufflepuffVideo || 'videos/hufflepuff.mp4' },
+    { id: activeVideoId, url: activeVideoUrl },
     { id: 'musicFile',       url: c.musicFile       || 'birthday.mp3'         }
   ].filter(asset => asset.url);
 
