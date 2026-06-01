@@ -721,9 +721,9 @@ body::before {
 #scroll-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(6,3,1,0.72);
-  backdrop-filter: blur(16px) saturate(0.7);
-  -webkit-backdrop-filter: blur(16px) saturate(0.7);
+  background: rgba(6,3,1,0.65);
+  backdrop-filter: blur(6px) saturate(0.8);
+  -webkit-backdrop-filter: blur(6px) saturate(0.8);
   z-index: 200;
   display: flex;
   align-items: center;
@@ -905,8 +905,8 @@ body::before {
 
 .hogwarts-headmistress {
   font-family   : 'IM Fell English', serif;
-  font-size     : 0.78rem;
-  color         : #6B4A1E;
+  font-size     : 0.88rem;
+  color         : #4A3319; /* Rich brown contrast */
   margin        : 0 0 0.55rem;
   line-height   : 1.5;
 }
@@ -923,11 +923,11 @@ body::before {
 .hogwarts-motto-sub {
   font-family  : 'IM Fell English', serif;
   font-style   : italic;
-  font-size    : 0.68rem;
-  color        : #7A5C2E;
-  letter-spacing: 0.04em;
+  font-size    : 0.88rem; /* Increased size for Android readability */
+  color        : #3E2714; /* Darker tone for better contrast against parchment background */
+  letter-spacing: 0.08em;
   margin       : 0;
-  opacity      : 0.78;
+  opacity      : 0.95;    /* Higher opacity for clear visibility */
 }
 
 /* Personal Salutation */
@@ -971,6 +971,19 @@ body::before {
   overflow      : hidden;
   text-align    : justify;
   text-justify  : inter-word;
+  opacity       : 0;
+  animation     : letterFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes letterFadeIn {
+  from {
+    opacity   : 0;
+    transform : translateY(12px);
+  }
+  to {
+    opacity   : 1;
+    transform : translateY(0);
+  }
 }
 
 #scroll-message p {

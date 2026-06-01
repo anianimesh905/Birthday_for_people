@@ -294,57 +294,60 @@ function stopAmbientWaves() {
 }
 
 /* ── Paragraph-Aware Stagger Reveal & Drop Cap ── */
-function _injectDropCapAndStagger(el, text, intervalMs) {
+function _injectDropCapAndRender(el, text) {
   if (!el || !text) return;
   el.innerHTML = '';
 
   const paragraphs = text.split('\n').filter(p => p.trim() !== '');
-  let globalDelay = 0;
-  const BASE_DELAY_MS = intervalMs || 80;
+  const dropCapParaIdx = paragraphs.length > 1 ? 1 : 0;
 
   paragraphs.forEach((para, pIdx) => {
     const pEl = document.createElement('p');
-    pEl.style.marginBottom = '0.9em';
-    pEl.style.position = 'relative';
-    pEl.style.zIndex  = '1';
 
-    const words  = para.split(/\s+/).filter(Boolean);
-    let startIdx = 0;
-
-    // Inject drop cap only on the very first paragraph
-    if (pIdx === 0 && words[0] && words[0].length > 0) {
-      const capEl = document.createElement('span');
-      capEl.className = 'drop-cap';
-      capEl.textContent = words[0][0];
-      pEl.appendChild(capEl);
-
-      const restOfFirst = words[0].slice(1);
-      if (restOfFirst) {
-        const rSpan = document.createElement('span');
-        rSpan.className = 'word-reveal';
-        rSpan.style.animationDelay = `${globalDelay * BASE_DELAY_MS}ms`;
-        rSpan.innerHTML = _escapeHtml(restOfFirst);
-        pEl.appendChild(rSpan);
-        globalDelay++;
-      }
-      
-      if (words.length > 1) {
-        pEl.appendChild(document.createTextNode(' '));
-      }
-      startIdx = 1;
+    // Right-align the closing and signature lines at the end of the letter
+    if (pIdx === paragraphs.length - 1) {
+      pEl.style.textAlign = 'right';
+      pEl.style.marginTop = '1.2em';
+      pEl.style.fontStyle = 'italic';
+      pEl.style.paddingRight = '5%';
+      pEl.textContent = para;
+      el.appendChild(pEl);
+      return;
+    } else if (pIdx === paragraphs.length - 2 && para.trim().startsWith('With') && para.length < 80) {
+      pEl.style.textAlign = 'right';
+      pEl.style.fontStyle = 'italic';
+      pEl.style.paddingRight = '5%';
+      pEl.textContent = para;
+      el.appendChild(pEl);
+      return;
     }
 
-    for (let i = startIdx; i < words.length; i++) {
-      const wSpan = document.createElement('span');
-      wSpan.className = 'word-reveal';
-      wSpan.style.animationDelay = `${globalDelay * BASE_DELAY_MS}ms`;
-      wSpan.innerHTML = _escapeHtml(words[i]);
-      pEl.appendChild(wSpan);
-      
-      if (i < words.length - 1) {
-        pEl.appendChild(document.createTextNode(' '));
+    // Apply drop cap to the first body paragraph
+    if (pIdx === dropCapParaIdx) {
+      const words = para.split(/\s+/).filter(Boolean);
+      if (words[0] && words[0].length > 0) {
+        const capEl = document.createElement('span');
+        capEl.className = 'drop-cap';
+        capEl.textContent = words[0][0];
+        pEl.appendChild(capEl);
+
+        const restOfFirst = words[0].slice(1);
+        if (restOfFirst) {
+          const rSpan = document.createElement('span');
+          rSpan.textContent = restOfFirst;
+          pEl.appendChild(rSpan);
+        }
+
+        if (words.length > 1) {
+          pEl.appendChild(document.createTextNode(' '));
+        }
+
+        for (let i = 1; i < words.length; i++) {
+          pEl.appendChild(document.createTextNode(words[i] + (i < words.length - 1 ? ' ' : '')));
+        }
       }
-      globalDelay++;
+    } else {
+      pEl.textContent = para;
     }
 
     el.appendChild(pEl);
@@ -353,25 +356,24 @@ function _injectDropCapAndStagger(el, text, intervalMs) {
 
 function revealHogwartsLetter(msgEl, text, sigEl) {
   if (!msgEl) return;
-  _injectDropCapAndStagger(msgEl, text || '', 80);
+  
+  // Re-trigger fade-in animation by removing and adding class/animation
+  msgEl.style.animation = 'none';
+  void msgEl.offsetHeight; // trigger reflow
+  msgEl.style.animation = 'letterFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards';
 
-  const wordCount = (text || '').split(/\s+/).length;
-  const totalDuration = wordCount * 80 + 400;
+  // Render letter text immediately with drop cap
+  _injectDropCapAndRender(msgEl, text || '');
 
+  // Hide duplicate signature element
   if (sigEl) {
-    sigEl.style.opacity = '0';
-    sigEl.style.transition = 'opacity 0.6s ease';
-    sigEl.textContent = window._bdSender || '';
-    setTimeout(() => { sigEl.style.opacity = '1'; }, totalDuration);
+    sigEl.style.display = 'none';
   }
 
-  // Handle auto-scroll down for long letters as they print
+  // Reset scroll position to top
   const inner = document.getElementById('scroll-inner');
   if (inner) {
-    const scrollInterval = setInterval(() => {
-      inner.scrollTop = inner.scrollHeight;
-    }, 120);
-    setTimeout(() => clearInterval(scrollInterval), totalDuration + 200);
+    inner.scrollTop = 0;
   }
 }
 
@@ -1400,6 +1402,14 @@ function initEnvelope() {
         if (paper) {
           paper.classList.add("unfolded");
           playScrollSound();
+          
+          // Trigger a dynamic sparkle burst centered on screen "with a bang" when paper unfolds
+          window.dispatchEvent(new CustomEvent('envelopeTapped', {
+            detail: {
+              x: window.innerWidth / 2,
+              y: window.innerHeight / 2
+            }
+          }));
         }
       }, 300);
       return;
@@ -1456,17 +1466,23 @@ function initEnvelope() {
         if (paper) {
           paper.classList.add("unfolded");
           playScrollSound();
+          
+          // Trigger a dynamic sparkle burst centered on screen "with a bang" when paper unfolds
+          window.dispatchEvent(new CustomEvent('envelopeTapped', {
+            detail: {
+              x: window.innerWidth / 2,
+              y: window.innerHeight / 2
+            }
+          }));
         }
       }, 300);
 
       spawnConfetti();
 
-      // Salutation mapping
+      // Hide duplicate scroll-title
       const titleEl = document.getElementById('scroll-title');
       if (titleEl) {
-        const nameSpan = titleEl.querySelector('#friend-name');
-        const c = window._bdContent || {};
-        if (nameSpan) nameSpan.textContent = c.friendName || '';
+        titleEl.style.display = 'none';
       }
 
       const c2 = window._bdContent || {};
@@ -1524,11 +1540,10 @@ function initEnvelope() {
       const houseCfg = HOUSES[newHouse] || HOUSES.gryffindor;
       const msg = c2[houseCfg.message] || c2.slytherinMessage || '';
       
-      // Update friend name salutation
+      // Ensure duplicate scroll-title remains hidden
       const titleEl = document.getElementById('scroll-title');
       if (titleEl) {
-        const nameSpan = titleEl.querySelector('#friend-name');
-        if (nameSpan) nameSpan.textContent = c2.friendName || '';
+        titleEl.style.display = 'none';
       }
       
       revealHogwartsLetter(msgEl, msg, sigEl);
