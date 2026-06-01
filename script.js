@@ -161,6 +161,7 @@ let waveModInterval = null;
 let waveCleanupTimeoutId = null;
 
 function startAmbientWaves() {
+  return; // Disabled per user request to silence ambient background video audio
   try {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextClass) return;

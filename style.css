@@ -901,6 +901,17 @@ body::before {
   text-shadow     : 0 1px 3px rgba(0,0,0,0.15);
   margin          : 0 0 0.25rem;
   line-height     : 1.4;
+  transition      : color 0.4s ease;
+}
+
+.theme-slytherin .hogwarts-school-name {
+  color: #1A472A !important; /* Slytherin dark green */
+  text-shadow: none;
+}
+
+.theme-ravenclaw .hogwarts-school-name {
+  color: #0E1A40 !important; /* Ravenclaw dark blue */
+  text-shadow: none;
 }
 
 .hogwarts-headmistress {
@@ -1019,6 +1030,27 @@ body::before {
   opacity         : 1 !important;
   animation       : none !important;
   padding-right   : 0.04em;
+  transition      : color 0.4s ease;
+}
+
+.theme-slytherin .drop-cap {
+  color: #1A472A !important; /* Slytherin dark green */
+  text-shadow: none;
+}
+
+.theme-ravenclaw .drop-cap {
+  color: #0E1A40 !important; /* Ravenclaw dark blue */
+  text-shadow: none;
+}
+
+.theme-gryffindor .drop-cap {
+  color: #740001 !important; /* Gryffindor dark red */
+  text-shadow: none;
+}
+
+.theme-gryffindor .hogwarts-school-name {
+  color: #740001 !important; /* Gryffindor dark red */
+  text-shadow: none;
 }
 
 /* Word Reveal Stagger Animation */
