@@ -1,0 +1,401 @@
+<!-- ═══════════════════════════════════════════════════════════
+     1. HTML — Replace contents of #theme-switcher-panel
+     ═══════════════════════════════════════════════════════════ -->
+
+<div id="theme-switcher-panel">
+
+  <button class="house-badge" data-house="gryffindor" aria-label="Select Gryffindor">
+    <span class="badge-emoji">🦁</span>
+    <span class="badge-name">Gryffindor</span>
+  </button>
+
+  <button class="house-badge" data-house="slytherin" aria-label="Select Slytherin">
+    <span class="badge-emoji">🐍</span>
+    <span class="badge-name">Slytherin</span>
+  </button>
+
+  <button class="house-badge" data-house="ravenclaw" aria-label="Select Ravenclaw">
+    <span class="badge-emoji">🦅</span>
+    <span class="badge-name">Ravenclaw</span>
+  </button>
+
+  <button class="house-badge" data-house="hufflepuff" aria-label="Select Hufflepuff">
+    <span class="badge-emoji">🦡</span>
+    <span class="badge-name">Hufflepuff</span>
+  </button>
+
+</div>
+
+<!-- Toast notification — direct child of <body>, NOT inside the panel -->
+<div id="house-toast" aria-live="polite" aria-atomic="true"></div>
+
+
+/* ═══════════════════════════════════════════════════════════
+   2. CSS — Paste into your main stylesheet or house-selector.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Panel ─────────────────────────────────────────────── */
+#theme-switcher-panel {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(10, 8, 20, 0.75);
+  border: 1px solid rgba(211, 166, 37, 0.4);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 9999;
+}
+
+/* ── Badge base ─────────────────────────────────────────── */
+.house-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  outline: none;
+}
+
+.badge-emoji {
+  font-size: 1.6rem;
+  display: block;
+  line-height: 1;
+}
+
+.badge-name {
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Cinzel', 'Palatino Linotype', serif;
+}
+
+/* ── Active states (per house) ──────────────────────────── */
+.house-badge[data-house="gryffindor"].active {
+  border-color: #D3A625;
+  box-shadow: 0 0 14px rgba(211, 166, 37, 0.7), inset 0 0 8px rgba(116, 0, 1, 0.4);
+  background: rgba(116, 0, 1, 0.3);
+}
+
+.house-badge[data-house="slytherin"].active {
+  border-color: #AAAAAA;
+  box-shadow: 0 0 14px rgba(170, 170, 170, 0.6), inset 0 0 8px rgba(26, 71, 42, 0.5);
+  background: rgba(26, 71, 42, 0.35);
+}
+
+.house-badge[data-house="ravenclaw"].active {
+  border-color: #946B2D;
+  box-shadow: 0 0 14px rgba(148, 107, 45, 0.7), inset 0 0 8px rgba(14, 26, 64, 0.5);
+  background: rgba(14, 26, 64, 0.4);
+}
+
+.house-badge[data-house="hufflepuff"].active {
+  border-color: #ECB939;
+  box-shadow: 0 0 14px rgba(236, 185, 57, 0.8), inset 0 0 8px rgba(42, 42, 42, 0.3);
+  background: rgba(180, 140, 30, 0.25);
+}
+
+/* ── Keyframes ──────────────────────────────────────────── */
+
+/* Shimmer sweep on hover */
+@keyframes badgeShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.house-badge:hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: badgeShimmer 0.8s ease-in-out;
+  pointer-events: none;
+}
+
+/* Emoji spin on select */
+@keyframes emojiSpin {
+  0%   { transform: rotate(0deg)   scale(1);   }
+  50%  { transform: rotate(180deg) scale(1.3); }
+  100% { transform: rotate(360deg) scale(1);   }
+}
+
+.badge-emoji.spinning {
+  animation: emojiSpin 0.4s ease-out forwards;
+}
+
+/* Pulse glow on active badge */
+@keyframes glowPulse {
+  0%, 100% { opacity: 1;   }
+  50%       { opacity: 0.6; }
+}
+
+.house-badge.active {
+  animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+/* ── Toast ──────────────────────────────────────────────── */
+#house-toast {
+  position: fixed;
+  bottom: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.7rem 1.4rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-family: 'Cinzel', 'Palatino Linotype', serif;
+  color: #fff;
+  white-space: nowrap;
+  z-index: 10000;
+  transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+  opacity: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+#house-toast.visible {
+  bottom: 2rem;
+  opacity: 1;
+}
+
+/* ── Video crossfade support ────────────────────────────── */
+/* Add this to your existing #bg-video rule */
+#bg-video {
+  transition: opacity 0.3s ease;
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// 3. JavaScript — Save as house-selector.js, link before </body>
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Hogwarts House Selector
+ * Requires: siteContent to be available as window.siteContent
+ * Dispatches: CustomEvent 'houseChanged' with { house, primary, accent }
+ */
+
+const HOUSES = {
+  gryffindor: {
+    emoji: '🦁',
+    label: 'Gryffindor',
+    primary: '#740001',
+    accent: '#D3A625',
+    toastBg: 'rgba(116,0,1,0.92)',
+    toastColor: '#ffffff',
+    videoSrc: null,
+  },
+  slytherin: {
+    emoji: '🐍',
+    label: 'Slytherin',
+    primary: '#1A472A',
+    accent: '#AAAAAA',
+    toastBg: 'rgba(26,71,42,0.92)',
+    toastColor: '#ffffff',
+    videoSrc: null,
+  },
+  ravenclaw: {
+    emoji: '🦅',
+    label: 'Ravenclaw',
+    primary: '#0E1A40',
+    accent: '#946B2D',
+    toastBg: 'rgba(14,26,64,0.92)',
+    toastColor: '#ffffff',
+    videoSrc: null,
+  },
+  hufflepuff: {
+    emoji: '🦡',
+    label: 'Hufflepuff',
+    primary: '#ECB939',
+    accent: '#2A2A2A',
+    toastBg: 'rgba(236,185,57,0.95)',
+    toastColor: '#1a1a1a', // dark text — gold bg is too light for white
+    videoSrc: null,
+  },
+};
+
+let toastTimer = null;
+
+/**
+ * Show a 2-second slide-up toast with house branding.
+ */
+function showHouseToast(house) {
+  const toast = document.getElementById('house-toast');
+  if (!toast) return;
+
+  toast.textContent = `The Sorting Hat has chosen… ${house.label}! ${house.emoji}`;
+  toast.style.background = house.toastBg;
+  toast.style.color = house.toastColor;
+  toast.style.borderColor = house.accent + '66'; // ~40% opacity border
+
+  clearTimeout(toastTimer);
+  toast.classList.remove('visible');
+  void toast.offsetWidth; // force reflow to restart transition
+  toast.classList.add('visible');
+
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), 2000);
+}
+
+/**
+ * Core house switching logic.
+ * @param {string} houseName  - one of: gryffindor | slytherin | ravenclaw | hufflepuff
+ * @param {object} options
+ * @param {boolean} options.showToast - show the Sorting Hat toast (default true)
+ * @param {boolean} options.spin      - spin the badge emoji (default true)
+ */
+function selectHouse(houseName, { showToast = true, spin = true } = {}) {
+  const house = HOUSES[houseName];
+  if (!house) {
+    console.warn(`[hp-house-selector] Unknown house: "${houseName}"`);
+    return;
+  }
+
+  // 1. Update active class on all badges
+  document.querySelectorAll('.house-badge').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.house === houseName);
+  });
+
+  // 2. Spin the selected badge emoji
+  if (spin) {
+    const emojiEl = document.querySelector(
+      `.house-badge[data-house="${houseName}"] .badge-emoji`
+    );
+    if (emojiEl) {
+      emojiEl.classList.remove('spinning');
+      void emojiEl.offsetWidth; // reflow — restart animation if re-selecting same house
+      emojiEl.classList.add('spinning');
+      emojiEl.addEventListener(
+        'animationend',
+        () => emojiEl.classList.remove('spinning'),
+        { once: true }
+      );
+    }
+  }
+
+  // 3. Crossfade background video
+  const video = document.getElementById('bg-video');
+  if (video && house.videoSrc) {
+    video.style.opacity = '0';
+    setTimeout(() => {
+      video.src = house.videoSrc;
+      video.load();
+      video.play().catch(() => {
+        // Silently ignore autoplay policy blocks — fallback color handles it
+      });
+      video.style.opacity = '1';
+    }, 300); // matches CSS opacity transition duration
+  }
+
+  // 4. Update envelope seal color
+  const seal = document.getElementById('env-seal');
+  if (seal) seal.style.backgroundColor = house.primary;
+
+  // 5. Swap body theme class
+  const bodyClasses = Array.from(document.body.classList).filter(
+    c => !c.startsWith('theme-')
+  );
+  document.body.className = bodyClasses.join(' ');
+  document.body.classList.add(`theme-${houseName}`);
+
+  // 6. Toast notification
+  if (showToast) showHouseToast(house);
+
+  // 7. Notify particle system (and any other listeners)
+  document.dispatchEvent(
+    new CustomEvent('houseChanged', {
+      bubbles: true,
+      detail: {
+        house: houseName,
+        primary: house.primary,
+        accent: house.accent,
+      },
+    })
+  );
+}
+
+/**
+ * Initialise the selector.
+ * Reads videoSrc paths from siteContent config, wires click listeners,
+ * and activates the defaultHouse silently on page load.
+ */
+function initHouseSelector(cfg = {}) {
+  // Hydrate video sources from siteContent
+  HOUSES.gryffindor.videoSrc = cfg.gryffindorVideo ? `videos/${cfg.gryffindorVideo}` : null;
+  HOUSES.slytherin.videoSrc  = cfg.slytherinVideo  ? `videos/${cfg.slytherinVideo}`  : null;
+  HOUSES.ravenclaw.videoSrc  = cfg.ravenclawVideo  ? `videos/${cfg.ravenclawVideo}`  : null;
+  HOUSES.hufflepuff.videoSrc = cfg.hufflepuffVideo ? `videos/${cfg.hufflepuffVideo}` : null;
+
+  // Wire badge click listeners
+  document.querySelectorAll('.house-badge').forEach(btn => {
+    btn.addEventListener('click', () => selectHouse(btn.dataset.house));
+  });
+
+  // Activate default house without toast or spin (silent initial load)
+  const defaultHouse = (cfg.defaultHouse || 'gryffindor').toLowerCase();
+  selectHouse(defaultHouse, { showToast: false, spin: false });
+}
+
+// Bootstrap on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  initHouseSelector(window.siteContent || {});
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   Integration Notes
+   ═══════════════════════════════════════════════════════════
+
+HTML
+  Replace the ENTIRE contents of your existing #theme-switcher-panel div
+  with the HTML block above. Add the <div id="house-toast"> as a direct child
+  of <body> — it must NOT be nested inside the panel.
+
+CSS
+  Paste into your main stylesheet or save as house-selector.css and add:
+    <link rel="stylesheet" href="house-selector.css">
+  in your <head>. For the Cinzel font, also add:
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
+  Important: add `transition: opacity 0.3s ease;` to your existing #bg-video CSS
+  rule so the crossfade works.
+
+JavaScript
+  Save as house-selector.js and add before </body>:
+    <script src="house-selector.js"></script>
+  This must load AFTER your content.js so window.siteContent is already set.
+  If you're using ES modules (import/export), add `export { selectHouse }` at
+  the bottom so other scripts can call it directly.
+
+Particle system integration
+  In your particles script, listen for the custom event:
+
+    document.addEventListener('houseChanged', (e) => {
+      const { house, primary, accent } = e.detail;
+      // e.g. updateParticleColors(primary, accent);
+    });
+
+Videos
+  Make sure you have these files in your /videos/ folder (matching your content.js):
+    gryffindor.mp4, slytherin.mp4, ravenclaw.mp4, hufflepuff.mp4
+  The fallback colors from content.js (gryffindorFallbackColor etc.) will show
+  automatically when videos can't load, via the body.theme-* class + CSS.
+*/

@@ -1,0 +1,419 @@
+// ═══════════════════════════════════════════════════════════════════
+// 1. JavaScript — initVideoBackground()
+//    REPLACES the getHours() time-switch block in your script.js
+//
+//    DELETE this entire section from your existing script.js:
+//      const hour = new Date().getHours();
+//      switch(true) {
+//        case (hour >= 6 && hour < 12):  videoSrc = BIRTHDAY_CONTENT.morningVideo;   break;
+//        case (hour >= 12 && hour < 17): videoSrc = BIRTHDAY_CONTENT.afternoonVideo; break;
+//        case (hour >= 17 && hour < 20): videoSrc = BIRTHDAY_CONTENT.sunsetVideo;    break;
+//        default:                        videoSrc = BIRTHDAY_CONTENT.nightVideo;     break;
+//      }
+//    Then paste initVideoBackground() below in its place and call it from
+//    your DOMContentLoaded handler.
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * initVideoBackground(cfg)
+ *
+ * Loads the correct Hogwarts house video on page start, then crossfades
+ * to a new video whenever the houseChanged event fires.
+ *
+ * Falls back to an animated gradient if no video file is found or the
+ * file fails to load — the site always looks beautiful, video or not.
+ *
+ * @param {object} cfg - window.siteContent (from content.js)
+ */
+function initVideoBackground(cfg = {}) {
+  const video = document.getElementById('bg-video');
+  if (!video) return;
+
+  // Set up the fade-out transition duration (fade-in is set dynamically)
+  video.style.transition = 'opacity 0.4s ease';
+
+  // Map each house name to its video file path.
+  // Paths are relative to the HTML file — adjust the 'videos/' prefix if needed.
+  const VIDEO_MAP = {
+    gryffindor: cfg.gryffindorVideo ? `videos/${cfg.gryffindorVideo}` : null,
+    slytherin:  cfg.slytherinVideo  ? `videos/${cfg.slytherinVideo}`  : null,
+    ravenclaw:  cfg.ravenclawVideo  ? `videos/${cfg.ravenclawVideo}`  : null,
+    hufflepuff: cfg.hufflepuffVideo ? `videos/${cfg.hufflepuffVideo}` : null,
+  };
+
+  // Track the current house to skip redundant reloads
+  let currentHouse = null;
+
+  /**
+   * Apply the animated gradient fallback for a given house.
+   * Hides the <video> element and shows the gradient on the container instead.
+   */
+  function applyFallback(houseName) {
+    video.style.opacity = '0'; // hide broken video element
+
+    // Target the video container — adjust this selector to match your site's HTML
+    const container =
+      document.getElementById('bg-video-container') ||
+      document.getElementById('video-container')    ||
+      document.querySelector('.video-bg-wrap')      ||
+      document.body;
+
+    container.classList.remove(
+      'fallback-gryffindor',
+      'fallback-slytherin',
+      'fallback-ravenclaw',
+      'fallback-hufflepuff'
+    );
+    container.classList.add(`fallback-${houseName}`);
+  }
+
+  /**
+   * Load and play the video for a given house.
+   * @param {string}  houseName - one of: gryffindor | slytherin | ravenclaw | hufflepuff
+   * @param {boolean} animate   - crossfade (true) or instant load (false for page load)
+   */
+  function loadHouseVideo(houseName, animate = true) {
+    if (houseName === currentHouse) return; // already showing this house
+    currentHouse = houseName;
+
+    const src = VIDEO_MAP[houseName];
+
+    // Clear any active gradient fallback — we're attempting a real video
+    const container =
+      document.getElementById('bg-video-container') ||
+      document.getElementById('video-container')    ||
+      document.querySelector('.video-bg-wrap')      ||
+      document.body;
+
+    container.classList.remove(
+      'fallback-gryffindor',
+      'fallback-slytherin',
+      'fallback-ravenclaw',
+      'fallback-hufflepuff'
+    );
+
+    // Reassign onerror for this specific load (avoids stacking multiple listeners)
+    video.onerror = () => applyFallback(houseName);
+
+    // No video file configured for this house — jump straight to fallback
+    if (!src) {
+      applyFallback(houseName);
+      return;
+    }
+
+    if (animate) {
+      // ── Step 1: Fade current video out over 400ms ──────────────
+      video.style.transition = 'opacity 0.4s ease';
+      video.style.opacity = '0';
+
+      setTimeout(() => {
+        // ── Step 2: Swap the source ────────────────────────────
+        video.src = src;
+        video.load();
+
+        // ── Step 3: Fade new video in over 600ms ──────────────
+        video.style.transition = 'opacity 0.6s ease';
+        video.style.opacity = '1';
+
+        video.play().catch(() => applyFallback(houseName));
+
+        // Restore faster fade-out transition for next switch
+        video.addEventListener(
+          'canplay',
+          () => { video.style.transition = 'opacity 0.4s ease'; },
+          { once: true }
+        );
+      }, 400); // matches the 0.4s fade-out duration
+
+    } else {
+      // ── Initial page load: no animation, just play ─────────────
+      video.src = src;
+      video.load();
+      video.style.opacity = '1';
+      video.play().catch(() => applyFallback(houseName));
+    }
+  }
+
+  // ── Listen for house selection events (from hp-house-selector-ui) ──
+  document.addEventListener('houseChanged', (e) => {
+    const house = (e.detail && e.detail.house) ? e.detail.house : 'gryffindor';
+    loadHouseVideo(house, true);
+  });
+
+  // ── Initial load on page open ───────────────────────────────────
+  const defaultHouse = (cfg.defaultHouse || 'gryffindor').toLowerCase();
+  loadHouseVideo(defaultHouse, false);
+}
+
+// ── Bootstrap ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initVideoBackground(window.siteContent || {});
+});
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   2. CSS — House gradient fallback animations
+      Paste into your main stylesheet or a new video-bg.css file.
+      These run when a house video file is missing or fails to load.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Gryffindor: deep red → golden brown → dark gold → deep red ─── */
+@keyframes gradGryffindor {
+  0%   { background-position: 0% 50%;   }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%;   }
+}
+
+.fallback-gryffindor {
+  background-image: linear-gradient(
+    135deg,
+    #3d0000,
+    #740001,
+    #8B4513,
+    #D3A625,
+    #8B4513,
+    #740001,
+    #3d0000
+  );
+  background-size: 300% 300%;
+  animation: gradGryffindor 8s ease-in-out infinite;
+}
+
+/* ── Slytherin: near-black → forest green → dark sage → near-black ─ */
+@keyframes gradSlytherin {
+  0%   { background-position: 0% 50%;   }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%;   }
+}
+
+.fallback-slytherin {
+  background-image: linear-gradient(
+    135deg,
+    #0a1a0f,
+    #1A472A,
+    #2a3a2a,
+    #1A472A,
+    #0a1a0f
+  );
+  background-size: 300% 300%;
+  animation: gradSlytherin 8s ease-in-out infinite;
+}
+
+/* ── Ravenclaw: near-black → navy → indigo → navy → near-black ───── */
+@keyframes gradRavenclaw {
+  0%   { background-position: 0% 50%;   }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%;   }
+}
+
+.fallback-ravenclaw {
+  background-image: linear-gradient(
+    135deg,
+    #060d1f,
+    #0E1A40,
+    #1a1a4a,
+    #0E1A40,
+    #060d1f
+  );
+  background-size: 300% 300%;
+  animation: gradRavenclaw 8s ease-in-out infinite;
+}
+
+/* ── Hufflepuff: dark amber → golden yellow → warm amber → dark amber */
+@keyframes gradHufflepuff {
+  0%   { background-position: 0% 50%;   }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%;   }
+}
+
+.fallback-hufflepuff {
+  background-image: linear-gradient(
+    135deg,
+    #7a5c00,
+    #c49a2a,
+    #ECB939,
+    #c49a2a,
+    #7a5c00
+  );
+  background-size: 300% 300%;
+  animation: gradHufflepuff 8s ease-in-out infinite;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   3. CSS — Container setup for fallback classes
+      Apply these to whichever element wraps #bg-video in your HTML.
+      Common IDs: #bg-video-container, #video-container, .video-bg-wrap
+   ═══════════════════════════════════════════════════════════════════ */
+
+#bg-video-container,
+#video-container,
+.video-bg-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  /* Smooth gradient transition when house changes fallback → fallback */
+  transition: background-image 0.6s ease;
+}
+
+/* #bg-video itself: full coverage, object-fit for cinematic crop */
+#bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Crossfade transition is set dynamically by JS; this is just a safe default */
+  transition: opacity 0.4s ease;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   4. VIDEO SOURCING GUIDE
+   ═══════════════════════════════════════════════════════════════════
+
+   All videos should be:
+   ✓ Duration:    15–30 seconds (they loop — shorter loops are smoother)
+   ✓ Resolution:  1920×1080 preferred, 1280×720 acceptable
+   ✓ Format:      MP4 (H.264 codec for broadest browser support)
+   ✓ File size:   Under 20MB — larger files slow the page down on mobile
+   ✓ Style:       Slow, atmospheric, low motion — it plays BEHIND text,
+                  so avoid anything too busy or fast-cutting
+
+   Save all files into the /videos/ folder (same level as your index.html):
+     your-site/
+       index.html
+       content.js
+       videos/
+         gryffindor.mp4   ← must match gryffindorVideo in content.js
+         slytherin.mp4    ← must match slytherinVideo  in content.js
+         ravenclaw.mp4    ← must match ravenclawVideo  in content.js
+         hufflepuff.mp4   ← must match hufflepuffVideo in content.js
+
+   ────────────────────────────────────────────────────────────────
+   🦁  GRYFFINDOR — warm, fiery, golden
+       Filename: gryffindor.mp4
+
+       Pexels (pexels.com/videos):
+         "fireplace crackling close up"
+         "candles flickering dark background"
+         "fire embers glowing slow motion"
+         "golden light bokeh particles"
+         "burning fireplace ambient"
+
+       Pixabay (pixabay.com/videos):
+         "fireplace loop"
+         "burning fire dark"
+         "candlelight ambient"
+         "golden light particles"
+
+   ────────────────────────────────────────────────────────────────
+   🐍  SLYTHERIN — dark, cool, mysterious
+       Filename: slytherin.mp4
+
+       Pexels:
+         "green underwater dark"
+         "dark forest mist atmospheric"
+         "smoke tendrils black background"
+         "green particles dark loop"
+         "misty lake night"
+
+       Pixabay:
+         "underwater green loop"
+         "dark forest fog"
+         "mystical smoke green"
+         "green bokeh dark"
+
+   ────────────────────────────────────────────────────────────────
+   🦅  RAVENCLAW — celestial, cosmic, starry
+       Filename: ravenclaw.mp4
+
+       Pexels:
+         "stars night sky timelapse"
+         "galaxy milky way slow"
+         "blue nebula space loop"
+         "aurora borealis night blue"
+         "starfield deep space"
+
+       Pixabay:
+         "starfield loop"
+         "night sky stars timelapse"
+         "blue galaxy space"
+         "aurora night sky"
+
+   ────────────────────────────────────────────────────────────────
+   🦡  HUFFLEPUFF — warm, earthy, cosy, autumnal
+       Filename: hufflepuff.mp4
+
+       Pexels:
+         "autumn leaves falling slow motion"
+         "golden wheat field breeze"
+         "sunlight through trees bokeh"
+         "warm nature bokeh golden hour"
+         "honey sunflower field"
+
+       Pixabay:
+         "autumn forest warm loop"
+         "golden nature bokeh"
+         "sunbeams forest slow"
+         "fall leaves wind"
+
+   ────────────────────────────────────────────────────────────────
+   HOW TO DOWNLOAD FROM PEXELS
+   1. Go to  pexels.com/videos
+   2. Search one of the terms above
+   3. Click a video you like
+   4. Click "Free Download" → choose 1080p (or 720p for smaller file)
+   5. Rename the file to match the filename above (e.g. gryffindor.mp4)
+   6. Drop it into your /videos/ folder
+
+   HOW TO DOWNLOAD FROM PIXABAY
+   1. Go to  pixabay.com/videos
+   2. Search one of the terms above
+   3. Click a video → "Free Download" → choose 1920×1080
+   4. Rename and save to /videos/ as above
+
+   Both sites are completely free for personal use.
+   Pexels: no attribution required.
+   Pixabay: no attribution required, but crediting the creator is appreciated.
+
+   TIP: If a video loops with a visible jump, look for videos tagged
+   "seamless loop" or "cinemagraph" — they're designed to repeat smoothly.
+
+   ═══════════════════════════════════════════════════════════════════ */
+
+
+/*
+═══════════════════════════════════════════════════════════════════
+Integration Notes
+═══════════════════════════════════════════════════════════════════
+
+JavaScript
+  1. Find the getHours() / switch(true) block in your script.js and DELETE it.
+  2. Paste initVideoBackground() in its place.
+  3. In your DOMContentLoaded handler, the bootstrap at the bottom of this
+     file calls it automatically — you don't need to call it twice.
+  4. Load order: content.js → house-selector.js → video-background.js
+
+CSS
+  Paste the CSS sections into your main stylesheet, or save as video-bg.css:
+    <link rel="stylesheet" href="video-bg.css">
+  Add before </head>.
+
+Container ID
+  The JS looks for #bg-video-container, #video-container, and .video-bg-wrap
+  in that order. If your site uses a different element, update the selectors
+  in both applyFallback() and loadHouseVideo() in the JS, AND in the CSS block.
+
+Testing fallbacks without videos
+  To test the gradient fallbacks, temporarily rename a video file (or set
+  the filename in content.js to something that doesn't exist). The onerror
+  handler will fire and show the animated gradient. Every house should produce
+  a visibly different colour wash.
+
+Video doesn't autoplay?
+  Most browsers block autoplay with sound. Make sure #bg-video has:
+    <video id="bg-video" autoplay muted loop playsinline>
+  The muted and playsinline attributes are required for autoplay to work
+  on mobile (especially iOS Safari).
+*/

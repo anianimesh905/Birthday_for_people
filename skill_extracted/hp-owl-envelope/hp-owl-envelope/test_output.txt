@@ -1,0 +1,364 @@
+<!-- ═══════════════════════════════════════════════════════════
+     1. HTML — Replace your entire #envelope-scene contents
+     ═══════════════════════════════════════════════════════════ -->
+
+<div id="envelope-scene">
+
+  <!-- Envelope back flap -->
+  <div id="env-back"></div>
+
+  <!-- Main envelope body — all decorative elements live inside here -->
+  <div id="envelope">
+
+    <!-- Faint house crest watermark — purely decorative, sits behind everything -->
+    <div class="env-watermark" aria-hidden="true">⚡</div>
+
+    <!-- Cursive address block (name comes from JS / siteContent.friendName) -->
+    <div class="env-address" aria-label="Addressed to recipient">
+      <span class="env-address-to">To:</span>
+      <span class="env-address-name">Luna</span>
+      <span class="env-address-line2">The Bedroom</span>
+    </div>
+
+    <!-- Wax seal — centred on the envelope flap join -->
+    <div id="env-seal">
+      <span id="env-seal-letter">G</span>
+    </div>
+
+    <!-- 4 owl silhouettes — drift left to right across the envelope -->
+
+    <div class="env-owl owl-1" aria-hidden="true">
+      <svg class="owl-svg" viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 20 14 C 17 10, 10 6, 2 8 C 6 10, 8 12, 10 14 C 12 16, 14 18, 16 17 C 17 19, 18 21, 20 20 C 22 21, 23 19, 24 17 C 26 18, 28 16, 30 14 C 32 12, 34 10, 38 8 C 30 6, 23 10, 20 14 Z" fill="#5a3e2b"/>
+      </svg>
+    </div>
+
+    <div class="env-owl owl-2" aria-hidden="true">
+      <svg class="owl-svg" viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 20 14 C 17 10, 10 6, 2 8 C 6 10, 8 12, 10 14 C 12 16, 14 18, 16 17 C 17 19, 18 21, 20 20 C 22 21, 23 19, 24 17 C 26 18, 28 16, 30 14 C 32 12, 34 10, 38 8 C 30 6, 23 10, 20 14 Z" fill="#5a3e2b"/>
+      </svg>
+    </div>
+
+    <div class="env-owl owl-3" aria-hidden="true">
+      <svg class="owl-svg" viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 20 14 C 17 10, 10 6, 2 8 C 6 10, 8 12, 10 14 C 12 16, 14 18, 16 17 C 17 19, 18 21, 20 20 C 22 21, 23 19, 24 17 C 26 18, 28 16, 30 14 C 32 12, 34 10, 38 8 C 30 6, 23 10, 20 14 Z" fill="#5a3e2b"/>
+      </svg>
+    </div>
+
+    <!-- owl-4 uses the simpler minimal path — cleaner at 14px -->
+    <div class="env-owl owl-4" aria-hidden="true">
+      <svg class="owl-svg" viewBox="0 0 36 20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 18 12 Q 10 4, 1 7 Q 7 10, 10 13 Q 14 17, 18 16 Q 22 17, 26 13 Q 29 10, 35 7 Q 26 4, 18 12 Z" fill="#5a3e2b"/>
+      </svg>
+    </div>
+
+  </div><!-- /#envelope -->
+
+  <!-- Tap hint text below the envelope -->
+  <p id="envelope-hint">Tap to unseal — an owl delivered this just for you ✦</p>
+
+</div><!-- /#envelope-scene -->
+
+
+/* ═══════════════════════════════════════════════════════════
+   2. CSS — Paste into your main stylesheet or owl-envelope.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── CSS custom property defaults (overridden by hp-house-selector-ui) ─ */
+:root {
+  --house-primary: #740001;
+  --house-accent:  #D3A625;
+}
+
+/* ── Envelope parchment reskin ──────────────────────────── */
+#envelope,
+#env-back {
+  background-color: #E8D5A3;
+}
+
+/* Make sure envelope is a positioned container for absolute children */
+#envelope {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Faint crest watermark ──────────────────────────────── */
+.env-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 160px;
+  line-height: 1;
+  opacity: 0.04;
+  color: #5a3e2b;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+/* ── Cursive address block ──────────────────────────────── */
+.env-address {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.env-address-to {
+  font-family: 'Dancing Script', cursive;
+  font-size: 0.85rem;
+  color: #3d2b1f;
+  opacity: 0.7;
+}
+
+.env-address-name {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2a1a0e;
+  line-height: 1.2;
+}
+
+.env-address-line2 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 0.95rem;
+  color: #3d2b1f;
+  opacity: 0.8;
+}
+
+/* ── Wax seal ───────────────────────────────────────────── */
+#env-seal {
+  /* keep existing centering/positioning from original site */
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--house-primary);
+  border: 2px solid var(--house-accent);
+  box-shadow:
+    inset 0 0 0 3px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* needed for ::before */
+  z-index: 10;
+  cursor: pointer;
+  transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+/* Wax drip blob behind the main circle */
+#env-seal::before {
+  content: '';
+  position: absolute;
+  width: 72px;
+  height: 68px;
+  background: var(--house-primary);
+  opacity: 0.55;
+  border-radius: 48% 52% 60% 40% / 45% 55% 45% 55%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -46%);
+  z-index: -1;
+  filter: blur(2px);
+  transition: background 0.4s ease;
+}
+
+/* House initial letter inside the seal */
+#env-seal-letter {
+  font-family: 'Cinzel', 'Palatino Linotype', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--house-accent);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  position: relative;
+  z-index: 1;
+  transition: color 0.4s ease;
+}
+
+/* ── Owl SVG base ───────────────────────────────────────── */
+.env-owl {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 3;
+}
+
+.owl-svg {
+  display: block;
+}
+
+/* ── Per-owl sizing, vertical position, speed, delay ───── */
+.owl-1 {
+  width: 22px;
+  top: 18%;
+  animation: owlDrift 10s linear infinite;
+}
+
+.owl-2 {
+  width: 16px;
+  top: 55%;
+  animation: owlDrift 13s linear infinite 3s;
+}
+
+.owl-3 {
+  width: 19px;
+  top: 30%;
+  animation: owlDrift 8s linear infinite 1.5s;
+}
+
+.owl-4 {
+  width: 14px;
+  top: 72%;
+  animation: owlDrift 14s linear infinite 6s;
+}
+
+/* ── Drift keyframe (left-to-right, fades in/out at edges) ─ */
+@keyframes owlDrift {
+  0% {
+    left: -30px;
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.5;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    left: calc(100% + 40px);
+    opacity: 0;
+  }
+}
+
+/* ── Delivery burst — triggered by JS on envelope tap ───── */
+.owl-delivering {
+  animation-duration: 0.8s !important;
+  opacity: 0.85 !important;
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// 3. JavaScript — Save as owl-envelope.js, link before </body>
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * HP Owl Envelope
+ * - Syncs address name from siteContent.friendName
+ * - Updates wax seal letter when house changes
+ * - Triggers owl delivery burst on envelope tap
+ *
+ * Listens for CustomEvent 'houseChanged' (dispatched by hp-house-selector-ui)
+ */
+
+const HOUSE_INITIALS = {
+  gryffindor: 'G',
+  slytherin:  'S',
+  ravenclaw:  'R',
+  hufflepuff: 'H',
+};
+
+/**
+ * Update the wax seal letter and CSS custom properties for the active house.
+ * @param {string} houseName - lowercase house name
+ * @param {string} [primary] - hex color (optional, from houseChanged event)
+ * @param {string} [accent]  - hex color (optional, from houseChanged event)
+ */
+function updateSealForHouse(houseName, primary, accent) {
+  const letterEl = document.getElementById('env-seal-letter');
+  if (letterEl) {
+    letterEl.textContent = HOUSE_INITIALS[houseName] || 'H';
+  }
+
+  // Update CSS variables so seal background + drip + letter color all react
+  if (primary) document.documentElement.style.setProperty('--house-primary', primary);
+  if (accent)  document.documentElement.style.setProperty('--house-accent', accent);
+}
+
+/**
+ * Brief animation burst on owl-1, as if it just delivered the letter.
+ * Restores normal speed after 800ms.
+ */
+function triggerOwlDelivery() {
+  const deliveryOwl = document.querySelector('.owl-1');
+  if (!deliveryOwl) return;
+
+  deliveryOwl.classList.add('owl-delivering');
+  setTimeout(() => deliveryOwl.classList.remove('owl-delivering'), 800);
+}
+
+// ── Listen for house changes from hp-house-selector-ui ──────
+document.addEventListener('houseChanged', (e) => {
+  const { house, primary, accent } = e.detail;
+  updateSealForHouse(house, primary, accent);
+});
+
+// ── Owl delivery on envelope tap ────────────────────────────
+const envelope = document.getElementById('envelope');
+if (envelope) {
+  envelope.addEventListener('click', triggerOwlDelivery);
+}
+
+// ── Initialise on DOM ready ──────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const cfg = window.siteContent || {};
+
+  // Set address name from content.js
+  const nameEl = document.querySelector('.env-address-name');
+  if (nameEl && cfg.friendName) {
+    nameEl.textContent = cfg.friendName;
+  }
+
+  // Set initial seal letter from defaultHouse
+  const defaultHouse = (cfg.defaultHouse || 'gryffindor').toLowerCase();
+  // Primary/accent not passed here — :root CSS vars cover the default
+  updateSealForHouse(defaultHouse);
+});
+
+
+/*
+═══════════════════════════════════════════════════════════
+Integration Notes
+═══════════════════════════════════════════════════════════
+
+HTML
+  Replace the ENTIRE contents of #envelope-scene (or the whole div itself)
+  with the HTML block above.
+  Remove all 8 .env-particle divs — the 4 .env-owl divs replace them.
+
+CSS
+  Paste into your main stylesheet, or save as owl-envelope.css and link in <head>:
+    <link rel="stylesheet" href="owl-envelope.css">
+  Also add these two Google Fonts to <head> if not already present:
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Cinzel&display=swap" rel="stylesheet">
+
+JavaScript
+  Save as owl-envelope.js and link before </body>:
+    <script src="owl-envelope.js"></script>
+  Load order: content.js → house-selector.js → owl-envelope.js
+
+CSS variables
+  The seal color uses --house-primary and --house-accent.
+  If hp-house-selector-ui is installed, it sets these automatically on houseChanged.
+  If not, the :root defaults in the CSS block (Gryffindor red/gold) apply.
+
+Envelope sizing
+  The owls use left: -30px → left: calc(100% + 40px) to drift across.
+  This requires #envelope to have position: relative (add if missing).
+  If #envelope has overflow: visible and you see owls outside the envelope,
+  add overflow: hidden to #envelope.
+
+Delivery animation
+  The owl-1 burst triggers on every envelope tap.
+  If your site only allows the envelope to open once, add { once: true }
+  to the addEventListener call in owl-envelope.js.
+*/
