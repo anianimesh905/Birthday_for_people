@@ -81,7 +81,7 @@ const BIRTHDAY_CONTENT = {
   // Each message is shown when that house is selected. Written as a magical letter.
   // We use backticks ` ` here to allow multi-line formatting easily.
 
-  slytherinMessage: `Dear Vanshika Singh,
+  slytherinMessage: `Dear Vanshika Singh ( Alt. Narcissa Malfoy, but significantly less judgmental ),
 
 To the most cunning, ambitious and greatest pride women for the world. I present you with the happiest birthday. Your brilliance is unmatched with the pride of conquering the dungeons of Slytherin. You have always known what you want and moved toward it with a quiet, elegant determination that most people can only admire from a distance. That is my rare and precious gift to you.
 
@@ -99,7 +99,7 @@ Wishing you the best gryffindor style birthday filled with golden light, and a w
 With pride and a heart full of Gryffindor fire,
 Ani ✨`,
 
-  ravenclawMessage: `Dear Vanshika Singh,
+  ravenclawMessage: `Dear Vanshika Singh ( Alt. Cho Chang with a library card addiction ),
 
 To a mind and beauty as vast as the night sky over the Astronomy Tower — happy birthday. You have always been keen sighted person and seen what others overlook, found questions no one asked, and chased dreams quietly and wonderfully.
 
@@ -108,7 +108,7 @@ May the year ahead bring you beautiful solutions to your problems, unexpected di
 With warmth and the deepest respect from the stars behind this,
 Ani 📚`,
 
-  hufflepuffMessage: `Dear Vanshika Singh,
+  hufflepuffMessage: `Dear Vanshika Singh ( Alt. Nymphadora Tonks ),
 
 To the truest friend in all of Hogwarts — the one who shows up without being asked, the one who remembers every small things that matter most, and the one whose kindness makes every room feel like home — happiest birthday to the one and all V.A.N.S.H.I.K.A S.I.N.G.H.
 
