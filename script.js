@@ -151,147 +151,327 @@ function playScrollSound() {
   }
 }
 
-/* ── Procedural Web Audio Synthesis: Ambient Wind/Waves Synthesizer ── */
-let waveAudioCtx = null;
-let waveNoiseSource = null;
-let waveFilterNode = null;
-let waveMainGain = null;
-let waveLfoOsc = null;
-let waveModInterval = null;
-let waveCleanupTimeoutId = null;
+/* ── Procedural Web Audio Synthesis: House-Specific Ambient Soundscapes ── */
+let ambientContext = null;
+let ambientNodes = [];
+let ambientInterval = null;
+let ambientCleanupTimeoutId = null;
 
 function startAmbientWaves() {
-  return; // Disabled per user request to silence ambient background video audio
-  try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-
-    if (waveCleanupTimeoutId) {
-      clearTimeout(waveCleanupTimeoutId);
-      waveCleanupTimeoutId = null;
-    }
-
-    if (!waveAudioCtx) {
-      waveAudioCtx = new AudioContextClass();
-    }
-
-    if (waveAudioCtx.state === "suspended") {
-      waveAudioCtx.resume();
-    }
-
-    const bufferSize = waveAudioCtx.sampleRate * 4;
-    const buffer = waveAudioCtx.createBuffer(1, bufferSize, waveAudioCtx.sampleRate);
-    const data = buffer.getChannelData(0);
-    
-    let lastOut = 0.0;
-    for (let i = 0; i < bufferSize; i++) {
-      const white = Math.random() * 2 - 1;
-      data[i] = (lastOut + (0.02 * white)) / 1.02;
-      lastOut = data[i];
-      data[i] *= 3.5;
-    }
-
-    if (waveNoiseSource) {
-      try { waveNoiseSource.stop(); } catch(e) {}
-      waveNoiseSource.disconnect();
-    }
-    if (waveLfoOsc) {
-      try { waveLfoOsc.stop(); } catch(e) {}
-      waveLfoOsc.disconnect();
-    }
-    if (waveModInterval) {
-      clearInterval(waveModInterval);
-    }
-
-    waveNoiseSource = waveAudioCtx.createBufferSource();
-    waveNoiseSource.buffer = buffer;
-    waveNoiseSource.loop = true;
-
-    waveFilterNode = waveAudioCtx.createBiquadFilter();
-    waveFilterNode.type = "lowpass";
-    waveFilterNode.Q.value = 1.2;
-
-    waveMainGain = waveAudioCtx.createGain();
-    waveMainGain.gain.setValueAtTime(0, waveAudioCtx.currentTime);
-
-    waveLfoOsc = waveAudioCtx.createOscillator();
-    waveLfoOsc.type = "sine";
-    waveLfoOsc.frequency.value = 0.12;
-
-    const lfoGain = waveAudioCtx.createGain();
-    lfoGain.gain.value = 220;
-
-    waveLfoOsc.connect(lfoGain);
-    lfoGain.connect(waveFilterNode.frequency);
-
-    waveFilterNode.frequency.setValueAtTime(320, waveAudioCtx.currentTime);
-
-    waveNoiseSource.connect(waveFilterNode);
-    waveFilterNode.connect(waveMainGain);
-    waveMainGain.connect(waveAudioCtx.destination);
-
-    waveNoiseSource.start(0);
-    waveLfoOsc.start(0);
-
-    waveMainGain.gain.linearRampToValueAtTime(0.08, waveAudioCtx.currentTime + 3.0);
-
-    let angle = 0;
-    waveModInterval = setInterval(() => {
-      if (!waveAudioCtx || waveAudioCtx.state === "suspended") return;
-      angle += 0.05;
-      const sinVal = Math.sin(angle);
-      const targetGain = 0.055 + sinVal * 0.025;
-      if (waveMainGain) {
-        waveMainGain.gain.setTargetAtTime(targetGain, waveAudioCtx.currentTime, 0.1);
-      }
-    }, 100);
-
-  } catch (e) {
-    // Fail silently
-  }
+  startHouseAmbience(_currentHouse);
 }
 
 function stopAmbientWaves() {
-  if (waveModInterval) {
-    clearInterval(waveModInterval);
-    waveModInterval = null;
-  }
-  if (waveMainGain && waveAudioCtx) {
-    try {
-      waveMainGain.gain.cancelScheduledValues(waveAudioCtx.currentTime);
-      waveMainGain.gain.linearRampToValueAtTime(0, waveAudioCtx.currentTime + 2.0);
-    } catch(e) {}
-  }
-  
-  if (waveCleanupTimeoutId) {
-    clearTimeout(waveCleanupTimeoutId);
+  stopHouseAmbience();
+}
+
+function startHouseAmbience(house) {
+  stopHouseAmbience();
+  if (ambientCleanupTimeoutId) {
+    clearTimeout(ambientCleanupTimeoutId);
+    ambientCleanupTimeoutId = null;
   }
   
-  waveCleanupTimeoutId = setTimeout(() => {
-    try {
-      if (waveNoiseSource) {
-        waveNoiseSource.stop();
-        waveNoiseSource.disconnect();
-        waveNoiseSource = null;
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    ambientContext = new AudioContextClass();
+    
+    const h = (house || 'gryffindor').toLowerCase();
+    
+    // Main output gain node
+    const mainGain = ambientContext.createGain();
+    mainGain.gain.setValueAtTime(0, ambientContext.currentTime);
+    mainGain.connect(ambientContext.destination);
+    
+    // Smooth fade in to prevent clicks
+    mainGain.gain.linearRampToValueAtTime(0.35, ambientContext.currentTime + 2.0);
+    ambientNodes.push(mainGain);
+    
+    if (h === 'gryffindor') {
+      // 1. Gryffindor: Crackling fireplace (low rumble + random pops)
+      const bufferSize = ambientContext.sampleRate * 2;
+      const buffer = ambientContext.createBuffer(1, bufferSize, ambientContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      let lastOut = 0.0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        data[i] = (lastOut + (0.015 * white)) / 1.015;
+        lastOut = data[i];
+        data[i] *= 4.0;
       }
-      if (waveLfoOsc) {
-        waveLfoOsc.stop();
-        waveLfoOsc.disconnect();
-        waveLfoOsc = null;
+      
+      const rumbleSrc = ambientContext.createBufferSource();
+      rumbleSrc.buffer = buffer;
+      rumbleSrc.loop = true;
+      
+      const lp = ambientContext.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(95, ambientContext.currentTime);
+      
+      rumbleSrc.connect(lp);
+      lp.connect(mainGain);
+      rumbleSrc.start(0);
+      ambientNodes.push(rumbleSrc);
+      
+      // Fire crackle generator
+      ambientInterval = setInterval(() => {
+        if (!ambientContext || ambientContext.state === "suspended") return;
+        
+        if (Math.random() < 0.28) {
+          const crackle = ambientContext.createOscillator();
+          const crackleGain = ambientContext.createGain();
+          
+          crackle.type = "triangle";
+          crackle.frequency.setValueAtTime(700 + Math.random() * 1400, ambientContext.currentTime);
+          
+          crackleGain.gain.setValueAtTime(0.06 * Math.random(), ambientContext.currentTime);
+          crackleGain.gain.exponentialRampToValueAtTime(0.001, ambientContext.currentTime + 0.005 + Math.random() * 0.02);
+          
+          crackle.connect(crackleGain);
+          crackleGain.connect(mainGain);
+          crackle.start(0);
+          crackle.stop(ambientContext.currentTime + 0.05);
+        }
+      }, 55);
+      
+    } else if (h === 'slytherin') {
+      // 2. Slytherin: Deep dungeon echoes (low drone + cave water drips)
+      const osc1 = ambientContext.createOscillator();
+      const osc2 = ambientContext.createOscillator();
+      const droneGain = ambientContext.createGain();
+      
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(55, ambientContext.currentTime); // A1 note
+      osc2.type = "triangle";
+      osc2.frequency.setValueAtTime(110.3, ambientContext.currentTime); // detuned octave
+      
+      droneGain.gain.setValueAtTime(0.2, ambientContext.currentTime);
+      
+      // Modulate drone volume for organic pulsing
+      const droneLfo = ambientContext.createOscillator();
+      const lfoGain = ambientContext.createGain();
+      droneLfo.frequency.setValueAtTime(0.07, ambientContext.currentTime);
+      lfoGain.gain.setValueAtTime(0.06, ambientContext.currentTime);
+      droneLfo.connect(lfoGain);
+      lfoGain.connect(droneGain.gain);
+      
+      osc1.connect(droneGain);
+      osc2.connect(droneGain);
+      droneGain.connect(mainGain);
+      
+      osc1.start(0);
+      osc2.start(0);
+      droneLfo.start(0);
+      ambientNodes.push(osc1, osc2, droneLfo);
+      
+      // Water drips echo generator
+      ambientInterval = setInterval(() => {
+        if (!ambientContext || ambientContext.state === "suspended") return;
+        
+        if (Math.random() < 0.22) {
+          const dripOsc = ambientContext.createOscillator();
+          const dripGain = ambientContext.createGain();
+          const delay = ambientContext.createDelay();
+          const feedback = ambientContext.createGain();
+          
+          dripOsc.type = "sine";
+          const now = ambientContext.currentTime;
+          dripOsc.frequency.setValueAtTime(650, now);
+          dripOsc.frequency.exponentialRampToValueAtTime(1450, now + 0.06);
+          
+          dripGain.gain.setValueAtTime(0.0, now);
+          dripGain.gain.linearRampToValueAtTime(0.09, now + 0.01);
+          dripGain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+          
+          delay.delayTime.setValueAtTime(0.38, now);
+          feedback.gain.setValueAtTime(0.58, now);
+          
+          dripOsc.connect(dripGain);
+          dripGain.connect(mainGain);
+          
+          // Feedback Delay loop
+          dripGain.connect(delay);
+          delay.connect(feedback);
+          feedback.connect(delay);
+          delay.connect(mainGain);
+          
+          dripOsc.start(now);
+          dripOsc.stop(now + 1.8);
+        }
+      }, 2200);
+      
+    } else if (h === 'ravenclaw') {
+      // 3. Ravenclaw: Windy towers (howling wind noise filter + celestial chimes)
+      const bufferSize = ambientContext.sampleRate * 3;
+      const buffer = ambientContext.createBuffer(1, bufferSize, ambientContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
       }
-      if (waveFilterNode) {
-        waveFilterNode.disconnect();
-        waveFilterNode = null;
+      
+      const noise = ambientContext.createBufferSource();
+      noise.buffer = buffer;
+      noise.loop = true;
+      
+      const filter = ambientContext.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.Q.setValueAtTime(2.2, ambientContext.currentTime);
+      filter.frequency.setValueAtTime(380, ambientContext.currentTime);
+      
+      const windLfo = ambientContext.createOscillator();
+      const lfoGain = ambientContext.createGain();
+      windLfo.frequency.setValueAtTime(0.06, ambientContext.currentTime);
+      lfoGain.gain.setValueAtTime(190, ambientContext.currentTime);
+      
+      windLfo.connect(lfoGain);
+      lfoGain.connect(filter.frequency);
+      
+      noise.connect(filter);
+      filter.connect(mainGain);
+      
+      noise.start(0);
+      windLfo.start(0);
+      ambientNodes.push(noise, windLfo);
+      
+      // Astronomy Tower chimes
+      ambientInterval = setInterval(() => {
+        if (!ambientContext || ambientContext.state === "suspended") return;
+        
+        if (Math.random() < 0.16) {
+          const chime = ambientContext.createOscillator();
+          const chimeGain = ambientContext.createGain();
+          chime.type = "sine";
+          chime.frequency.setValueAtTime(1800 + Math.random() * 1100, ambientContext.currentTime);
+          
+          const now = ambientContext.currentTime;
+          chimeGain.gain.setValueAtTime(0.025, now);
+          chimeGain.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
+          
+          chime.connect(chimeGain);
+          chimeGain.connect(mainGain);
+          chime.start(now);
+          chime.stop(now + 2.0);
+        }
+      }, 3500);
+      
+    } else if (h === 'hufflepuff') {
+      // 4. Hufflepuff: Sunny meadows (ambient pink noise breeze + buzzing bees)
+      const bufferSize = ambientContext.sampleRate * 2.5;
+      const buffer = ambientContext.createBuffer(1, bufferSize, ambientContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        b6 = white * 0.115926;
+        data[i] *= 0.04;
       }
-      if (waveMainGain) {
-        waveMainGain.disconnect();
-        waveMainGain = null;
-      }
-      waveCleanupTimeoutId = null;
-    } catch (e) {
-      // Fail silently
+      
+      const noise = ambientContext.createBufferSource();
+      noise.buffer = buffer;
+      noise.loop = true;
+      
+      const lp = ambientContext.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(220, ambientContext.currentTime);
+      
+      noise.connect(lp);
+      lp.connect(mainGain);
+      noise.start(0);
+      ambientNodes.push(noise);
+      
+      // Bumblebee stereophonic pan flying paths
+      ambientInterval = setInterval(() => {
+        if (!ambientContext || ambientContext.state === "suspended") return;
+        
+        if (Math.random() < 0.22) {
+          const bee = ambientContext.createOscillator();
+          const beeGain = ambientContext.createGain();
+          const panner = ambientContext.createStereoPanner ? ambientContext.createStereoPanner() : null;
+          
+          bee.type = "sawtooth";
+          bee.frequency.setValueAtTime(170 + Math.random() * 50, ambientContext.currentTime);
+          
+          const flutter = ambientContext.createOscillator();
+          const flutterGain = ambientContext.createGain();
+          flutter.frequency.setValueAtTime(32, ambientContext.currentTime); // wing flapping frequency
+          flutterGain.gain.setValueAtTime(0.5, ambientContext.currentTime);
+          
+          flutter.connect(flutterGain);
+          
+          const now = ambientContext.currentTime;
+          beeGain.gain.setValueAtTime(0, now);
+          beeGain.gain.linearRampToValueAtTime(0.035, now + 0.4);
+          beeGain.gain.exponentialRampToValueAtTime(0.001, now + 2.8);
+          
+          if (panner) {
+            const startPan = Math.random() < 0.5 ? -1 : 1;
+            panner.pan.setValueAtTime(startPan, now);
+            panner.pan.linearRampToValueAtTime(-startPan, now + 2.8);
+            
+            bee.connect(beeGain);
+            beeGain.connect(panner);
+            panner.connect(mainGain);
+          } else {
+            bee.connect(beeGain);
+            beeGain.connect(mainGain);
+          }
+          
+          bee.start(now);
+          flutter.start(now);
+          bee.stop(now + 3.0);
+          flutter.stop(now + 3.0);
+        }
+      }, 3000);
     }
-  }, 2100);
+  } catch (e) {
+    // Fail silently in case browser policy restricts AudioContext creation
+  }
+}
+
+function stopHouseAmbience() {
+  if (ambientInterval) {
+    clearInterval(ambientInterval);
+    ambientInterval = null;
+  }
+  
+  const currentNodes = [...ambientNodes];
+  ambientNodes = [];
+  const ctx = ambientContext;
+  ambientContext = null;
+  
+  if (ctx) {
+    try {
+      const now = ctx.currentTime;
+      if (currentNodes.length > 0) {
+        const mainGain = currentNodes[0];
+        mainGain.gain.cancelScheduledValues(now);
+        mainGain.gain.linearRampToValueAtTime(0, now + 0.8);
+      }
+      
+      ambientCleanupTimeoutId = setTimeout(() => {
+        currentNodes.forEach(node => {
+          try {
+            node.stop();
+            node.disconnect();
+          } catch(e) {}
+        });
+        try {
+          ctx.close();
+        } catch(e) {}
+        ambientCleanupTimeoutId = null;
+      }, 950);
+    } catch(e) {
+      ambientContext = null;
+    }
+  }
 }
 
 /* ── Paragraph-Aware Stagger Reveal & Drop Cap ── */
@@ -660,7 +840,12 @@ function initMagicParticles(opts = {}) {
   }
 
   function spawnSparkCluster(cx, cy, count, radial) {
+    const isLumos = window.isLumosActive;
     count = count || Math.floor(rand(3, 7));
+    
+    if (cx === undefined && isLumos) cx = window.lastLumosX;
+    if (cy === undefined && isLumos) cy = window.lastLumosY;
+    
     cx = cx !== undefined ? cx : rand(0, canvas.width);
     cy = cy !== undefined ? cy : rand(0, canvas.height);
     for (let i = 0; i < count; i++) {
@@ -685,7 +870,7 @@ function initMagicParticles(opts = {}) {
       p.life = rand(1.5, 2.5); 
       p.age = 0;
       p.size = rand(8, 14); 
-      p.color = palette.spark;
+      p.color = isLumos ? '#FFF3CD' : palette.spark;
       p.rotation = rand(0, Math.PI * 2); 
       p.spin = rand(-0.12, 0.12);
     }
@@ -697,49 +882,52 @@ function initMagicParticles(opts = {}) {
   function spawnOrb() {
     const p = getFreeParticle(); 
     if (!p) return;
+    const isLumos = window.isLumosActive;
     p.active = true; 
     p.type = 'B';
-    p.x = rand(0, canvas.width); 
-    p.y = rand(0, canvas.height);
-    p.vx = rand(-0.35, 0.35); 
-    p.vy = rand(-0.35, 0.35);
-    p.life = rand(4, 6); 
+    p.x = isLumos ? window.lastLumosX + rand(-18, 18) : rand(0, canvas.width); 
+    p.y = isLumos ? window.lastLumosY + rand(-18, 18) : rand(0, canvas.height);
+    p.vx = isLumos ? rand(-0.8, 0.8) : rand(-0.35, 0.35); 
+    p.vy = isLumos ? rand(-0.8, 0.8) : rand(-0.35, 0.35);
+    p.life = isLumos ? rand(1.5, 3.5) : rand(4, 6); 
     p.age = 0;
-    p.radius = rand(3, 8); 
+    p.radius = isLumos ? rand(2, 6) : rand(3, 8); 
     p.baseAlpha = rand(0.25, 0.55);
     p.pulseFreq = rand(1.2, 2.2);
-    p.color = palette.orb; 
-    p.glowColor = palette.spark;
+    p.color = isLumos ? 'rgba(255, 244, 200, 0.5)' : palette.orb; 
+    p.glowColor = isLumos ? '#FFFFFF' : palette.spark;
   }
 
   function spawnBolt() {
     const p = getFreeParticle(); 
     if (!p) return;
+    const isLumos = window.isLumosActive;
     p.active = true; 
     p.type = 'C';
-    p.x = rand(40, canvas.width - 40); 
-    p.y = rand(40, canvas.height - 40);
+    p.x = isLumos ? window.lastLumosX + rand(-25, 25) : rand(40, canvas.width - 40); 
+    p.y = isLumos ? window.lastLumosY + rand(-25, 25) : rand(40, canvas.height - 40);
     p.vx = 0; 
     p.vy = 0;
     p.life = rand(0.3, 0.6); 
     p.age = 0;
     p.size = rand(10, 18); 
-    p.color = palette.bolt;
+    p.color = isLumos ? '#FFFFAA' : palette.bolt;
   }
 
   function spawnStar() {
     const p = getFreeParticle(); 
     if (!p) return;
+    const isLumos = window.isLumosActive;
     p.active = true; 
     p.type = 'D';
-    p.x = rand(0, canvas.width); 
-    p.y = rand(canvas.height * 0.3, canvas.height);
-    p.vx = rand(-0.25, 0.25); 
-    p.vy = rand(-1.1, -0.5);
+    p.x = isLumos ? window.lastLumosX + rand(-20, 20) : rand(0, canvas.width); 
+    p.y = isLumos ? window.lastLumosY + rand(-20, 20) : rand(canvas.height * 0.3, canvas.height);
+    p.vx = isLumos ? rand(-0.5, 0.5) : rand(-0.25, 0.25); 
+    p.vy = isLumos ? rand(-1.2, -0.6) : rand(-1.1, -0.5);
     p.life = 3.0; 
     p.age = 0;
     p.size = rand(8, 16); 
-    p.color = palette.star;
+    p.color = isLumos ? '#FFFFD0' : palette.star;
   }
 
   const TYPE_WEIGHTS = [
@@ -918,7 +1106,7 @@ function initMagicParticles(opts = {}) {
     lastTime = now;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    if (!IS_MOBILE) {
+    if (!IS_MOBILE || window.isLumosActive) {
       tickSpawner(now);
     }
     
@@ -931,7 +1119,7 @@ function initMagicParticles(opts = {}) {
       }
     }
 
-    if (activeCount === 0 && (IS_MOBILE || !document.hasFocus())) {
+    if (activeCount === 0 && (IS_MOBILE || !document.hasFocus()) && !window.isLumosActive) {
       isLoopRunning = false;
       rafId = null;
       return;
@@ -1408,11 +1596,101 @@ function initEnvelope() {
   if (!wrapper || !envelope || !overlay) return;
 
   let opened = false;
+  let firstLetterRead = false;
+  let secondLetterRead = false;
+
+  function triggerCinematicUnseal() {
+    // 1. Shake viewport
+    document.body.classList.add("screen-shake");
+    setTimeout(() => {
+      document.body.classList.remove("screen-shake");
+    }, 280);
+
+    // 2. White Spell Flash
+    const flash = document.createElement("div");
+    flash.id = "spell-flash";
+    document.body.appendChild(flash);
+    requestAnimationFrame(() => {
+      flash.style.opacity = "0.95";
+      setTimeout(() => {
+        flash.style.opacity = "0";
+        setTimeout(() => flash.remove(), 250);
+      }, 40);
+    });
+  }
+
+  function triggerEnvelopeMorph() {
+    const envArea = document.getElementById("envelope-area");
+    const envelope = document.getElementById("envelope");
+    const wrapper = document.getElementById("envelope-wrapper");
+    const hint = document.getElementById("envelope-hint");
+    const sealLetter = document.getElementById("env-seal-letter");
+    
+    if (!envArea || !envelope || !wrapper) return;
+    
+    // Disable interactions temporarily
+    wrapper.style.pointerEvents = "none";
+    
+    setTimeout(() => {
+      // Fade out envelope area smoothly
+      envArea.style.transition = "opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)";
+      envArea.style.opacity = "0";
+      envArea.style.transform = "scale(0.95)";
+      
+      setTimeout(() => {
+        // Morph layout styles to crimson private letter theme
+        envelope.classList.add("eyes-only");
+        wrapper.classList.add("eyes-only");
+        
+        // Swap cursive salutation names
+        const addrTo = document.querySelector(".env-address-to");
+        const addrName = document.querySelector(".env-address-name");
+        const addrLine2 = document.querySelector(".env-address-line2");
+        
+        if (addrTo) addrTo.textContent = "Personal:";
+        if (addrName) addrName.textContent = "Vanshika Singh";
+        if (addrLine2) addrLine2.textContent = "For Your Eyes Only";
+        
+        // Change wax seal to Heart
+        if (sealLetter) sealLetter.textContent = "❤";
+        
+        // Change text hints
+        if (hint) {
+          hint.textContent = "A secret letter has appeared... Tap to unseal ✦";
+          hint.style.opacity = "1";
+        }
+        
+        // Reset envelope open status
+        envelope.classList.remove("open");
+        opened = false;
+        
+        // Fade back in
+        envArea.style.opacity = "1";
+        envArea.style.transform = "scale(1)";
+        
+        // Spawn a magical pink/gold burst centered on the morphed envelope
+        setTimeout(() => {
+          const areaRect = envArea.getBoundingClientRect();
+          window.dispatchEvent(new CustomEvent('envelopeTapped', {
+            detail: {
+              x: areaRect.left + areaRect.width / 2,
+              y: areaRect.top + areaRect.height / 2
+            }
+          }));
+          wrapper.style.pointerEvents = "auto";
+        }, 500);
+        
+      }, 850);
+    }, 900); // Trigger 900ms after closing letter scroll
+  }
 
   function openEnvelope(e) {
     if (typeof window.startMusic === 'function') {
       window.startMusic();
     }
+    
+    const isPersonal = envelope.classList.contains("eyes-only");
+    
     if (opened) {
       overlay.classList.add("open");
       startAmbientWaves();
@@ -1448,6 +1726,7 @@ function initEnvelope() {
     // Unseal interactions
     burstSealParticles(sealCx, sealCy);
     playCrackSound();
+    triggerCinematicUnseal();
 
     if (window.navigator && typeof window.navigator.vibrate === "function") {
       try {
@@ -1504,8 +1783,27 @@ function initEnvelope() {
       }
 
       const c2 = window._bdContent || {};
-      const houseCfg = HOUSES[_currentHouse] || HOUSES.gryffindor;
-      const msg = c2[houseCfg.message] || c2.slytherinMessage || '';
+      let msg = "";
+      
+      if (isPersonal) {
+        msg = c2.eyesOnlyMessage || "Dear Vanshika, Happy Birthday!";
+        overlay.classList.add("eyes-only-modal");
+        
+        // Update headers to personal private context
+        const schoolNameEl = overlay.querySelector(".hogwarts-school-name");
+        const headmistressEl = overlay.querySelector(".hogwarts-headmistress");
+        const dividerEl = overlay.querySelector(".hogwarts-divider");
+        const mottoEl = overlay.querySelector(".hogwarts-motto-sub");
+        
+        if (schoolNameEl) schoolNameEl.textContent = "A Message For Your Eyes Only";
+        if (headmistressEl) headmistressEl.innerHTML = "<em>Confidential & Private</em>";
+        if (dividerEl) dividerEl.textContent = "· · · ❤️ · · ·";
+        if (mottoEl) mottoEl.innerHTML = "<em>Amor Vincit Omnia</em>";
+      } else {
+        const houseCfg = HOUSES[_currentHouse] || HOUSES.gryffindor;
+        msg = c2[houseCfg.message] || c2.slytherinMessage || '';
+        overlay.classList.remove("eyes-only-modal");
+      }
 
       setTimeout(() => revealHogwartsLetter(msgEl, msg, sigEl), 200);
     }, 450);
@@ -1515,6 +1813,15 @@ function initEnvelope() {
     overlay.classList.remove("open");
     stopAmbientWaves();
     if (paper) paper.classList.remove("unfolded");
+    
+    // Handle sequential letter morphing
+    const isPersonal = envelope.classList.contains("eyes-only");
+    if (!isPersonal && !firstLetterRead) {
+      firstLetterRead = true;
+      triggerEnvelopeMorph();
+    } else if (isPersonal && !secondLetterRead) {
+      secondLetterRead = true;
+    }
   }
 
   wrapper.addEventListener("touchend", (e) => {
@@ -1565,6 +1872,7 @@ function initEnvelope() {
       }
       
       revealHogwartsLetter(msgEl, msg, sigEl);
+      startAmbientWaves(); // Dynamically shift synthesized ambient soundscape
     }
   });
 }
@@ -1629,6 +1937,81 @@ async function startPreloader() {
   if (loadingTitle) {
     loadingTitle.textContent = `For ${friendName}`;
   }
+
+  // Setup solemn swear calligraphy display
+  const solemnSwear = document.getElementById("loading-solemn-swear");
+  if (solemnSwear) {
+    solemnSwear.style.opacity = "0.85";
+  }
+
+  // 👣 Marauder's Map preloader footstep walker simulation
+  let footstepInterval = null;
+  let currentX = 15;
+  let currentY = 85;
+  let currentAngle = -30;
+  let isLeft = true;
+
+  function spawnPreloaderFootstep() {
+    const container = document.getElementById("footsteps-container");
+    if (!container || preloadCompleted) return;
+
+    currentAngle += (Math.random() * 40 - 20); // jitter angle
+    if (currentAngle < -75) currentAngle = -75;
+    if (currentAngle > 15) currentAngle = 15;
+
+    const rad = currentAngle * Math.PI / 180;
+    const stepDist = 8.5; // distance per step (percentage)
+    const sideOffset = 2.4;
+    const offsetRad = (currentAngle + 90) * Math.PI / 180;
+    const sideSign = isLeft ? -1 : 1;
+
+    let spawnX = currentX + Math.cos(rad) * stepDist + Math.cos(offsetRad) * sideOffset * sideSign;
+    let spawnY = currentY + Math.sin(rad) * stepDist + Math.sin(offsetRad) * sideOffset * sideSign;
+
+    // Reset walkers path if they wander off boundaries
+    if (spawnX < 4 || spawnX > 96 || spawnY < 4 || spawnY > 96) {
+      currentX = 10 + Math.random() * 15;
+      currentY = 80 + Math.random() * 15;
+      currentAngle = -30;
+      spawnX = currentX;
+      spawnY = currentY;
+    } else {
+      currentX = spawnX;
+      currentY = spawnY;
+    }
+
+    const footprint = document.createElement("div");
+    footprint.className = `map-footprint ${isLeft ? 'left' : 'right'}`;
+    footprint.style.left = `${spawnX}%`;
+    footprint.style.top = `${spawnY}%`;
+    footprint.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg)`;
+    
+    footprint.innerHTML = `
+      <svg viewBox="0 0 30 14" fill="rgba(62, 39, 20, 0.55)" width="100%" height="100%">
+        <path d="M12 2 C16 2, 22 4, 24 7 C26 9, 23 12, 19 12 C15 12, 13 9, 11 7 C9 5, 8 2, 12 2 Z" />
+        <path d="M4 5 C6 5, 8 6, 8 8 C 8 10, 6 11, 4 11 C2 11, 1 10, 1 8 C1 6, 2 5, 4 5 Z" />
+      </svg>
+    `;
+    container.appendChild(footprint);
+
+    // Fade in
+    requestAnimationFrame(() => {
+      footprint.style.opacity = "0.7";
+    });
+
+    // Fade out and remove
+    setTimeout(() => {
+      footprint.style.transition = "opacity 1.2s ease";
+      footprint.style.opacity = "0";
+      setTimeout(() => footprint.remove(), 1200);
+    }, 1800);
+
+    isLeft = !isLeft;
+  }
+
+  // Alternate footprint timer
+  spawnPreloaderFootstep();
+  footstepInterval = setInterval(spawnPreloaderFootstep, 580);
 
   // Identify active house to only preload its video on startup (others load on demand)
   const savedHouse = sessionStorage.getItem('selectedHouse');
@@ -1712,18 +2095,50 @@ async function startPreloader() {
     preloadCompleted = true;
     clearTimeout(fallbackTimeout);
 
+    if (footstepInterval) {
+      clearInterval(footstepInterval);
+      footstepInterval = null;
+    }
+
     const progressBar = document.getElementById("loading-progress-bar");
     const percentageLabel = document.getElementById("loading-percentage");
     const statusLabel = document.getElementById("loading-status");
+    const subtitle = document.getElementById("loading-subtitle");
 
     if (progressBar) progressBar.style.width = "100%";
     if (percentageLabel) percentageLabel.textContent = "100%";
+    
     if (statusLabel) {
       statusLabel.style.opacity = "0";
       setTimeout(() => {
         statusLabel.textContent = "Sealing the envelope with wax\u2026";
         statusLabel.style.opacity = "1";
       }, 150);
+    }
+
+    // Calligraphy morph to "Mischief Managed"
+    if (subtitle) {
+      subtitle.style.transition = "opacity 0.3s ease";
+      subtitle.style.opacity = "0";
+      setTimeout(() => {
+        subtitle.textContent = "Mischief Managed.";
+        subtitle.style.opacity = "1";
+      }, 300);
+    }
+
+    // Fade out progressive preloader details
+    if (solemnSwear) {
+      solemnSwear.style.transition = "opacity 0.4s ease";
+      solemnSwear.style.opacity = "0";
+    }
+    const progressContainer = document.getElementById("loading-progress-container");
+    if (progressContainer) {
+      progressContainer.style.transition = "opacity 0.4s ease";
+      progressContainer.style.opacity = "0";
+    }
+    if (percentageLabel) {
+      percentageLabel.style.transition = "opacity 0.4s ease";
+      percentageLabel.style.opacity = "0";
     }
 
     setTimeout(() => {
@@ -1737,7 +2152,7 @@ async function startPreloader() {
       } else {
         initializeMainApp();
       }
-    }, 800);
+    }, 950);
   }
 
   assets.forEach(async (asset) => {
@@ -1777,6 +2192,165 @@ async function startPreloader() {
     completePreloading();
   }
 }
+
+/* ============================================================
+   💡 LUMOS SPELL INTERACTION & EASTER EGG
+   ============================================================ */
+let typedKeys = "";
+let lumosActive = false;
+let lumosVignette = null;
+let lumosGlow = null;
+
+// Standard center position for initial render
+let lastLumosX = window.innerWidth / 2;
+let lastLumosY = window.innerHeight / 2;
+
+// Set global values for particles coordinates
+window.lastLumosX = lastLumosX;
+window.lastLumosY = lastLumosY;
+
+function updateLumosCoords(clientX, clientY) {
+  lastLumosX = clientX;
+  lastLumosY = clientY;
+  window.lastLumosX = clientX;
+  window.lastLumosY = clientY;
+  
+  document.documentElement.style.setProperty("--x", `${clientX}px`);
+  document.documentElement.style.setProperty("--y", `${clientY}px`);
+  
+  // Fire periodic magic wand sparkles centered on cursor coordinates
+  if (lumosActive && Math.random() < 0.14) {
+    window.dispatchEvent(new CustomEvent('envelopeTapped', {
+      detail: { x: clientX, y: clientY }
+    }));
+  }
+}
+
+function handleLumosMove(e) {
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+  const y = e.touches ? e.touches[0].clientY : e.clientY;
+  updateLumosCoords(x, y);
+}
+
+function playSpellSound(isLumos) {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    const now = ctx.currentTime;
+    if (isLumos) {
+      // Lumos: Uplifting magic frequency sweep
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(1450, now + 0.85);
+      
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.18, now + 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+      
+      osc.start(now);
+      osc.stop(now + 0.9);
+    } else {
+      // Nox: Falling shadow frequency sweep
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(1100, now);
+      osc.frequency.exponentialRampToValueAtTime(75, now + 0.65);
+      
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+      
+      osc.start(now);
+      osc.stop(now + 0.7);
+    }
+    
+    setTimeout(() => {
+      try { ctx.close(); } catch(e) {}
+    }, 1100);
+  } catch (e) {
+    // Fail silently
+  }
+}
+
+function toggleLumosSpell(activate) {
+  if (activate === lumosActive) return;
+  lumosActive = activate;
+  window.isLumosActive = activate;
+  
+  if (activate) {
+    lumosVignette = document.createElement("div");
+    lumosVignette.id = "lumos-vignette";
+    
+    lumosGlow = document.createElement("div");
+    lumosGlow.id = "lumos-glow";
+    
+    document.body.appendChild(lumosVignette);
+    document.body.appendChild(lumosGlow);
+    
+    updateLumosCoords(lastLumosX, lastLumosY);
+    
+    requestAnimationFrame(() => {
+      lumosVignette.classList.add("active");
+      lumosGlow.classList.add("active");
+    });
+    
+    window.addEventListener("mousemove", handleLumosMove);
+    window.addEventListener("touchmove", handleLumosMove, { passive: true });
+    
+    playSpellSound(true);
+    showSpellToast("Lumos Maxima! ⚡");
+  } else {
+    if (lumosVignette && lumosGlow) {
+      lumosVignette.classList.remove("active");
+      lumosGlow.classList.remove("active");
+      
+      const v = lumosVignette;
+      const g = lumosGlow;
+      setTimeout(() => {
+        v.remove();
+        g.remove();
+      }, 800);
+    }
+    
+    window.removeEventListener("mousemove", handleLumosMove);
+    window.removeEventListener("touchmove", handleLumosMove);
+    
+    playSpellSound(false);
+    showSpellToast("Nox. 🌙");
+  }
+}
+
+function showSpellToast(text) {
+  const toast = document.getElementById("house-toast");
+  if (!toast) return;
+  toast.textContent = text;
+  toast.className = "show";
+  setTimeout(() => {
+    if (toast.textContent === text) {
+      toast.className = "";
+    }
+  }, 2200);
+}
+
+// Global keystroke listener to unlock Easter egg
+document.addEventListener("keydown", (e) => {
+  if (e.key && e.key.length === 1) {
+    typedKeys += e.key.toLowerCase();
+    typedKeys = typedKeys.slice(-12);
+    
+    if (typedKeys.endsWith("lumos")) {
+      toggleLumosSpell(true);
+    } else if (typedKeys.endsWith("nox")) {
+      toggleLumosSpell(false);
+    }
+  }
+});
 
 /* ── DOM Init ── */
 document.addEventListener("DOMContentLoaded", () => {

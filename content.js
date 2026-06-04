@@ -145,4 +145,13 @@ Ani 🌻`,
 
   musicLabel: "🎵 Wingardium Leviosa",
   // ^ Label on the music button (before music starts playing).
+
+  eyesOnlyMessage: `Dear Vanshika,
+
+This is a secret message just for you, hidden behind the magic of Hogwarts. 
+
+You are one of the most brilliant, cunning, and ambitious people in the world, and I am so incredibly grateful to have you in my life. May this year bring you endless success, adventure, and everything you've ever dreamed of.
+
+With all my heart and a spark of magic,
+Ani ❤️`,
 };

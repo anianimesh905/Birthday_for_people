@@ -1617,28 +1617,20 @@ body::before {
 #loading-bg {
   position: absolute;
   inset: -20px;
-  background: linear-gradient(135deg, #0d1b2a 0%, #15102a 35%, #2a101b 70%, #0d1b2a 100%);
-  background-size: 400% 400%;
-  animation: loadingSky 16s ease-in-out infinite;
-  filter: blur(10px);
+  background: radial-gradient(circle, #f5ecd6 60%, #e3d2ad 100%);
   z-index: 0;
-}
-
-@keyframes loadingSky {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 #loading-card {
   position: relative;
-  z-index: 1;
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 10;
+  background: rgba(248, 240, 218, 0.7); /* warm parchment card look */
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(62, 39, 20, 0.15);
   box-shadow: 
-    0 30px 60px rgba(0, 0, 0, 0.6),
-    inset 0 0 20px rgba(255, 255, 255, 0.02);
+    0 24px 55px rgba(62, 39, 20, 0.18),
+    inset 0 0 25px rgba(255, 255, 255, 0.45);
   border-radius: 24px;
   padding: 3.5rem 2.2rem;
   width: min(390px, 88vw);
@@ -1654,9 +1646,9 @@ body::before {
 .loading-icon {
   width: 76px;
   height: 76px;
-  margin: 0 auto 2.2rem;
-  color: var(--house-accent, #D3A625);
-  filter: drop-shadow(0 0 10px rgba(211, 166, 37, 0.35));
+  margin: 0 auto 2.0rem;
+  color: #8c1d1d; /* Deep scarlet ink */
+  filter: drop-shadow(0 2px 4px rgba(62, 39, 20, 0.15));
   animation: loadingSpin 9s linear infinite;
 }
 
@@ -1674,27 +1666,39 @@ body::before {
   font-family: 'Cinzel', serif;
   font-size: clamp(1.6rem, 5.5vw, 2.2rem);
   font-weight: 700;
-  color: #fff;
+  color: #3e2714; /* Deep brown ink */
   letter-spacing: 0.04em;
   margin-bottom: 0.4rem;
-  text-shadow: 0 0 12px rgba(255,255,255,0.15);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.5);
 }
 
 #loading-subtitle {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Cinzel', serif;
   font-size: 0.72rem;
-  font-weight: 300;
-  letter-spacing: 0.16em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  color: #5c3d24; /* Muted brown ink */
+}
+
+#loading-solemn-swear {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.15rem;
+  color: #3e2714;
+  font-style: italic;
+  font-weight: 700;
+  margin: 1.2rem auto 0.4rem;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.4);
 }
 
 #loading-progress-container {
   width: 100%;
   height: 3px;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(62, 39, 20, 0.1);
   border-radius: 10px;
-  margin: 2.4rem auto 0.8rem;
+  margin: 1.8rem auto 0.8rem;
   position: relative;
   overflow: visible;
 }
@@ -1702,13 +1706,13 @@ body::before {
 #loading-progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--house-accent, #D3A625) 0%, #ffd770 100%);
+  background: linear-gradient(90deg, #8c1d1d 0%, #d4a373 100%);
   border-radius: 10px;
   position: relative;
   transition: width 0.25s cubic-bezier(0.1, 0.8, 0.2, 1);
   box-shadow: 
-    0 0 12px rgba(211, 166, 37, 0.7),
-    0 0 24px rgba(211, 166, 37, 0.3);
+    0 0 8px rgba(140, 29, 29, 0.4),
+    0 0 16px rgba(140, 29, 29, 0.2);
 }
 
 #loading-progress-sparkle {
@@ -1720,8 +1724,8 @@ body::before {
   background: #fff;
   border-radius: 50%;
   box-shadow: 
-    0 0 12px #fff,
-    0 0 25px 4px var(--house-accent, #D3A625);
+    0 0 10px #fff,
+    0 0 20px 3px #8c1d1d;
   animation: sparkleScale 0.8s ease-in-out infinite alternate;
 }
 
@@ -1735,7 +1739,7 @@ body::before {
   font-size: 1.4rem;
   font-weight: 500;
   font-style: italic;
-  color: var(--house-accent, #D3A625);
+  color: #8c1d1d;
   margin-bottom: 0.4rem;
   letter-spacing: 0.02em;
 }
@@ -1744,7 +1748,7 @@ body::before {
   font-family: 'Lora', serif;
   font-style: italic;
   font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.75);
+  color: #3e2714;
   min-height: 1.5em;
   transition: opacity 0.3s ease;
 }
@@ -1876,4 +1880,185 @@ body::before {
     -webkit-backdrop-filter: none !important;
     background: rgba(10, 8, 6, 0.92) !important; /* Hard dark contrast theme without filter overhead */
   }
+}
+
+
+/* ============================================================
+   👣 MARAUDER'S MAP FOOTSTEPS
+   ============================================================ */
+#footsteps-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.map-footprint {
+  position: absolute;
+  width: clamp(26px, 5.5vw, 34px);
+  height: clamp(12px, 2.6vw, 16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 10;
+}
+
+
+/* ============================================================
+   ⚡ CINEMATIC FLASH & SHAKE ON UNSEAL
+   ============================================================ */
+#spell-flash {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100005; /* Above loader and modal overlays */
+  transition: opacity 0.15s ease-out;
+}
+
+.screen-shake {
+  animation: viewportShake 0.28s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+@keyframes viewportShake {
+  10%, 90% { transform: translate3d(-3px, 0px, 0); }
+  20%, 80% { transform: translate3d(4px, 0px, 0); }
+  30%, 50%, 70% { transform: translate3d(-5px, -2px, 0); }
+  40%, 60% { transform: translate3d(5px, 2px, 0); }
+}
+
+
+/* ============================================================
+   💡 LUMOS SPELL FLASHLIGHT EFFECT
+   ============================================================ */
+#lumos-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 140; /* Just below particles canvas (150) and letter scroll modal (200) */
+  background: rgba(4, 3, 2, 0.9);
+  mix-blend-mode: multiply;
+  transition: opacity 0.8s ease-in-out;
+  opacity: 0;
+}
+
+#lumos-vignette.active {
+  opacity: 1;
+  mask-image: radial-gradient(circle 120px at var(--x, 50vw) var(--y, 50vh), transparent 45%, black 100%);
+  -webkit-mask-image: radial-gradient(circle 120px at var(--x, 50vw) var(--y, 50vh), transparent 45%, black 100%);
+}
+
+#lumos-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 145; /* Just below particle canvas */
+  background: radial-gradient(circle 120px at var(--x, 50vw) var(--y, 50vh), rgba(255, 252, 220, 0.3) 0%, rgba(255, 218, 120, 0.08) 60%, transparent 100%);
+  mix-blend-mode: screen;
+  transition: opacity 0.8s ease-in-out;
+  opacity: 0;
+}
+
+#lumos-glow.active {
+  opacity: 1;
+}
+
+
+/* ============================================================
+   🍷 PRIVATE "EYES ONLY" ENVELOPE THEME OVERRIDES
+   ============================================================ */
+#envelope.eyes-only {
+  background-color: #6b0d0d;
+}
+
+#envelope.eyes-only #env-back {
+  background: linear-gradient(160deg, #6b0d0d 0%, #520606 100%);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.5),
+    0 2px 8px  rgba(0,0,0,0.4),
+    inset 0 0 0 1px rgba(212, 175, 55, 0.35);
+}
+
+#envelope.eyes-only #env-flap-bottom {
+  background: linear-gradient(170deg, #5c0808 0%, #400404 100%);
+}
+
+#envelope.eyes-only #env-flap-left {
+  background: linear-gradient(100deg, #570707 0%, #4a0505 60%, #6b0d0d 100%);
+}
+
+#envelope.eyes-only #env-flap-right {
+  background: linear-gradient(260deg, #570707 0%, #4a0505 60%, #6b0d0d 100%);
+}
+
+#envelope.eyes-only #env-flap-top {
+  background: linear-gradient(180deg, #6b0d0d 0%, #570707 100%);
+}
+
+#envelope.eyes-only #env-flap-top-inner {
+  background: linear-gradient(180deg, #7a1212 0%, #5c0808 100%);
+}
+
+#envelope.eyes-only #env-seal {
+  background: radial-gradient(circle, #cc1414 0%, #800000 100%);
+  box-shadow: 
+    0 4px 12px rgba(0,0,0,0.6), 
+    inset 0 2px 4px rgba(255,255,255,0.25),
+    0 0 12px rgba(212,175,55,0.45);
+}
+
+#envelope.eyes-only #env-seal-letter {
+  color: #ffd700;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+}
+
+#envelope.eyes-only .env-address-to {
+  color: #ffeb80;
+}
+
+#envelope.eyes-only .env-address-name {
+  color: #fff8d6;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+#envelope.eyes-only .env-address-line2 {
+  color: #ffc4c4;
+}
+
+#envelope.eyes-only #env-letter {
+  background: linear-gradient(160deg, #fff2f2 0%, #ffe3e3 100%);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(212, 175, 55, 0.35);
+}
+
+#envelope.eyes-only .letter-line {
+  background: rgba(180, 50, 50, 0.25);
+}
+
+/* 🌹 Rosy Tint for Private Message Scroll Overlay */
+#scroll-overlay.eyes-only-modal #scroll-paper-bg {
+  background: radial-gradient(circle, #fff9f5 60%, #fae6de 100%) !important;
+  box-shadow: 
+    inset 0 0 40px rgba(180, 50, 50, 0.1),
+    0 24px 70px rgba(0, 0, 0, 0.7) !important;
+  border: 2px solid rgba(212, 175, 55, 0.45) !important;
+}
+
+#scroll-overlay.eyes-only-modal #scroll-close {
+  background: radial-gradient(circle, #cc1414 0%, #800000 100%) !important;
+  color: #ffd700 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+#scroll-overlay.eyes-only-modal .hogwarts-school-name {
+  color: #8a1313 !important;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+}
+
+#scroll-overlay.eyes-only-modal .hogwarts-divider {
+  color: #d4af37 !important;
 }
