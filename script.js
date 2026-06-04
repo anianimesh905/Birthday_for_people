@@ -151,327 +151,21 @@ function playScrollSound() {
   }
 }
 
-/* ── Procedural Web Audio Synthesis: House-Specific Ambient Soundscapes ── */
-let ambientContext = null;
-let ambientNodes = [];
-let ambientInterval = null;
-let ambientCleanupTimeoutId = null;
-
+/* ── Procedural Web Audio Synthesis: House-Specific Ambient Soundscapes (Disabled) ── */
 function startAmbientWaves() {
-  startHouseAmbience(_currentHouse);
+  // Ambient sounds disabled per user request
 }
 
 function stopAmbientWaves() {
-  stopHouseAmbience();
+  // Ambient sounds disabled per user request
 }
 
 function startHouseAmbience(house) {
-  stopHouseAmbience();
-  if (ambientCleanupTimeoutId) {
-    clearTimeout(ambientCleanupTimeoutId);
-    ambientCleanupTimeoutId = null;
-  }
-  
-  try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-    ambientContext = new AudioContextClass();
-    
-    const h = (house || 'gryffindor').toLowerCase();
-    
-    // Main output gain node
-    const mainGain = ambientContext.createGain();
-    mainGain.gain.setValueAtTime(0, ambientContext.currentTime);
-    mainGain.connect(ambientContext.destination);
-    
-    // Smooth fade in to prevent clicks
-    mainGain.gain.linearRampToValueAtTime(0.35, ambientContext.currentTime + 2.0);
-    ambientNodes.push(mainGain);
-    
-    if (h === 'gryffindor') {
-      // 1. Gryffindor: Crackling fireplace (low rumble + random pops)
-      const bufferSize = ambientContext.sampleRate * 2;
-      const buffer = ambientContext.createBuffer(1, bufferSize, ambientContext.sampleRate);
-      const data = buffer.getChannelData(0);
-      let lastOut = 0.0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        data[i] = (lastOut + (0.015 * white)) / 1.015;
-        lastOut = data[i];
-        data[i] *= 4.0;
-      }
-      
-      const rumbleSrc = ambientContext.createBufferSource();
-      rumbleSrc.buffer = buffer;
-      rumbleSrc.loop = true;
-      
-      const lp = ambientContext.createBiquadFilter();
-      lp.type = "lowpass";
-      lp.frequency.setValueAtTime(95, ambientContext.currentTime);
-      
-      rumbleSrc.connect(lp);
-      lp.connect(mainGain);
-      rumbleSrc.start(0);
-      ambientNodes.push(rumbleSrc);
-      
-      // Fire crackle generator
-      ambientInterval = setInterval(() => {
-        if (!ambientContext || ambientContext.state === "suspended") return;
-        
-        if (Math.random() < 0.28) {
-          const crackle = ambientContext.createOscillator();
-          const crackleGain = ambientContext.createGain();
-          
-          crackle.type = "triangle";
-          crackle.frequency.setValueAtTime(700 + Math.random() * 1400, ambientContext.currentTime);
-          
-          crackleGain.gain.setValueAtTime(0.06 * Math.random(), ambientContext.currentTime);
-          crackleGain.gain.exponentialRampToValueAtTime(0.001, ambientContext.currentTime + 0.005 + Math.random() * 0.02);
-          
-          crackle.connect(crackleGain);
-          crackleGain.connect(mainGain);
-          crackle.start(0);
-          crackle.stop(ambientContext.currentTime + 0.05);
-        }
-      }, 55);
-      
-    } else if (h === 'slytherin') {
-      // 2. Slytherin: Deep dungeon echoes (low drone + cave water drips)
-      const osc1 = ambientContext.createOscillator();
-      const osc2 = ambientContext.createOscillator();
-      const droneGain = ambientContext.createGain();
-      
-      osc1.type = "sine";
-      osc1.frequency.setValueAtTime(55, ambientContext.currentTime); // A1 note
-      osc2.type = "triangle";
-      osc2.frequency.setValueAtTime(110.3, ambientContext.currentTime); // detuned octave
-      
-      droneGain.gain.setValueAtTime(0.2, ambientContext.currentTime);
-      
-      // Modulate drone volume for organic pulsing
-      const droneLfo = ambientContext.createOscillator();
-      const lfoGain = ambientContext.createGain();
-      droneLfo.frequency.setValueAtTime(0.07, ambientContext.currentTime);
-      lfoGain.gain.setValueAtTime(0.06, ambientContext.currentTime);
-      droneLfo.connect(lfoGain);
-      lfoGain.connect(droneGain.gain);
-      
-      osc1.connect(droneGain);
-      osc2.connect(droneGain);
-      droneGain.connect(mainGain);
-      
-      osc1.start(0);
-      osc2.start(0);
-      droneLfo.start(0);
-      ambientNodes.push(osc1, osc2, droneLfo);
-      
-      // Water drips echo generator
-      ambientInterval = setInterval(() => {
-        if (!ambientContext || ambientContext.state === "suspended") return;
-        
-        if (Math.random() < 0.22) {
-          const dripOsc = ambientContext.createOscillator();
-          const dripGain = ambientContext.createGain();
-          const delay = ambientContext.createDelay();
-          const feedback = ambientContext.createGain();
-          
-          dripOsc.type = "sine";
-          const now = ambientContext.currentTime;
-          dripOsc.frequency.setValueAtTime(650, now);
-          dripOsc.frequency.exponentialRampToValueAtTime(1450, now + 0.06);
-          
-          dripGain.gain.setValueAtTime(0.0, now);
-          dripGain.gain.linearRampToValueAtTime(0.09, now + 0.01);
-          dripGain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
-          
-          delay.delayTime.setValueAtTime(0.38, now);
-          feedback.gain.setValueAtTime(0.58, now);
-          
-          dripOsc.connect(dripGain);
-          dripGain.connect(mainGain);
-          
-          // Feedback Delay loop
-          dripGain.connect(delay);
-          delay.connect(feedback);
-          feedback.connect(delay);
-          delay.connect(mainGain);
-          
-          dripOsc.start(now);
-          dripOsc.stop(now + 1.8);
-        }
-      }, 2200);
-      
-    } else if (h === 'ravenclaw') {
-      // 3. Ravenclaw: Windy towers (howling wind noise filter + celestial chimes)
-      const bufferSize = ambientContext.sampleRate * 3;
-      const buffer = ambientContext.createBuffer(1, bufferSize, ambientContext.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-      
-      const noise = ambientContext.createBufferSource();
-      noise.buffer = buffer;
-      noise.loop = true;
-      
-      const filter = ambientContext.createBiquadFilter();
-      filter.type = "bandpass";
-      filter.Q.setValueAtTime(2.2, ambientContext.currentTime);
-      filter.frequency.setValueAtTime(380, ambientContext.currentTime);
-      
-      const windLfo = ambientContext.createOscillator();
-      const lfoGain = ambientContext.createGain();
-      windLfo.frequency.setValueAtTime(0.06, ambientContext.currentTime);
-      lfoGain.gain.setValueAtTime(190, ambientContext.currentTime);
-      
-      windLfo.connect(lfoGain);
-      lfoGain.connect(filter.frequency);
-      
-      noise.connect(filter);
-      filter.connect(mainGain);
-      
-      noise.start(0);
-      windLfo.start(0);
-      ambientNodes.push(noise, windLfo);
-      
-      // Astronomy Tower chimes
-      ambientInterval = setInterval(() => {
-        if (!ambientContext || ambientContext.state === "suspended") return;
-        
-        if (Math.random() < 0.16) {
-          const chime = ambientContext.createOscillator();
-          const chimeGain = ambientContext.createGain();
-          chime.type = "sine";
-          chime.frequency.setValueAtTime(1800 + Math.random() * 1100, ambientContext.currentTime);
-          
-          const now = ambientContext.currentTime;
-          chimeGain.gain.setValueAtTime(0.025, now);
-          chimeGain.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
-          
-          chime.connect(chimeGain);
-          chimeGain.connect(mainGain);
-          chime.start(now);
-          chime.stop(now + 2.0);
-        }
-      }, 3500);
-      
-    } else if (h === 'hufflepuff') {
-      // 4. Hufflepuff: Sunny meadows (ambient pink noise breeze + buzzing bees)
-      const bufferSize = ambientContext.sampleRate * 2.5;
-      const buffer = ambientContext.createBuffer(1, bufferSize, ambientContext.sampleRate);
-      const data = buffer.getChannelData(0);
-      let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        b0 = 0.99886 * b0 + white * 0.0555179;
-        b1 = 0.99332 * b1 + white * 0.0750759;
-        b2 = 0.96900 * b2 + white * 0.1538520;
-        b3 = 0.86650 * b3 + white * 0.3104856;
-        b4 = 0.55000 * b4 + white * 0.5329522;
-        b5 = -0.7616 * b5 - white * 0.0168980;
-        data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-        b6 = white * 0.115926;
-        data[i] *= 0.04;
-      }
-      
-      const noise = ambientContext.createBufferSource();
-      noise.buffer = buffer;
-      noise.loop = true;
-      
-      const lp = ambientContext.createBiquadFilter();
-      lp.type = "lowpass";
-      lp.frequency.setValueAtTime(220, ambientContext.currentTime);
-      
-      noise.connect(lp);
-      lp.connect(mainGain);
-      noise.start(0);
-      ambientNodes.push(noise);
-      
-      // Bumblebee stereophonic pan flying paths
-      ambientInterval = setInterval(() => {
-        if (!ambientContext || ambientContext.state === "suspended") return;
-        
-        if (Math.random() < 0.22) {
-          const bee = ambientContext.createOscillator();
-          const beeGain = ambientContext.createGain();
-          const panner = ambientContext.createStereoPanner ? ambientContext.createStereoPanner() : null;
-          
-          bee.type = "sawtooth";
-          bee.frequency.setValueAtTime(170 + Math.random() * 50, ambientContext.currentTime);
-          
-          const flutter = ambientContext.createOscillator();
-          const flutterGain = ambientContext.createGain();
-          flutter.frequency.setValueAtTime(32, ambientContext.currentTime); // wing flapping frequency
-          flutterGain.gain.setValueAtTime(0.5, ambientContext.currentTime);
-          
-          flutter.connect(flutterGain);
-          
-          const now = ambientContext.currentTime;
-          beeGain.gain.setValueAtTime(0, now);
-          beeGain.gain.linearRampToValueAtTime(0.035, now + 0.4);
-          beeGain.gain.exponentialRampToValueAtTime(0.001, now + 2.8);
-          
-          if (panner) {
-            const startPan = Math.random() < 0.5 ? -1 : 1;
-            panner.pan.setValueAtTime(startPan, now);
-            panner.pan.linearRampToValueAtTime(-startPan, now + 2.8);
-            
-            bee.connect(beeGain);
-            beeGain.connect(panner);
-            panner.connect(mainGain);
-          } else {
-            bee.connect(beeGain);
-            beeGain.connect(mainGain);
-          }
-          
-          bee.start(now);
-          flutter.start(now);
-          bee.stop(now + 3.0);
-          flutter.stop(now + 3.0);
-        }
-      }, 3000);
-    }
-  } catch (e) {
-    // Fail silently in case browser policy restricts AudioContext creation
-  }
+  // Ambient sounds disabled per user request
 }
 
 function stopHouseAmbience() {
-  if (ambientInterval) {
-    clearInterval(ambientInterval);
-    ambientInterval = null;
-  }
-  
-  const currentNodes = [...ambientNodes];
-  ambientNodes = [];
-  const ctx = ambientContext;
-  ambientContext = null;
-  
-  if (ctx) {
-    try {
-      const now = ctx.currentTime;
-      if (currentNodes.length > 0) {
-        const mainGain = currentNodes[0];
-        mainGain.gain.cancelScheduledValues(now);
-        mainGain.gain.linearRampToValueAtTime(0, now + 0.8);
-      }
-      
-      ambientCleanupTimeoutId = setTimeout(() => {
-        currentNodes.forEach(node => {
-          try {
-            node.stop();
-            node.disconnect();
-          } catch(e) {}
-        });
-        try {
-          ctx.close();
-        } catch(e) {}
-        ambientCleanupTimeoutId = null;
-      }, 950);
-    } catch(e) {
-      ambientContext = null;
-    }
-  }
+  // Ambient sounds disabled per user request
 }
 
 /* ── Paragraph-Aware Stagger Reveal & Drop Cap ── */
@@ -803,7 +497,7 @@ function initMagicParticles(opts = {}) {
   window.addEventListener('resize', resizeCanvas, { passive: true });
 
   const IS_MOBILE = window.innerWidth < 768;
-  const MAX_PARTICLES = IS_MOBILE ? 20 : 80;
+  window.maxParticlesLimit = IS_MOBILE ? 20 : 80;
   const SPAWN_INTERVAL = IS_MOBILE ? 400 : 180;
 
   const PALETTES = {
@@ -828,7 +522,7 @@ function initMagicParticles(opts = {}) {
   function Particle() { 
     this.active = false; 
   }
-  for (let i = 0; i < MAX_PARTICLES; i++) { 
+  for (let i = 0; i < 250; i++) { 
     particles.push(new Particle()); 
   }
 
@@ -861,16 +555,57 @@ function initMagicParticles(opts = {}) {
         vx = rand(-2.0, 2.0);
         vy = rand(-3.5, -0.8);
       }
+      
       p.active = true; 
       p.type = 'A';
       p.x = cx + rand(-12, 12); 
       p.y = cy + rand(-12, 12);
+      
+      // Spell physics customizations
+      if (window.activeSpellMode === 'incendio') {
+        vy = rand(-4.8, -2.0);
+        vx = rand(-1.5, 1.5);
+      } else if (window.activeSpellMode === 'aguamenti') {
+        vy = rand(3.5, 6.5);
+        vx = rand(-0.4, 0.4);
+      } else if (window.activeSpellMode === 'glacius') {
+        vy = rand(-0.2, 0.2);
+        vx = rand(-0.2, 0.2);
+      } else if (window.activeSpellMode === 'patronus') {
+        vy = rand(-1.2, -0.4);
+        vx = rand(-0.8, 0.8);
+      } else if (window.activeSpellMode === 'orchideous') {
+        vy = rand(1.2, 2.8);
+        vx = rand(-1.5, 1.5);
+      }
+      
       p.vx = vx; 
       p.vy = vy;
       p.life = rand(1.5, 2.5); 
       p.age = 0;
       p.size = rand(8, 14); 
-      p.color = isLumos ? '#FFF3CD' : palette.spark;
+      p.isFlower = (window.activeSpellMode === 'orchideous');
+      
+      // Spell color customizations
+      let color = isLumos ? '#FFF3CD' : palette.spark;
+      if (window.activeSpellMode === 'incendio') {
+        const fireColors = ['#FF4500', '#FF3000', '#FF6347', '#FF8C00', '#FFD700'];
+        color = fireColors[Math.floor(Math.random() * fireColors.length)];
+      } else if (window.activeSpellMode === 'aguamenti') {
+        const rainColors = ['#1E90FF', '#00BFFF', '#87CEFA', '#4682B4'];
+        color = rainColors[Math.floor(Math.random() * rainColors.length)];
+      } else if (window.activeSpellMode === 'glacius') {
+        const iceColors = ['#E0FFFF', '#B0E0E6', '#AFEEEE', '#FFFFFF'];
+        color = iceColors[Math.floor(Math.random() * iceColors.length)];
+      } else if (window.activeSpellMode === 'patronus') {
+        const silverColors = ['#F5F5F7', '#E8E8F0', '#D0D8F0', '#FFFFFF'];
+        color = silverColors[Math.floor(Math.random() * silverColors.length)];
+      } else if (window.activeSpellMode === 'orchideous') {
+        const flowerColors = ['#FFC0CB', '#FFB6C1', '#FF69B4', '#DA70D6', '#FFFFFF'];
+        color = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+      }
+      p.color = color;
+      
       p.rotation = rand(0, Math.PI * 2); 
       p.spin = rand(-0.12, 0.12);
     }
@@ -878,6 +613,7 @@ function initMagicParticles(opts = {}) {
       startLoop();
     }
   }
+  window.spawnSparkCluster = spawnSparkCluster;
 
   function spawnOrb() {
     const p = getFreeParticle(); 
@@ -952,9 +688,36 @@ function initMagicParticles(opts = {}) {
   let lastSpawn = 0;
   function tickSpawner(now) {
     const alive = particles.filter(p => p.active).length;
-    if (alive >= MAX_PARTICLES) return;
-    if (now - lastSpawn > SPAWN_INTERVAL) { 
-      pickWeighted(); 
+    const currentMax = window.maxParticlesLimit;
+    if (alive >= currentMax) return;
+    
+    let currentInterval = SPAWN_INTERVAL;
+    if (window.activeSpellMode === 'incendio' || window.activeSpellMode === 'aguamenti' || window.activeSpellMode === 'orchideous') {
+      currentInterval = IS_MOBILE ? 50 : 25;
+    }
+    
+    if (now - lastSpawn > currentInterval) { 
+      if (window.activeSpellMode && window.activeSpellMode !== 'none') {
+        if (window.activeSpellMode === 'incendio') {
+          const cx = rand(0, canvas.width);
+          const cy = canvas.height + 10;
+          spawnSparkCluster(cx, cy, Math.floor(rand(2, 5)), false);
+        } else if (window.activeSpellMode === 'aguamenti') {
+          const cx = rand(0, canvas.width);
+          const cy = -10;
+          spawnSparkCluster(cx, cy, Math.floor(rand(2, 5)), false);
+        } else if (window.activeSpellMode === 'orchideous') {
+          const cx = rand(0, canvas.width);
+          const cy = -20;
+          spawnSparkCluster(cx, cy, Math.floor(rand(1, 3)), false);
+        } else {
+          const cx = window.isLumosActive ? window.lastLumosX : (window.innerWidth / 2);
+          const cy = window.isLumosActive ? window.lastLumosY : (window.innerHeight / 2);
+          spawnSparkCluster(cx + rand(-80, 80), cy + rand(-80, 80), 2, false);
+        }
+      } else {
+        pickWeighted(); 
+      }
       lastSpawn = now; 
     }
   }
@@ -968,13 +731,26 @@ function initMagicParticles(opts = {}) {
     const progress = p.age / p.life;
     switch (p.type) {
       case 'A':
-        p.x += p.vx; 
-        p.y += p.vy;
-        p.vy += 0.06; 
-        p.vx *= 0.97; 
+        if (window.activeSpellMode === 'glacius') {
+          p.x += p.vx * 0.15;
+          p.y += p.vy * 0.15;
+        } else if (window.activeSpellMode === 'aguamenti') {
+          p.x += p.vx;
+          p.y += p.vy;
+        } else if (window.activeSpellMode === 'incendio') {
+          p.x += p.vx + Math.sin(p.age * 5.0) * 0.45;
+          p.y += p.vy;
+        } else {
+          p.x += p.vx; 
+          p.y += p.vy;
+          p.vy += 0.06; 
+          p.vx *= 0.97; 
+        }
         p.rotation += p.spin;
         p.alpha = progress > 0.70 ? 1 - (progress - 0.70) / 0.30 : 1;
-        p.color = palette.spark;
+        if (!window.activeSpellMode && !window.isLumosActive) {
+          p.color = palette.spark;
+        }
         break;
       case 'B':
         p.x += p.vx; 
@@ -1014,7 +790,15 @@ function initMagicParticles(opts = {}) {
         ctx.fillStyle = p.color;
         ctx.textAlign = 'center'; 
         ctx.textBaseline = 'middle';
-        ctx.fillText('✦', 0, 0);
+        if (p.isFlower) {
+          const flowers = ['🌸', '🌺', '🌼', '🌹', '🍀'];
+          if (!p.flowerChar) {
+            p.flowerChar = flowers[Math.floor(Math.random() * flowers.length)];
+          }
+          ctx.fillText(p.flowerChar, 0, 0);
+        } else {
+          ctx.fillText('✦', 0, 0);
+        }
         break;
       }
       case 'B': {
@@ -1065,6 +849,7 @@ function initMagicParticles(opts = {}) {
     lastTime = performance.now();
     rafId = requestAnimationFrame(loop);
   }
+  window.startMagicParticlesLoop = startLoop;
 
   window.addEventListener('envelopeTapped', (e) => {
     const detail = e.detail || {};
@@ -1693,6 +1478,7 @@ function initEnvelope() {
     
     if (opened) {
       overlay.classList.add("open");
+      document.body.classList.add("letter-open");
       startAmbientWaves();
       setTimeout(() => {
         if (paper) {
@@ -1728,11 +1514,7 @@ function initEnvelope() {
     playCrackSound();
     triggerCinematicUnseal();
 
-    if (window.navigator && typeof window.navigator.vibrate === "function") {
-      try {
-        window.navigator.vibrate([50, 30, 50]);
-      } catch (err) {}
-    }
+
 
     // Top flap rotates open, letter rises (40ms response delay)
     setTimeout(() => {
@@ -1757,6 +1539,7 @@ function initEnvelope() {
     // Scroll open modal sequence (snappy 450ms transition instead of 900ms)
     setTimeout(() => {
       overlay.classList.add("open");
+      document.body.classList.add("letter-open");
       startAmbientWaves();
 
       setTimeout(() => {
@@ -1811,17 +1594,12 @@ function initEnvelope() {
 
   function closeModal() {
     overlay.classList.remove("open");
+    document.body.classList.remove("letter-open");
     stopAmbientWaves();
     if (paper) paper.classList.remove("unfolded");
     
-    // Handle sequential letter morphing
-    const isPersonal = envelope.classList.contains("eyes-only");
-    if (!isPersonal && !firstLetterRead) {
-      firstLetterRead = true;
-      triggerEnvelopeMorph();
-    } else if (isPersonal && !secondLetterRead) {
-      secondLetterRead = true;
-    }
+    // Sequential envelope morphing is disabled to use the Revelio/Alohomora chest instead!
+    firstLetterRead = true;
   }
 
   wrapper.addEventListener("touchend", (e) => {
@@ -1916,6 +1694,74 @@ function initializeMainApp() {
   initSwipeDismiss();
   initMagicParticles({ canvasId: 'sparkle-canvas' });
 
+  // 🪄 Spell Caster Popup Overlay Listeners
+  const spellBtn = document.getElementById("spell-btn");
+  const spellModal = document.getElementById("spell-modal");
+  const spellClose = document.getElementById("spell-modal-close");
+  const spellInput = document.getElementById("spell-input-field");
+  const spellCast = document.getElementById("spell-cast-action");
+  const spellBg = document.getElementById("spell-modal-bg");
+
+  if (spellBtn && spellModal) {
+    const openSpellModal = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      spellModal.classList.add("open");
+      if (spellInput) {
+        spellInput.value = "";
+        setTimeout(() => spellInput.focus(), 150);
+      }
+    };
+
+    const closeSpellModal = () => {
+      spellModal.classList.remove("open");
+    };
+
+    spellBtn.addEventListener("click", openSpellModal);
+    spellBtn.addEventListener("touchend", openSpellModal);
+
+    if (spellClose) {
+      spellClose.addEventListener("click", closeSpellModal);
+      spellClose.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        closeSpellModal();
+      });
+    }
+
+    if (spellBg) {
+      spellBg.addEventListener("click", closeSpellModal);
+      spellBg.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        closeSpellModal();
+      });
+    }
+
+    const executeSpell = () => {
+      if (spellInput) {
+        const val = spellInput.value;
+        castSpellText(val);
+        closeSpellModal();
+      }
+    };
+
+    if (spellCast) {
+      spellCast.addEventListener("click", executeSpell);
+      spellCast.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        executeSpell();
+      });
+    }
+
+    if (spellInput) {
+      spellInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          executeSpell();
+        }
+      });
+    }
+  }
+
   // Disallow long presses triggering context menus
   document.addEventListener("contextmenu", (e) => e.preventDefault());
 
@@ -1926,6 +1772,8 @@ function initializeMainApp() {
     if (now - lastTap < 300) e.preventDefault();
     lastTap = now;
   }, { passive: false });
+
+  initTreasureBox();
 }
 
 /* ── Preloader File Downloads ── */
@@ -2197,10 +2045,14 @@ async function startPreloader() {
 /* ============================================================
    💡 LUMOS SPELL INTERACTION & EASTER EGG
    ============================================================ */
-let typedKeys = "";
 let lumosActive = false;
 let lumosVignette = null;
 let lumosGlow = null;
+
+// New spell states
+window.revelioCast = false;
+window.chestUnlocked = false;
+window.activeSpellMode = "";
 
 // Standard center position for initial render
 let lastLumosX = window.innerWidth / 2;
@@ -2339,19 +2191,407 @@ function showSpellToast(text) {
   }, 2200);
 }
 
-// Global keystroke listener to unlock Easter egg
-document.addEventListener("keydown", (e) => {
-  if (e.key && e.key.length === 1) {
-    typedKeys += e.key.toLowerCase();
-    typedKeys = typedKeys.slice(-12);
-    
-    if (typedKeys.endsWith("lumos")) {
-      toggleLumosSpell(true);
-    } else if (typedKeys.endsWith("nox")) {
-      toggleLumosSpell(false);
-    }
+function activateTouchBlocker(durationMs) {
+  let blocker = document.getElementById("spell-touch-blocker");
+  if (!blocker) {
+    blocker = document.createElement("div");
+    blocker.id = "spell-touch-blocker";
+    document.body.appendChild(blocker);
   }
-});
+  setTimeout(() => {
+    if (blocker && blocker.parentNode) {
+      blocker.remove();
+    }
+  }, durationMs);
+}
+
+function triggerOrchideousPile() {
+  const pile = document.getElementById("flower-pile");
+  if (!pile) return;
+  
+  pile.innerHTML = "";
+  pile.className = "";
+  
+  const flowers = ['🌸', '🌺', '🌼', '🌹', '🌻', '🌷', '🏵️', '🍀'];
+  for (let i = 0; i < 45; i++) {
+    const flowerSpan = document.createElement("span");
+    flowerSpan.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+    flowerSpan.style.margin = "0 -8px";
+    flowerSpan.style.transform = `rotate(${rand(-25, 25)}deg) translateY(${rand(0, 15)}px) scale(${rand(0.8, 1.2)})`;
+    pile.appendChild(flowerSpan);
+  }
+  
+  void pile.offsetWidth;
+  pile.classList.add("fill-up");
+  
+  setTimeout(() => {
+    pile.classList.remove("fill-up");
+    pile.classList.add("fall-down");
+    setTimeout(() => {
+      pile.innerHTML = "";
+      pile.className = "";
+    }, 1500);
+  }, 5000);
+}
+
+function triggerPatronusFlight() {
+  document.querySelectorAll(".patronus-element").forEach(el => el.remove());
+
+  const animals = [
+    { type: 'stag', delay: 0, top: 0.24, amp: 30 },
+    { type: 'otter', delay: 1200, top: 0.48, amp: -20 },
+    { type: 'owl', delay: 2400, top: 0.10, amp: 50 },
+    { type: 'wolf', delay: 3600, top: 0.35, amp: -10 },
+    { type: 'fox', delay: 4800, top: 0.18, amp: 30 },
+    { type: 'cat', delay: 6000, top: 0.55, amp: -30 }
+  ];
+
+  animals.forEach(anim => {
+    const el = document.createElement("div");
+    el.className = `patronus-element ${anim.type}`;
+    document.body.appendChild(el);
+  });
+
+  let startTime = Date.now();
+  let trailInterval = setInterval(() => {
+    let elapsed = Date.now() - startTime;
+    if (elapsed > 13000) {
+      clearInterval(trailInterval);
+      return;
+    }
+    
+    const w = window.innerWidth;
+    animals.forEach(anim => {
+      let t = (elapsed - anim.delay) / 6500;
+      if (t >= 0 && t <= 1) {
+        let x = -200 + (w + 200) * t;
+        let y = window.innerHeight * anim.top - anim.amp * Math.sin(t * Math.PI);
+        if (typeof window.spawnSparkCluster === 'function') {
+          window.spawnSparkCluster(x + 90, y + 90, 1, false);
+        }
+      }
+    });
+  }, 40);
+
+  setTimeout(() => {
+    document.querySelectorAll(".patronus-element").forEach(el => el.remove());
+  }, 13000);
+}
+
+function spawnGeminioDecoys() {
+  document.querySelectorAll(".geminio-decoy").forEach(el => el.remove());
+  const count = 10;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  for (let i = 0; i < count; i++) {
+    const decoy = document.createElement("div");
+    decoy.className = "geminio-decoy";
+    const x = Math.max(20, Math.min(w - 120, Math.random() * (w - 80)));
+    const y = Math.max(20, Math.min(h - 120, Math.random() * (h - 80)));
+    decoy.style.left = `${x}px`;
+    decoy.style.top = `${y}px`;
+    const rot = Math.floor(Math.random() * 60 - 30);
+    decoy.style.transform = `rotate(${rot}deg)`;
+    
+    const handlePop = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      decoy.classList.add("burst");
+      if (typeof playCrackSound === "function") playCrackSound();
+      window.dispatchEvent(new CustomEvent('envelopeTapped', {
+        detail: { x: x + 40, y: y + 30 }
+      }));
+      setTimeout(() => decoy.remove(), 300);
+    };
+
+    decoy.addEventListener("click", handlePop);
+    decoy.addEventListener("touchend", handlePop);
+    
+    document.body.appendChild(decoy);
+  }
+}
+
+function triggerRevelioSweep() {
+  const sweep = document.createElement("div");
+  sweep.id = "revelio-sweep";
+  const x = lastLumosX || window.innerWidth / 2;
+  const y = lastLumosY || window.innerHeight / 2;
+  document.documentElement.style.setProperty("--x", `${x}px`);
+  document.documentElement.style.setProperty("--y", `${y}px`);
+  document.body.appendChild(sweep);
+  setTimeout(() => sweep.remove(), 1600);
+}
+
+function resetChestToEnvelope() {
+  const envWrapper = document.getElementById("envelope-wrapper");
+  const envHint = document.getElementById("envelope-hint");
+  const chestWrapper = document.getElementById("treasure-chest-wrapper");
+  const chest = document.getElementById("treasure-chest");
+  
+  window.revelioCast = false;
+  window.chestUnlocked = false;
+  
+  if (chest) {
+    chest.classList.remove("unlocked");
+    chest.classList.add("locked");
+  }
+  
+  if (chestWrapper) {
+    chestWrapper.classList.add("hidden");
+  }
+  
+  if (envWrapper) {
+    envWrapper.classList.remove("hidden");
+  }
+  if (envHint) {
+    envHint.classList.remove("hidden");
+    envHint.style.opacity = "1";
+  }
+}
+
+function initTreasureBox() {
+  const overlay = document.getElementById("treasure-overlay");
+  const closeBtn = document.getElementById("treasure-close");
+  const chestWrapper = document.getElementById("treasure-chest-wrapper");
+  if (!overlay || !closeBtn || !chestWrapper) return;
+  
+  closeBtn.addEventListener("click", () => {
+    overlay.classList.add("hidden");
+    if (window.chestUnlocked) {
+      resetChestToEnvelope();
+    }
+  });
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      overlay.classList.add("hidden");
+      if (window.chestUnlocked) {
+        resetChestToEnvelope();
+      }
+    }
+  });
+  
+  chestWrapper.addEventListener("click", (e) => {
+    if (!window.chestUnlocked) {
+      chestWrapper.classList.add("shake");
+      if (typeof playCrackSound === "function") playCrackSound();
+      showSpellToast("It's locked with a powerful spell! Cast 'Alohomora' to unlock it.");
+      setTimeout(() => chestWrapper.classList.remove("shake"), 450);
+    } else {
+      const scroll = document.getElementById("treasure-scroll");
+      if (overlay && scroll) {
+        overlay.classList.remove("hidden");
+        scroll.classList.remove("hidden-scroll");
+        scroll.classList.add("show-scroll");
+      }
+    }
+  });
+}
+
+function castSpellText(spellText) {
+  const txt = (spellText || "").trim().toLowerCase();
+  
+  if (txt === "lumos") {
+    toggleLumosSpell(true);
+  } 
+  else if (txt === "nox") {
+    toggleLumosSpell(false);
+  } 
+  else if (txt === "alohomora") {
+    if (!window.revelioCast) {
+      showSpellToast("Search the box first before opening you cheater BOOO...");
+    } else if (window.revelioCast && !window.chestUnlocked) {
+      const chest = document.getElementById("treasure-chest");
+      const overlay = document.getElementById("treasure-overlay");
+      const scroll = document.getElementById("treasure-scroll");
+      const msgContent = document.getElementById("treasure-message-content");
+      const chestWrapper = document.getElementById("treasure-chest-wrapper");
+      
+      if (chest && overlay && scroll && msgContent) {
+        window.chestUnlocked = true;
+        chest.classList.remove("locked");
+        chest.classList.add("unlocked");
+        
+        if (chestWrapper) {
+          const rect = chestWrapper.getBoundingClientRect();
+          window.dispatchEvent(new CustomEvent('envelopeTapped', {
+            detail: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+          }));
+        }
+        
+        const c = window._bdContent || {};
+        const msg = c.eyesOnlyMessage || "Dear Vanshika, wishing you the most magical and beautiful birthday yet! ✦";
+        msgContent.innerHTML = `<p>${msg.replace(/\n/g, "</p><p>")}</p>`;
+        
+        if (typeof playCrackSound === "function") playCrackSound();
+        
+        setTimeout(() => {
+          overlay.classList.remove("hidden");
+          scroll.classList.remove("hidden-scroll");
+          scroll.classList.add("show-scroll");
+        }, 1200);
+        
+        showSpellToast("Alohomora! The chest has unlocked.");
+      }
+    } else {
+      showSpellToast("The chest is already open!");
+    }
+  } 
+  else if (txt === "revelio") {
+    window.revelioCast = true;
+    triggerRevelioSweep();
+    
+    const envWrapper = document.getElementById("envelope-wrapper");
+    const envHint = document.getElementById("envelope-hint");
+    const chestWrapper = document.getElementById("treasure-chest-wrapper");
+    
+    if (typeof playCrackSound === "function") playCrackSound();
+    
+    if (envWrapper) envWrapper.classList.add("hidden");
+    if (envHint) envHint.classList.add("hidden");
+    if (chestWrapper) {
+      chestWrapper.classList.remove("hidden");
+      setTimeout(() => {
+        const rect = chestWrapper.getBoundingClientRect();
+        window.dispatchEvent(new CustomEvent('envelopeTapped', {
+          detail: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+        }));
+      }, 300);
+    }
+    showSpellToast("Revelio! The hidden chest is revealed.");
+  } 
+  else if (txt === "expecto patronum") {
+    window.activeSpellMode = "patronus";
+    document.body.classList.add("patronus-active");
+    triggerPatronusFlight();
+    showSpellToast("Expecto Patronum! ⚡");
+    setTimeout(() => {
+      if (window.activeSpellMode === "patronus") window.activeSpellMode = "";
+      document.body.classList.remove("patronus-active");
+    }, 12500);
+  } 
+  else if (txt === "wingardium leviosa") {
+    window.activeSpellMode = "levitation";
+    const levTargets = ["#envelope-wrapper", "#spell-btn", "#music-btn", "#house-switch-btn"];
+    levTargets.forEach(sel => {
+      const el = document.querySelector(sel);
+      if (el) el.classList.add("levitating");
+    });
+    showSpellToast("Wingardium Leviosa! 💫");
+    setTimeout(() => {
+      levTargets.forEach(sel => {
+        const el = document.querySelector(sel);
+        if (el) el.classList.remove("levitating");
+      });
+      if (window.activeSpellMode === "levitation") window.activeSpellMode = "";
+    }, 8000);
+  } 
+  else if (txt === "incendio") {
+    window.activeSpellMode = "incendio";
+    window.maxParticlesLimit = 180;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    document.body.classList.add("incendio-running");
+    activateTouchBlocker(8000);
+    showSpellToast("Incendio! 🔥");
+    setTimeout(() => {
+      if (window.activeSpellMode === "incendio") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      document.body.classList.remove("incendio-running");
+    }, 8000);
+  } 
+  else if (txt === "aguamenti") {
+    window.activeSpellMode = "aguamenti";
+    window.maxParticlesLimit = 220;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    document.body.classList.add("aguamenti-running");
+    activateTouchBlocker(10000);
+    showSpellToast("Aguamenti! 💧");
+    
+    let water = document.getElementById("water-level");
+    if (!water) {
+      water = document.createElement("div");
+      water.id = "water-level";
+      document.body.appendChild(water);
+    }
+    water.className = "";
+    void water.offsetWidth;
+    water.classList.add("rising");
+    
+    setTimeout(() => {
+      if (window.activeSpellMode === "aguamenti") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      if (water) {
+        water.classList.remove("rising");
+        water.classList.add("falling");
+      }
+    }, 8000);
+
+    setTimeout(() => {
+      document.body.classList.remove("aguamenti-running");
+      if (water && water.parentNode) {
+        water.remove();
+      }
+    }, 10000);
+  } 
+  else if (txt === "glacius") {
+    window.activeSpellMode = "glacius";
+    window.maxParticlesLimit = 120;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    document.body.classList.add("frozen-lock");
+    activateTouchBlocker(8000);
+    if (typeof playCrackSound === "function") playCrackSound();
+    showSpellToast("Glacius! ❄️");
+    setTimeout(() => {
+      if (window.activeSpellMode === "glacius") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      document.body.classList.remove("frozen-lock");
+    }, 8000);
+  } 
+  else if (txt === "geminio") {
+    spawnGeminioDecoys();
+    showSpellToast("Geminio! ✉️");
+  } 
+  else if (txt === "orchideous") {
+    window.activeSpellMode = "orchideous";
+    window.maxParticlesLimit = 180;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    triggerOrchideousPile();
+    showSpellToast("Orchideous! 🌸");
+    
+    const w = window.innerWidth;
+    for (let i = 0; i < 15; i++) {
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('envelopeTapped', {
+          detail: { x: Math.random() * w, y: -20 }
+        }));
+      }, i * 80);
+    }
+    
+    setTimeout(() => {
+      if (window.activeSpellMode === "orchideous") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+    }, 6000);
+  }
+  else if (txt) {
+    showSpellToast("Fizzled... Try another spell!");
+  }
+}
 
 /* ── DOM Init ── */
 document.addEventListener("DOMContentLoaded", () => {

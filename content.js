@@ -148,10 +148,9 @@ Ani 🌻`,
 
   eyesOnlyMessage: `Dear Vanshika,
 
-This is a secret message just for you, hidden behind the magic of Hogwarts. 
+This is a secret message just for you, hidden behind the Hogwart's letter. 
 
-You are one of the most brilliant, cunning, and ambitious people in the world, and I am so incredibly grateful to have you in my life. May this year bring you endless success, adventure, and everything you've ever dreamed of.
+Well the birthday is already over and I don't know what to say. So if there is anything you want to say to me, you can say it.
 
-With all my heart and a spark of magic,
-Ani ❤️`,
+Anyway, if you want the whole code of this, just say it, I have it all here 😊`,
 };

@@ -171,6 +171,29 @@
 
         </div><!-- /envelope-wrapper -->
 
+        <!-- Treasure Chest (Hidden by default, revealed in place of envelope by Revelio spell) -->
+        <div id="treasure-chest-wrapper" class="hidden">
+          <!-- Padlock element -->
+          <div id="chest-padlock">
+            <div class="padlock-shackle"></div>
+            <div class="padlock-body">🔒</div>
+          </div>
+          
+          <!-- Chest elements -->
+          <div id="treasure-chest" class="locked">
+            <div class="chest-lid">
+              <div class="chest-handle"></div>
+              <div class="chest-metal-band-left"></div>
+              <div class="chest-metal-band-right"></div>
+            </div>
+            <div class="chest-body">
+              <div class="chest-lock-plate"></div>
+              <div class="chest-metal-band-left"></div>
+              <div class="chest-metal-band-right"></div>
+            </div>
+          </div>
+        </div>
+
         <p id="envelope-hint">Tap to unseal — an owl delivered this just for you ✦</p>
 
       </div><!-- /envelope-scene -->
@@ -267,6 +290,12 @@
     <span id="house-switch-btn-text" class="switcher-text">Sorting Hat</span>
   </button>
 
+  <!-- Spell Caster Button (Bottom-Center) -->
+  <button id="spell-btn" aria-label="Cast Spell" title="Wand">
+    <span class="spell-icon">🪄</span>
+    <span id="spell-btn-text" class="spell-text">Cast Spell</span>
+  </button>
+
   <!-- 🏰 Center Glassmorphic House Selector Overlay -->
   <div id="house-selector-overlay" role="dialog" aria-modal="true" aria-labelledby="selector-title">
     <div id="theme-switcher-panel">
@@ -302,6 +331,40 @@
 
   <!-- Sparkle Canvas Overlay -->
   <canvas id="sparkle-canvas"></canvas>
+
+  <!-- 🪄 Spell Input Modal -->
+  <div id="spell-modal" role="dialog" aria-modal="true" aria-labelledby="spell-modal-title">
+    <div id="spell-modal-bg"></div>
+    <div id="spell-modal-card">
+      <button id="spell-modal-close" aria-label="Close text dialog">✕</button>
+      <h3 id="spell-modal-title">Speak Your Charm</h3>
+      <p class="spell-modal-subtitle">Speak your spell to unlock magic</p>
+      <div class="spell-input-group">
+        <input type="text" id="spell-input-field" placeholder="e.g. Lumos" autocomplete="off" spellcheck="false" />
+        <button id="spell-cast-action" aria-label="Cast spell">Cast 🪄</button>
+      </div>
+      <p class="spell-help-text">Try: <strong>Lumos</strong>, <strong>Nox</strong>, <strong>Alohomora</strong>, <strong>Revelio</strong>, <strong>Expecto Patronum</strong>, <strong>Wingardium Leviosa</strong>, <strong>Incendio</strong>, <strong>Aguamenti</strong>, <strong>Glacius</strong>, <strong>Geminio</strong>, <strong>Orchideous</strong></p>
+    </div>
+  </div>
+
+  <!-- Treasure Scroll Reading Overlay (shown after chest is unlocked) -->
+  <div id="treasure-overlay" class="hidden">
+    <div id="treasure-container">
+      <button id="treasure-close" title="Close">✕</button>
+      
+      <!-- Secret Scroll (floats up after Alohomora) -->
+      <div id="treasure-scroll" class="hidden-scroll">
+        <div class="scroll-paper-mini">
+          <header class="scroll-header-mini">For Your Eyes Only</header>
+          <div class="scroll-divider-mini">✦ ❤️ ✦</div>
+          <div id="treasure-message-content"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flower Pile Layer (Orchideous Spell Flow) -->
+  <div id="flower-pile" aria-hidden="true"></div>
 
   <script src="script.js"></script>
 </body>
