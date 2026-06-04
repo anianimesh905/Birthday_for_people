@@ -1950,6 +1950,8 @@ async function startPreloader() {
   let currentY = 85;
   let currentAngle = -30;
   let isLeft = true;
+  let preloadCompleted = false;
+  let loadedCount = 0;
 
   function spawnPreloaderFootstep() {
     const container = document.getElementById("footsteps-container");
@@ -2049,8 +2051,7 @@ async function startPreloader() {
     musicFile      : "Tuning the enchanted phonograph\u2026"
   };
 
-  let loadedCount = 0;
-  let preloadCompleted = false;
+
 
   const fallbackTimeout = setTimeout(() => {
     if (!preloadCompleted) {
