@@ -1,0 +1,2022 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "procedural_web_audio_system",
+        "label": "Procedural Web Audio System",
+        "nodes": [
+          "new_birthday_script_playcracksound",
+          "new_birthday_script_playscrollsound",
+          "new_birthday_script_startambientwaves"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "script.js"
+      },
+      {
+        "id": "application_bootstrap_flow",
+        "label": "Application Bootstrap Flow",
+        "nodes": [
+          "new_birthday_script_startpreloader",
+          "new_birthday_script_initializemainapp",
+          "new_birthday_script_initmagicparticles",
+          "new_birthday_script_initenvelope",
+          "new_birthday_script_initparallax"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "script.js"
+      },
+      {
+        "id": "magical_spells_engine",
+        "label": "Magical Spells Engine",
+        "nodes": [
+          "new_birthday_script_castspelltext",
+          "new_birthday_script_togglelumosspell",
+          "new_birthday_script_triggerpatronusflight",
+          "new_birthday_script_triggerreveliosweep",
+          "new_birthday_script_inittreasurebox"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "script.js"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "content.js",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": "L1",
+      "id": "content",
+      "community": 6,
+      "norm_label": "content.js"
+    },
+    {
+      "label": "BIRTHDAY_CONTENT",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": "L15",
+      "id": "content_birthday_content",
+      "community": 6,
+      "norm_label": "birthday_content"
+    },
+    {
+      "label": "script.js",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1",
+      "id": "script",
+      "community": 1,
+      "norm_label": "script.js"
+    },
+    {
+      "label": "setVh()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L6",
+      "id": "script_setvh",
+      "community": 1,
+      "norm_label": "setvh()"
+    },
+    {
+      "label": "PRELOADED_ASSETS",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L15",
+      "id": "script_preloaded_assets",
+      "community": 1,
+      "norm_label": "preloaded_assets"
+    },
+    {
+      "label": "DEFAULT_SIZES",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L17",
+      "id": "script_default_sizes",
+      "community": 1,
+      "norm_label": "default_sizes"
+    },
+    {
+      "label": "_escapeHtml()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L26",
+      "id": "script_escapehtml",
+      "community": 1,
+      "norm_label": "_escapehtml()"
+    },
+    {
+      "label": "rand()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L36",
+      "id": "script_rand",
+      "community": 1,
+      "norm_label": "rand()"
+    },
+    {
+      "label": "getAudioCtx()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L49",
+      "id": "script_getaudioctx",
+      "community": 2,
+      "norm_label": "getaudioctx()"
+    },
+    {
+      "label": "playCrackSound()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L66",
+      "id": "script_playcracksound",
+      "community": 2,
+      "norm_label": "playcracksound()"
+    },
+    {
+      "label": "playScrollSound()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L104",
+      "id": "script_playscrollsound",
+      "community": 2,
+      "norm_label": "playscrollsound()"
+    },
+    {
+      "label": "startAmbientWaves()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L168",
+      "id": "script_startambientwaves",
+      "community": 1,
+      "norm_label": "startambientwaves()"
+    },
+    {
+      "label": "stopAmbientWaves()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L172",
+      "id": "script_stopambientwaves",
+      "community": 1,
+      "norm_label": "stopambientwaves()"
+    },
+    {
+      "label": "startHouseAmbience()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L176",
+      "id": "script_starthouseambience",
+      "community": 1,
+      "norm_label": "starthouseambience()"
+    },
+    {
+      "label": "stopHouseAmbience()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L180",
+      "id": "script_stophouseambience",
+      "community": 1,
+      "norm_label": "stophouseambience()"
+    },
+    {
+      "label": "_injectDropCapAndRender()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L185",
+      "id": "script_injectdropcapandrender",
+      "community": 8,
+      "norm_label": "_injectdropcapandrender()"
+    },
+    {
+      "label": "revealHogwartsLetter()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L245",
+      "id": "script_revealhogwartsletter",
+      "community": 8,
+      "norm_label": "revealhogwartsletter()"
+    },
+    {
+      "label": "setupMusic()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L269",
+      "id": "script_setupmusic",
+      "community": 4,
+      "norm_label": "setupmusic()"
+    },
+    {
+      "label": "initVideoBackground()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L382",
+      "id": "script_initvideobackground",
+      "community": 7,
+      "norm_label": "initvideobackground()"
+    },
+    {
+      "label": "loadHouseVideo()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L417",
+      "id": "script_loadhousevideo",
+      "community": 7,
+      "norm_label": "loadhousevideo()"
+    },
+    {
+      "label": "initMagicParticles()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L496",
+      "id": "script_initmagicparticles",
+      "community": 4,
+      "norm_label": "initmagicparticles()"
+    },
+    {
+      "label": "initSwipeDismiss()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1010",
+      "id": "script_initswipedismiss",
+      "community": 4,
+      "norm_label": "initswipedismiss()"
+    },
+    {
+      "label": "initParallax()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1074",
+      "id": "script_initparallax",
+      "community": 4,
+      "norm_label": "initparallax()"
+    },
+    {
+      "label": "initScrollReveal()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1120",
+      "id": "script_initscrollreveal",
+      "community": 4,
+      "norm_label": "initscrollreveal()"
+    },
+    {
+      "label": "burstSealParticles()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1139",
+      "id": "script_burstsealparticles",
+      "community": 1,
+      "norm_label": "burstsealparticles()"
+    },
+    {
+      "label": "spawnConfetti()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1174",
+      "id": "script_spawnconfetti",
+      "community": 1,
+      "norm_label": "spawnconfetti()"
+    },
+    {
+      "label": "showHouseToast()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1230",
+      "id": "script_showhousetoast",
+      "community": 5,
+      "norm_label": "showhousetoast()"
+    },
+    {
+      "label": "updateSealForHouse()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1256",
+      "id": "script_updatesealforhouse",
+      "community": 5,
+      "norm_label": "updatesealforhouse()"
+    },
+    {
+      "label": "triggerOwlDelivery()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1272",
+      "id": "script_triggerowldelivery",
+      "community": 1,
+      "norm_label": "triggerowldelivery()"
+    },
+    {
+      "label": "HOUSES",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1280",
+      "id": "script_houses",
+      "community": 1,
+      "norm_label": "houses"
+    },
+    {
+      "label": "selectHouse()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1322",
+      "id": "script_selecthouse",
+      "community": 5,
+      "norm_label": "selecthouse()"
+    },
+    {
+      "label": "initHouseSelector()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1386",
+      "id": "script_inithouseselector",
+      "community": 5,
+      "norm_label": "inithouseselector()"
+    },
+    {
+      "label": "initEnvelope()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1459",
+      "id": "script_initenvelope",
+      "community": 4,
+      "norm_label": "initenvelope()"
+    },
+    {
+      "label": "initializeMainApp()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1748",
+      "id": "script_initializemainapp",
+      "community": 4,
+      "norm_label": "initializemainapp()"
+    },
+    {
+      "label": "startPreloader()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L1869",
+      "id": "script_startpreloader",
+      "community": 1,
+      "norm_label": "startpreloader()"
+    },
+    {
+      "label": "updateLumosCoords()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2157",
+      "id": "script_updatelumoscoords",
+      "community": 2,
+      "norm_label": "updatelumoscoords()"
+    },
+    {
+      "label": "handleLumosMove()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2174",
+      "id": "script_handlelumosmove",
+      "community": 2,
+      "norm_label": "handlelumosmove()"
+    },
+    {
+      "label": "playSpellSound()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2180",
+      "id": "script_playspellsound",
+      "community": 2,
+      "norm_label": "playspellsound()"
+    },
+    {
+      "label": "toggleLumosSpell()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2221",
+      "id": "script_togglelumosspell",
+      "community": 2,
+      "norm_label": "togglelumosspell()"
+    },
+    {
+      "label": "showSpellToast()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2269",
+      "id": "script_showspelltoast",
+      "community": 2,
+      "norm_label": "showspelltoast()"
+    },
+    {
+      "label": "activateTouchBlocker()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2287",
+      "id": "script_activatetouchblocker",
+      "community": 2,
+      "norm_label": "activatetouchblocker()"
+    },
+    {
+      "label": "cacheSpellTargets()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2302",
+      "id": "script_cachespelltargets",
+      "community": 2,
+      "norm_label": "cachespelltargets()"
+    },
+    {
+      "label": "triggerPatronusFlight()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2320",
+      "id": "script_triggerpatronusflight",
+      "community": 2,
+      "norm_label": "triggerpatronusflight()"
+    },
+    {
+      "label": "triggerRevelioSweep()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2375",
+      "id": "script_triggerreveliosweep",
+      "community": 2,
+      "norm_label": "triggerreveliosweep()"
+    },
+    {
+      "label": "resetChestToEnvelope()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2386",
+      "id": "script_resetchesttoenvelope",
+      "community": 1,
+      "norm_label": "resetchesttoenvelope()"
+    },
+    {
+      "label": "initTreasureBox()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2413",
+      "id": "script_inittreasurebox",
+      "community": 4,
+      "norm_label": "inittreasurebox()"
+    },
+    {
+      "label": "castSpellText()",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": "L2452",
+      "id": "script_castspelltext",
+      "community": 2,
+      "norm_label": "castspelltext()"
+    },
+    {
+      "label": "BIRTHDAY_CONTENT",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_content_birthday_content",
+      "community": 0,
+      "norm_label": "birthday_content"
+    },
+    {
+      "label": "startPreloader",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_startpreloader",
+      "community": 0,
+      "norm_label": "startpreloader"
+    },
+    {
+      "label": "initializeMainApp",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_initializemainapp",
+      "community": 0,
+      "norm_label": "initializemainapp"
+    },
+    {
+      "label": "setupMusic",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_setupmusic",
+      "community": 0,
+      "norm_label": "setupmusic"
+    },
+    {
+      "label": "initHouseSelector",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_inithouseselector",
+      "community": 0,
+      "norm_label": "inithouseselector"
+    },
+    {
+      "label": "initVideoBackground",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_initvideobackground",
+      "community": 0,
+      "norm_label": "initvideobackground"
+    },
+    {
+      "label": "loadHouseVideo",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_loadhousevideo",
+      "community": 0,
+      "norm_label": "loadhousevideo"
+    },
+    {
+      "label": "initMagicParticles",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_initmagicparticles",
+      "community": 0,
+      "norm_label": "initmagicparticles"
+    },
+    {
+      "label": "initEnvelope",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_initenvelope",
+      "community": 3,
+      "norm_label": "initenvelope"
+    },
+    {
+      "label": "initTreasureBox",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_inittreasurebox",
+      "community": 0,
+      "norm_label": "inittreasurebox"
+    },
+    {
+      "label": "castSpellText",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_castspelltext",
+      "community": 3,
+      "norm_label": "castspelltext"
+    },
+    {
+      "label": "toggleLumosSpell",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_togglelumosspell",
+      "community": 3,
+      "norm_label": "togglelumosspell"
+    },
+    {
+      "label": "triggerRevelioSweep",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_triggerreveliosweep",
+      "community": 3,
+      "norm_label": "triggerreveliosweep"
+    },
+    {
+      "label": "triggerPatronusFlight",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_triggerpatronusflight",
+      "community": 3,
+      "norm_label": "triggerpatronusflight"
+    },
+    {
+      "label": "playCrackSound",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_playcracksound",
+      "community": 3,
+      "norm_label": "playcracksound"
+    },
+    {
+      "label": "playScrollSound",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_playscrollsound",
+      "community": 3,
+      "norm_label": "playscrollsound"
+    },
+    {
+      "label": "startAmbientWaves",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_startambientwaves",
+      "community": 3,
+      "norm_label": "startambientwaves"
+    },
+    {
+      "label": "initParallax",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_initparallax",
+      "community": 0,
+      "norm_label": "initparallax"
+    },
+    {
+      "label": "initScrollReveal",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_initscrollreveal",
+      "community": 0,
+      "norm_label": "initscrollreveal"
+    },
+    {
+      "label": "initSwipeDismiss",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_initswipedismiss",
+      "community": 0,
+      "norm_label": "initswipedismiss"
+    },
+    {
+      "label": "revealHogwartsLetter",
+      "file_type": "code",
+      "source_file": "script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_script_revealhogwartsletter",
+      "community": 3,
+      "norm_label": "revealhogwartsletter"
+    },
+    {
+      "label": "index.html",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_index_html",
+      "community": 0,
+      "norm_label": "index.html"
+    },
+    {
+      "label": "CODEBASE_GUIDE.md",
+      "file_type": "document",
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_codebase_guide_md",
+      "community": 9,
+      "norm_label": "codebase_guide.md"
+    },
+    {
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_readme_md",
+      "community": 10,
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "Parallel Preloader & Blob URL Caching Subsystem",
+      "file_type": "rationale",
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_codebase_guide_preloader_caching_subsystem",
+      "community": 0,
+      "norm_label": "parallel preloader & blob url caching subsystem"
+    },
+    {
+      "label": "Time-Aware Cross-fading Themes",
+      "file_type": "rationale",
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_codebase_guide_cross_fading_themes",
+      "community": 0,
+      "norm_label": "time-aware cross-fading themes"
+    },
+    {
+      "label": "Web Audio Procedural Synthesizers",
+      "file_type": "rationale",
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_codebase_guide_web_audio_synthesizers",
+      "community": 3,
+      "norm_label": "web audio procedural synthesizers"
+    },
+    {
+      "label": "Parallax & Device Orientation Math",
+      "file_type": "rationale",
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_codebase_guide_parallax_gyroscope",
+      "community": 0,
+      "norm_label": "parallax & device orientation math"
+    },
+    {
+      "label": "Sparkle Particle Trail",
+      "file_type": "rationale",
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_codebase_guide_sparkle_canvas",
+      "community": 0,
+      "norm_label": "sparkle particle trail"
+    },
+    {
+      "label": "Interactive 3D Scroll Modal",
+      "file_type": "rationale",
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "new_birthday_codebase_guide_3d_scroll_modal",
+      "community": 3,
+      "norm_label": "interactive 3d scroll modal"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "content.js",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "content",
+      "target": "content_birthday_content",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2287",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_activatetouchblocker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1139",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_burstsealparticles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2302",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_cachespelltargets",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2452",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_castspelltext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_default_sizes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_escapehtml",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_getaudioctx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2174",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_handlelumosmove",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1280",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_houses",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1459",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_initenvelope",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1386",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_inithouseselector",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1748",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_initializemainapp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L496",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_initmagicparticles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1074",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_initparallax",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1120",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_initscrollreveal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1010",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_initswipedismiss",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2413",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_inittreasurebox",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L382",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_initvideobackground",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L185",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_injectdropcapandrender",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L417",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_loadhousevideo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_playcracksound",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_playscrollsound",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2180",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_playspellsound",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_preloaded_assets",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_rand",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2386",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_resetchesttoenvelope",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L245",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_revealhogwartsletter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1322",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_selecthouse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L269",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_setupmusic",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_setvh",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1230",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_showhousetoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2269",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_showspelltoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1174",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_spawnconfetti",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L168",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_startambientwaves",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L176",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_starthouseambience",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1869",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_startpreloader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_stopambientwaves",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L180",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_stophouseambience",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2221",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_togglelumosspell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1272",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_triggerowldelivery",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2320",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_triggerpatronusflight",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2375",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_triggerreveliosweep",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2157",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_updatelumoscoords",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1256",
+      "weight": 1.0,
+      "source": "script",
+      "target": "script_updatesealforhouse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L68",
+      "weight": 1.0,
+      "source": "script_playcracksound",
+      "target": "script_getaudioctx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L106",
+      "weight": 1.0,
+      "source": "script_playscrollsound",
+      "target": "script_getaudioctx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2182",
+      "weight": 1.0,
+      "source": "script_playspellsound",
+      "target": "script_getaudioctx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2487",
+      "weight": 1.0,
+      "source": "script_castspelltext",
+      "target": "script_playcracksound",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L254",
+      "weight": 1.0,
+      "source": "script_revealhogwartsletter",
+      "target": "script_injectdropcapandrender",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1770",
+      "weight": 1.0,
+      "source": "script_initializemainapp",
+      "target": "script_setupmusic",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1777",
+      "weight": 1.0,
+      "source": "script_initializemainapp",
+      "target": "script_initvideobackground",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L414",
+      "weight": 1.0,
+      "source": "script_initvideobackground",
+      "target": "script_loadhousevideo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1784",
+      "weight": 1.0,
+      "source": "script_initializemainapp",
+      "target": "script_initmagicparticles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1783",
+      "weight": 1.0,
+      "source": "script_initializemainapp",
+      "target": "script_initswipedismiss",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1782",
+      "weight": 1.0,
+      "source": "script_initializemainapp",
+      "target": "script_initparallax",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1781",
+      "weight": 1.0,
+      "source": "script_initializemainapp",
+      "target": "script_initscrollreveal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1381",
+      "weight": 1.0,
+      "source": "script_selecthouse",
+      "target": "script_showhousetoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1372",
+      "weight": 1.0,
+      "source": "script_selecthouse",
+      "target": "script_updatesealforhouse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1396",
+      "weight": 1.0,
+      "source": "script_inithouseselector",
+      "target": "script_selecthouse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1776",
+      "weight": 1.0,
+      "source": "script_initializemainapp",
+      "target": "script_inithouseselector",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1780",
+      "weight": 1.0,
+      "source": "script_initializemainapp",
+      "target": "script_initenvelope",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L1865",
+      "weight": 1.0,
+      "source": "script_initializemainapp",
+      "target": "script_inittreasurebox",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2177",
+      "weight": 1.0,
+      "source": "script_handlelumosmove",
+      "target": "script_updatelumoscoords",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2236",
+      "weight": 1.0,
+      "source": "script_togglelumosspell",
+      "target": "script_updatelumoscoords",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2246",
+      "weight": 1.0,
+      "source": "script_togglelumosspell",
+      "target": "script_playspellsound",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2456",
+      "weight": 1.0,
+      "source": "script_castspelltext",
+      "target": "script_togglelumosspell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2247",
+      "weight": 1.0,
+      "source": "script_togglelumosspell",
+      "target": "script_showspelltoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2463",
+      "weight": 1.0,
+      "source": "script_castspelltext",
+      "target": "script_showspelltoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2537",
+      "weight": 1.0,
+      "source": "script_castspelltext",
+      "target": "script_activatetouchblocker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2550",
+      "weight": 1.0,
+      "source": "script_castspelltext",
+      "target": "script_cachespelltargets",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2527",
+      "weight": 1.0,
+      "source": "script_castspelltext",
+      "target": "script_triggerpatronusflight",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "script.js",
+      "source_location": "L2503",
+      "weight": 1.0,
+      "source": "script_castspelltext",
+      "target": "script_triggerreveliosweep",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_index_html",
+      "target": "new_birthday_content_birthday_content"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_inithouseselector",
+      "target": "new_birthday_content_birthday_content"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initializemainapp",
+      "target": "new_birthday_content_birthday_content"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_loadhousevideo",
+      "target": "new_birthday_content_birthday_content"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_startpreloader",
+      "target": "new_birthday_content_birthday_content"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_codebase_guide_preloader_caching_subsystem",
+      "target": "new_birthday_script_startpreloader"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_index_html",
+      "target": "new_birthday_script_startpreloader"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_startpreloader",
+      "target": "new_birthday_script_initializemainapp"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initializemainapp",
+      "target": "new_birthday_script_initenvelope"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initializemainapp",
+      "target": "new_birthday_script_inithouseselector"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initializemainapp",
+      "target": "new_birthday_script_initmagicparticles"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initializemainapp",
+      "target": "new_birthday_script_initparallax"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initializemainapp",
+      "target": "new_birthday_script_initscrollreveal"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initializemainapp",
+      "target": "new_birthday_script_initswipedismiss"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initializemainapp",
+      "target": "new_birthday_script_inittreasurebox"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initializemainapp",
+      "target": "new_birthday_script_initvideobackground"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initializemainapp",
+      "target": "new_birthday_script_setupmusic"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initvideobackground",
+      "target": "new_birthday_script_loadhousevideo"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_codebase_guide_cross_fading_themes",
+      "target": "new_birthday_script_loadhousevideo"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_codebase_guide_sparkle_canvas",
+      "target": "new_birthday_script_initmagicparticles"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_codebase_guide_3d_scroll_modal",
+      "target": "new_birthday_script_initenvelope"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initenvelope",
+      "target": "new_birthday_script_playcracksound"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initenvelope",
+      "target": "new_birthday_script_playscrollsound"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_initenvelope",
+      "target": "new_birthday_script_revealhogwartsletter"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_castspelltext",
+      "target": "new_birthday_script_playcracksound"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_castspelltext",
+      "target": "new_birthday_script_togglelumosspell"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_castspelltext",
+      "target": "new_birthday_script_triggerpatronusflight"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_castspelltext",
+      "target": "new_birthday_script_triggerreveliosweep"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_codebase_guide_web_audio_synthesizers",
+      "target": "new_birthday_script_playcracksound"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_playcracksound",
+      "target": "new_birthday_script_playscrollsound"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_codebase_guide_web_audio_synthesizers",
+      "target": "new_birthday_script_playscrollsound"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_script_startambientwaves",
+      "target": "new_birthday_script_playscrollsound"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_codebase_guide_web_audio_synthesizers",
+      "target": "new_birthday_script_startambientwaves"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_codebase_guide_parallax_gyroscope",
+      "target": "new_birthday_script_initparallax"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CODEBASE_GUIDE.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "new_birthday_codebase_guide_3d_scroll_modal",
+      "target": "new_birthday_script_revealhogwartsletter"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "procedural_web_audio_system",
+      "label": "Procedural Web Audio System",
+      "nodes": [
+        "new_birthday_script_playcracksound",
+        "new_birthday_script_playscrollsound",
+        "new_birthday_script_startambientwaves"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js"
+    },
+    {
+      "id": "application_bootstrap_flow",
+      "label": "Application Bootstrap Flow",
+      "nodes": [
+        "new_birthday_script_startpreloader",
+        "new_birthday_script_initializemainapp",
+        "new_birthday_script_initmagicparticles",
+        "new_birthday_script_initenvelope",
+        "new_birthday_script_initparallax"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js"
+    },
+    {
+      "id": "magical_spells_engine",
+      "label": "Magical Spells Engine",
+      "nodes": [
+        "new_birthday_script_castspelltext",
+        "new_birthday_script_togglelumosspell",
+        "new_birthday_script_triggerpatronusflight",
+        "new_birthday_script_triggerreveliosweep",
+        "new_birthday_script_inittreasurebox"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "script.js"
+    }
+  ],
+  "built_at_commit": "b5eecd371f44f9ce1a802d444fde39b4665500dc"
+}

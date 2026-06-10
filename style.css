@@ -1363,10 +1363,11 @@ body.letter-open::before {
   font-family: 'Cinzel', serif;
   color: #fff;
   white-space: nowrap;
-  z-index: 10000;
+  z-index: 100010;
+  background: rgba(20, 16, 12, 0.92);
   transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s;
   opacity: 0;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(212, 196, 154, 0.4);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   pointer-events: none;
@@ -1908,6 +1909,16 @@ body.letter-open::before {
     -webkit-backdrop-filter: none !important;
     background: rgba(10, 8, 6, 0.92) !important; /* Hard dark contrast theme without filter overhead */
   }
+  #water-level {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10, 80, 180, 0.75) !important;
+  }
+  #ice-overlay {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 20%, rgba(200,240,255,0.4) 60%, rgba(150,220,255,0.8) 100%) !important;
+  }
 }
 
 
@@ -2167,13 +2178,13 @@ body.letter-open::before {
   position: relative;
   z-index: 10;
   background: radial-gradient(circle, #fcf4e0 60%, #eedeb3 100%);
-  border: 2px solid #d4c49a;
+  border: 2.5px solid #cbb88a;
   box-shadow: 
     0 24px 60px rgba(0,0,0,0.65), 
     inset 0 0 20px rgba(255,255,255,0.4);
-  border-radius: 16px;
-  padding: 2.2rem 1.8rem;
-  width: min(360px, 92vw);
+  border-radius: 20px;
+  padding: 3.2rem 2.4rem;
+  width: min(550px, 94vw); /* Enlarged spell modal card */
   text-align: center;
   color: #3e2714;
   transform: scale(0.9);
@@ -2188,42 +2199,50 @@ body.letter-open::before {
 
 #spell-modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 15px;
+  right: 15px;
   background: transparent;
   border: none;
   color: #8c7050;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   cursor: pointer;
   padding: 4px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+#spell-modal-close:hover {
+  color: #740001;
+  transform: scale(1.15) rotate(90deg);
 }
 
 #spell-modal-title {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.15rem;
+  font-size: 1.6rem; /* Grander title */
+  letter-spacing: 0.06em;
+  margin-bottom: 0.2rem;
   margin-top: 0;
+  color: #520000;
 }
 
 .spell-modal-subtitle {
   font-family: 'Lora', serif;
   font-style: italic;
-  font-size: 0.8rem;
+  font-size: 0.92rem; /* Larger subtitle */
   color: #6b4e33;
-  margin-bottom: 1.4rem;
+  margin-bottom: 1.6rem;
   margin-top: 0;
 }
 
 .spell-input-group {
   display: flex;
   background: #fdfaf0;
-  border: 1.5px solid #cbb88a;
-  border-radius: 8px;
-  padding: 4px;
+  border: 2px solid #cbb88a;
+  border-radius: 10px;
+  padding: 6px;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-  margin-bottom: 0.9rem;
+  margin-bottom: 1.2rem;
+  align-items: center;
 }
 
 #spell-input-field {
@@ -2232,9 +2251,11 @@ body.letter-open::before {
   border: none;
   outline: none;
   font-family: 'Lora', serif;
-  font-size: 0.95rem;
-  padding: 8px 12px;
+  font-size: 1.2rem; /* Larger typing font */
+  padding: 10px 14px;
   color: #3e2714;
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 #spell-input-field::placeholder {
@@ -2245,30 +2266,122 @@ body.letter-open::before {
 #spell-cast-action {
   background: radial-gradient(circle, #740001 0%, #520000 100%);
   border: 1.5px solid #d4af37;
-  border-radius: 6px;
+  border-radius: 8px;
   color: #ffd700;
   font-family: 'Cinzel', serif;
   font-weight: 600;
-  font-size: 0.8rem;
-  padding: 6px 14px;
+  font-size: 0.95rem; /* Larger button */
+  padding: 10px 22px;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-  transition: transform 0.15s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+#spell-cast-action:hover {
+  background: radial-gradient(circle, #8a0002 0%, #630000 100%);
 }
 
 #spell-cast-action:active {
   transform: scale(0.96);
 }
 
-.spell-help-text {
-  font-family: 'Lora', serif;
-  font-size: 0.72rem;
-  color: #8c7050;
-  margin: 0;
+/* ✦ Categorized Scrollable Spell Helper Grid for Quick Tapping ✦ */
+.spell-help-container {
+  margin-top: 1.4rem;
+  border-top: 1px dashed rgba(140, 112, 80, 0.35);
+  padding-top: 1.2rem;
+  text-align: left;
 }
 
-.spell-help-text strong {
+.spell-help-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.92rem;
+  font-weight: 700;
   color: #740001;
+  text-align: center;
+  margin: 0 0 1rem 0;
+  letter-spacing: 0.05em;
+}
+
+.spell-help-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.spell-help-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.spell-help-grid::-webkit-scrollbar-thumb {
+  background: rgba(140, 112, 80, 0.35);
+  border-radius: 2px;
+}
+
+.spell-help-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: 1px solid rgba(212, 196, 154, 0.2);
+  padding-bottom: 0.6rem;
+}
+
+.spell-help-col:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.spell-cat {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #520000;
+  letter-spacing: 0.04em;
+}
+
+.spell-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.spell-tag {
+  background: #fdfaf0;
+  border: 1px solid rgba(203, 184, 138, 0.6);
+  border-radius: 6px;
+  color: #5c3e21;
+  font-family: 'Lora', serif;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.spell-tag:hover {
+  background: #740001;
+  color: #ffd700;
+  border-color: #ffd700;
+  transform: translateY(-1.5px);
+}
+
+.spell-tag:active {
+  transform: translateY(0);
+}
+
+.spell-tag.elemental {
+  background: #edf8fd;
+  border-color: rgba(135, 206, 250, 0.75);
+  color: #0b519e;
+}
+
+.spell-tag.elemental:hover {
+  background: #0b519e;
+  color: #fff;
+  border-color: #0b519e;
 }
 
 /* Mobile responsive circle overrides */
@@ -2358,35 +2471,7 @@ body.frosted::after {
   100% { transform: scale(120); opacity: 0; border-width: 1px; }
 }
 
-/* Geminio replica envelope decoy styles */
-.geminio-decoy {
-  position: fixed;
-  width: clamp(75px, 16vw, 105px);
-  height: clamp(50px, 11vw, 70px);
-  background: #E6D0AA;
-  border: 2px solid #8B6537;
-  border-radius: 3px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.65);
-  cursor: pointer;
-  z-index: 180;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  transform-style: preserve-3d;
-}
-.geminio-decoy::before {
-  content: '✉️';
-  font-size: clamp(1.2rem, 3vw, 1.6rem);
-}
-.geminio-decoy:hover {
-  transform: scale(1.1) rotate(5deg) translateY(-5px);
-}
-.geminio-decoy.burst {
-  transform: scale(1.7);
-  opacity: 0;
-  pointer-events: none;
-}
+
 
 /* Patronus Element Flight style */
 .patronus-element {
@@ -2772,39 +2857,6 @@ body.frozen-lock #scroll-paper {
 }
 
 /* ============================================================
-   🌸 ORCHIDEOUS FLOWER PILE
-   ============================================================ */
-
-#flower-pile {
-  position: fixed;
-  left: 0; right: 0; bottom: -120px;
-  height: 90px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-end;
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
-  z-index: 195;
-  pointer-events: none;
-  transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.15), opacity 0.8s ease;
-  overflow: visible;
-}
-#flower-pile.fill-up {
-  transform: translateY(-120px);
-  opacity: 1;
-}
-#flower-pile.fall-down {
-  transform: translateY(150px);
-  opacity: 0;
-  transition: transform 1.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 1s ease;
-}
-.flower-sprout {
-  margin: -5px;
-  display: inline-block;
-  transform: rotate(var(--r, 0deg)) scale(var(--s, 1));
-}
-
-/* ============================================================
    🌟 UPGRADED SPELL SYSTEM: PATRONUS, INCENDIO & AGUAMENTI
    ============================================================ */
 
@@ -2812,6 +2864,8 @@ body.frozen-lock #scroll-paper {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 16px rgba(0, 191, 255, 0.95)) drop-shadow(0 0 35px rgba(30, 144, 255, 0.85)) brightness(1.2);
 }
 
 .patronus-element.stag {
@@ -2855,39 +2909,138 @@ body.frozen-lock #scroll-paper {
   100% { left: 110vw; transform: translateY(-10px) scale(0.7) rotate(0); }
 }
 
-/* Incendio dimming light overlay */
-body.incendio-running::after {
+/* Wingardium Leviosa float upward animation */
+body.levitation-running #envelope-wrapper,
+body.levitation-running #treasure-chest-wrapper,
+body.levitation-running button:not(#spell-touch-blocker),
+body.levitation-running h1,
+body.levitation-running h2,
+body.levitation-running h3,
+body.levitation-running p,
+body.levitation-running .badge-img,
+body.levitation-running #scroll-paper {
+  pointer-events: none !important;
+}
+
+body.levitation-running h1 {
+  animation: levitateH1 7.2s cubic-bezier(0.55, 0, 0.55, 0.2) forwards !important;
+}
+body.levitation-running h2,
+body.levitation-running h3 {
+  animation: levitateH23 7.0s cubic-bezier(0.55, 0, 0.55, 0.2) 0.3s forwards !important;
+}
+body.levitation-running #envelope-wrapper,
+body.levitation-running #treasure-chest-wrapper {
+  animation: levitateChest 7.5s cubic-bezier(0.55, 0, 0.55, 0.2) 0.6s forwards !important;
+}
+body.levitation-running p {
+  animation: levitateP 6.8s cubic-bezier(0.55, 0, 0.55, 0.2) 1.0s forwards !important;
+}
+body.levitation-running button:not(#spell-touch-blocker) {
+  animation: levitateBtn 6.5s cubic-bezier(0.55, 0, 0.55, 0.2) 1.3s forwards !important;
+}
+body.levitation-running .badge-img {
+  animation: levitateBadge 7.3s cubic-bezier(0.55, 0, 0.55, 0.2) 0.5s forwards !important;
+}
+body.levitation-running #scroll-paper {
+  animation: levitateScroll 7.8s cubic-bezier(0.55, 0, 0.55, 0.2) forwards !important;
+}
+
+@keyframes levitateH1 {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(6deg); }
+}
+@keyframes levitateH23 {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(-5deg); }
+}
+@keyframes levitateChest {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(10deg); }
+}
+@keyframes levitateP {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(-4deg); }
+}
+@keyframes levitateBtn {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(7deg); }
+}
+@keyframes levitateBadge {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(-9deg); }
+}
+@keyframes levitateScroll {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(5deg); }
+}
+
+/* Wingardium Leviosa dimming light overlay */
+body.levitation-running::after {
   content: '';
   position: fixed;
   inset: 0;
-  background: rgba(18, 6, 2, 0.5); /* 50% dim orange-black */
+  background: rgba(10, 15, 30, 0.4); /* 40% dim cool dark blue */
   pointer-events: none;
   z-index: 175;
   animation: dimFadeIn 0.6s ease forwards;
 }
 
+/* Incendio dimming light overlay */
+body.incendio-running::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 69, 0, 0.15) 0%, rgba(20, 5, 0, 0.68) 100%);
+  pointer-events: none;
+  z-index: 175;
+  animation: fireDimPulse 0.2s infinite alternate ease-in-out;
+}
+
+@keyframes fireDimPulse {
+  0% { opacity: 0.82; }
+  100% { opacity: 0.95; }
+}
+
+body.incendio-running {
+  box-shadow: inset 0 0 100px rgba(255, 69, 0, 0.5) !important;
+  animation: bodyFireFlicker 0.15s infinite alternate !important;
+}
+
+@keyframes bodyFireFlicker {
+  0% { box-shadow: inset 0 0 80px rgba(255, 69, 0, 0.4); }
+  100% { box-shadow: inset 0 0 120px rgba(255, 69, 0, 0.75); }
+}
+
 /* Incendio burning visual overrides */
 body.incendio-running #envelope-wrapper,
 body.incendio-running #treasure-chest-wrapper,
+body.incendio-running #scroll-paper,
+body.incendio-running .badge-img {
+  filter: sepia(0.6) saturate(2.5) brightness(0.7) contrast(1.4) drop-shadow(0 0 20px #FF4500) !important;
+  border-color: #FF3000 !important;
+  box-shadow: 0 0 15px rgba(255, 69, 0, 0.8), inset 0 0 15px rgba(255, 69, 0, 0.6) !important;
+  animation: firePulse 0.15s infinite alternate !important;
+  transition: border-color 1s ease, transform 1s ease, box-shadow 1s ease !important;
+}
 body.incendio-running button:not(#spell-touch-blocker),
 body.incendio-running h1,
 body.incendio-running h2,
 body.incendio-running h3,
-body.incendio-running p,
-body.incendio-running .badge-img,
-body.incendio-running #scroll-paper {
-  filter: sepia(0.65) saturate(2.2) brightness(0.65) contrast(1.35) drop-shadow(0 0 16px rgba(255, 69, 0, 0.95)) !important;
-  color: #FF5500 !important;
-  border-color: #FF3C00 !important;
-  text-shadow: 0 0 12px rgba(255, 99, 71, 0.9) !important;
-  transition: filter 1s ease, color 1s ease, border-color 1s ease, transform 1s ease !important;
-  transform: scale(0.96) rotate(-0.5deg) !important;
-  animation: burnFlicker 0.15s infinite alternate !important;
+body.incendio-running p {
+  color: #FF4500 !important;
+  text-shadow: 0 0 8px #FF8C00, 0 0 16px #FF4500 !important;
+  animation: fireTextPulse 0.15s infinite alternate !important;
+  transition: color 1s ease, text-shadow 1s ease !important;
 }
 
-@keyframes burnFlicker {
-  0% { filter: sepia(0.65) saturate(2.2) brightness(0.65) contrast(1.35) drop-shadow(0 0 14px rgba(255, 69, 0, 0.9)) !important; }
-  100% { filter: sepia(0.65) saturate(2.4) brightness(0.72) contrast(1.4) drop-shadow(0 0 20px rgba(255, 90, 0, 1)) !important; }
+@keyframes firePulse {
+  0% { box-shadow: 0 0 10px rgba(255, 69, 0, 0.6), inset 0 0 10px rgba(255, 69, 0, 0.4); }
+  100% { box-shadow: 0 0 20px rgba(255, 69, 0, 0.95), inset 0 0 20px rgba(255, 69, 0, 0.7); }
+}
+@keyframes fireTextPulse {
+  0% { text-shadow: 0 0 6px #FF8C00, 0 0 12px #FF4500; }
+  100% { text-shadow: 0 0 12px #FFD700, 0 0 24px #FF3000; }
 }
 
 /* Aguamenti dimming light overlay */
@@ -2904,19 +3057,21 @@ body.aguamenti-running::after {
 /* Aguamenti element freezing overrides */
 body.aguamenti-running #envelope-wrapper,
 body.aguamenti-running #treasure-chest-wrapper,
+body.aguamenti-running #scroll-paper,
+body.aguamenti-running .badge-img {
+  filter: saturate(0.15) contrast(1.15) brightness(1.2) drop-shadow(0 0 14px rgba(135, 206, 250, 0.9)) !important;
+  border-color: #B2EBF2 !important;
+  transition: border-color 1.2s ease, transform 1.2s ease !important;
+  transform: scale(0.97) !important;
+}
 body.aguamenti-running button:not(#spell-touch-blocker),
 body.aguamenti-running h1,
 body.aguamenti-running h2,
 body.aguamenti-running h3,
-body.aguamenti-running p,
-body.aguamenti-running .badge-img,
-body.aguamenti-running #scroll-paper {
-  filter: saturate(0.15) contrast(1.15) brightness(1.2) drop-shadow(0 0 14px rgba(135, 206, 250, 0.9)) !important;
+body.aguamenti-running p {
   color: #E0F7FA !important;
-  border-color: #B2EBF2 !important;
-  text-shadow: 0 0 10px rgba(173, 216, 230, 0.85) !important;
-  transition: filter 1.2s ease, color 1.2s ease, border-color 1.2s ease, transform 1.2s ease !important;
-  transform: scale(0.97) !important;
+  text-shadow: 0 0 8px rgba(173, 216, 230, 0.85) !important;
+  transition: color 1.2s ease, text-shadow 1.2s ease !important;
 }
 
 /* Water Level overlay style */
@@ -2933,10 +3088,624 @@ body.aguamenti-running #scroll-paper {
   will-change: transform;
 }
 #water-level.rising {
-  transform: translateY(-25vh); /* rise to cover 25% of viewport */
+  transform: translateY(-70vh); /* rise to cover 70% of viewport */
   transition: transform 8s linear;
 }
 #water-level.falling {
   transform: translateY(110vh); /* fall down off-screen */
   transition: transform 2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+
+/* Glacius frosted overlay */
+#ice-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0) 25%, rgba(200,240,255,0.18) 60%, rgba(100,180,240,0.45) 100%);
+  box-shadow: inset 0 0 100px rgba(70,130,180,0.5);
+  backdrop-filter: blur(2.5px) saturate(0.3) contrast(1.1);
+  -webkit-backdrop-filter: blur(2.5px) saturate(0.3) contrast(1.1);
+  z-index: 185;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  will-change: opacity;
+  transform: translate3d(0, 0, 0);
+}
+#ice-overlay.frozen {
+  opacity: 1;
+}
+
+/* Glacius freezing visuals overrides */
+body.frozen-lock #envelope-wrapper,
+body.frozen-lock #treasure-chest-wrapper,
+body.frozen-lock #scroll-paper,
+body.frozen-lock .badge-img {
+  filter: saturate(0.2) brightness(0.9) contrast(1.1) drop-shadow(0 0 14px rgba(100, 180, 255, 0.6)) !important;
+  border-color: #B2EBF2 !important;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.45), inset 0 0 15px rgba(135, 206, 250, 0.3) !important;
+  transform: scale(0.96) !important;
+  transition: border-color 1.2s ease, box-shadow 1.2s ease, transform 1.2s ease !important;
+}
+
+body.frozen-lock h1,
+body.frozen-lock h2,
+body.frozen-lock h3 {
+  color: #e0f4ff !important;
+  text-shadow: 0 0 8px rgba(0, 191, 255, 0.8), 0 0 15px rgba(30, 144, 255, 0.5) !important;
+  transition: color 1.2s ease, text-shadow 1.2s ease !important;
+}
+
+body.frozen-lock p,
+body.frozen-lock #scroll-paper p,
+body.frozen-lock #scroll-message p,
+body.frozen-lock button:not(#spell-touch-blocker) {
+  color: #163e52 !important; /* dark frosty blue/teal for readability */
+  text-shadow: 0 0 4px rgba(135, 206, 250, 0.4) !important;
+  transition: color 1.2s ease, text-shadow 1.2s ease !important;
+}
+
+/* ==========================================================================
+   🪄 Four New Magic Spells (Confundo, Specialis Revelio, Accio, Depulso)
+   ========================================================================== */
+
+/* 1. Confundo (Confusion Charm) */
+body.confundo-running h1,
+body.confundo-running h2,
+body.confundo-running h3,
+body.confundo-running p,
+body.confundo-running button:not(#spell-touch-blocker),
+body.confundo-running #envelope-wrapper,
+body.confundo-running #treasure-chest-wrapper,
+body.confundo-running #scroll-paper,
+body.confundo-running .badge-img {
+  animation: confundoWobble 1.8s ease-in-out infinite alternate !important;
+  transform-origin: center !important;
+}
+
+@keyframes confundoWobble {
+  0% { transform: rotate(-4deg); }
+  50% { transform: rotate(3deg) scale(1.02); }
+  100% { transform: rotate(-3deg) scale(0.98); }
+}
+
+/* 2. Specialis Revelio (Scrutiny Spell) */
+#revelio-scan-line {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, transparent, #ffd700, #da70d6, #ffd700, transparent);
+  box-shadow: 0 0 20px 4px rgba(255, 215, 0, 0.8), 0 0 40px 8px rgba(218, 112, 214, 0.6);
+  z-index: 200;
+  pointer-events: none;
+  top: -10px;
+  will-change: transform;
+  animation: scanningSweep 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes scanningSweep {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(115vh); }
+}
+
+.revelio-pulse {
+  animation: elementPulse 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards !important;
+}
+
+@keyframes elementPulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px rgba(255, 215, 0, 0));
+  }
+  50% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 10px rgba(218, 112, 214, 0.8)) !important;
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px rgba(255, 215, 0, 0));
+  }
+}
+
+/* 3. Depulso (Banishing Charm) */
+body.depulso-running #envelope-wrapper,
+body.depulso-running #treasure-chest-wrapper,
+body.depulso-running button:not(#spell-touch-blocker),
+body.depulso-running h1,
+body.depulso-running h2,
+body.depulso-running h3,
+body.depulso-running p,
+body.depulso-running .badge-img,
+body.depulso-running #scroll-paper {
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.2s ease !important;
+}
+
+/* Quadrant-based translations for Depulso */
+body.depulso-running h1,
+body.depulso-running h2,
+body.depulso-running h3 {
+  transform: translate(-120vw, -120vh) rotate(-25deg) !important;
+}
+body.depulso-running .badge-img {
+  transform: translate(0, -120vh) rotate(15deg) !important;
+}
+body.depulso-running #envelope-wrapper {
+  transform: translate(-150vw, 10vh) rotate(-35deg) !important;
+}
+body.depulso-running #treasure-chest-wrapper {
+  transform: translate(150vw, -10vh) rotate(35deg) !important;
+}
+body.depulso-running #scroll-paper {
+  transform: translate(-120vw, 120vh) rotate(-15deg) !important;
+}
+body.depulso-running p {
+  transform: translate(0, 120vh) rotate(5deg) !important;
+}
+body.depulso-running button:not(#spell-touch-blocker) {
+  transform: translate(120vw, 120vh) rotate(45deg) !important;
+}
+
+/* 4. Accio (Summoning Charm) */
+body.accio-running #envelope-wrapper,
+body.accio-running #treasure-chest-wrapper,
+body.accio-running button:not(#spell-touch-blocker),
+body.accio-running h1,
+body.accio-running h2,
+body.accio-running h3,
+body.accio-running p,
+body.accio-running .badge-img,
+body.accio-running #scroll-paper {
+  transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease !important;
+}
+
+/* ==========================================================================
+   🪄 Android Optimized Spells Styling (Ventus, Duro, Fulgur, Pyra, etc.)
+   ========================================================================== */
+
+#sparkle-canvas {
+  will-change: transform; /* GPU Acceleration for canvas */
+}
+
+/* 1. Ventus (Wind) */
+body.ventus-running #envelope-wrapper,
+body.ventus-running #treasure-chest-wrapper,
+body.ventus-running #scroll-paper,
+body.ventus-running h1,
+body.ventus-running h2 {
+  animation: ventusSway 3s ease-in-out infinite alternate !important;
+}
+@keyframes ventusSway {
+  0% { transform: rotate(-1deg) translateY(0); }
+  100% { transform: rotate(1.5deg) translateY(-5px); }
+}
+
+/* 2. Duro (Earth/Stone) */
+body.duro-running #envelope-wrapper,
+body.duro-running #treasure-chest-wrapper,
+body.duro-running #scroll-paper {
+  border-color: #5d4037 !important;
+  background: #d7ccc8 !important;
+  box-shadow: 0 10px 30px rgba(93, 64, 55, 0.4) !important;
+}
+body.duro-running h1,
+body.duro-running h2,
+body.duro-running p {
+  color: #4e342e !important;
+  text-shadow: 0 2px 2px rgba(0,0,0,0.15) !important;
+}
+
+/* 3. Fulgur (Lightning) */
+body.fulgur-running::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  z-index: 9999;
+  pointer-events: none;
+  animation: fulgurFlash 0.3s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+}
+@keyframes fulgurFlash {
+  0% { opacity: 0.85; }
+  30% { opacity: 0.15; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0; }
+}
+
+/* 4. Pyra (Embers) */
+body.pyra-running #envelope-wrapper,
+body.pyra-running #treasure-chest-wrapper,
+body.pyra-running #scroll-paper {
+  border-color: #ff5722 !important;
+  box-shadow: 0 0 18px rgba(255, 87, 34, 0.6) !important;
+}
+body.pyra-running h1,
+body.pyra-running h2 {
+  color: #ff5722 !important;
+  text-shadow: 0 0 10px rgba(255, 87, 34, 0.5) !important;
+}
+
+/* 5. Herbivicus (Nature) */
+body.herbivicus-running #envelope-wrapper,
+body.herbivicus-running #treasure-chest-wrapper,
+body.herbivicus-running #scroll-paper {
+  border-color: #2e7d32 !important;
+  box-shadow: 0 0 18px rgba(46, 125, 50, 0.3) !important;
+}
+body.herbivicus-running h1,
+body.herbivicus-running h2,
+body.herbivicus-running p {
+  color: #1b5e20 !important;
+}
+
+/* 6. Caligo (Mist) */
+body.caligo-running::after {
+  content: '';
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: 35vh;
+  background: linear-gradient(to top, rgba(230,230,230,0.55), rgba(230,230,230,0));
+  z-index: 170;
+  pointer-events: none;
+}
+
+/* 7. Solis (Sunbeam) */
+body.solis-running::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(255,224,130,0.25), transparent 70%);
+  z-index: 170;
+  pointer-events: none;
+}
+body.solis-running h1,
+body.solis-running h2 {
+  color: #ffb300 !important;
+  text-shadow: 0 0 12px rgba(255, 179, 0, 0.6) !important;
+}
+
+/* 8. Obscuro (Darkness) */
+body.obscuro-running::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, transparent 35%, rgba(6, 2, 14, 0.82) 100%);
+  z-index: 170;
+  pointer-events: none;
+}
+
+/* 9. Cryo (Frost) */
+body.cryo-running #envelope-wrapper,
+body.cryo-running #treasure-chest-wrapper,
+body.cryo-running #scroll-paper {
+  border-color: #4dd0e1 !important;
+  box-shadow: 0 0 15px rgba(77, 208, 225, 0.5) !important;
+}
+body.cryo-running h1,
+body.cryo-running h2 {
+  color: #e0f7fa !important;
+  text-shadow: 0 0 10px rgba(77, 208, 225, 0.6) !important;
+}
+
+/* 10. Polaris (Magnetic) */
+body.polaris-running #envelope-wrapper,
+body.polaris-running #treasure-chest-wrapper,
+body.polaris-running #scroll-paper {
+  border-color: #00e5ff !important;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.45) !important;
+}
+
+/* 11. Prisma (Rainbow) — enhanced */
+body.prisma-running h1,
+body.prisma-running h2 {
+  animation: prismaShift 5s linear infinite !important;
+}
+body.prisma-running * {
+  cursor: crosshair;
+}
+@keyframes prismaShift {
+  0%   { color: #ff5252; text-shadow: 0 0 12px #ff5252; }
+  16%  { color: #ff9800; text-shadow: 0 0 12px #ff9800; }
+  33%  { color: #ffeb3b; text-shadow: 0 0 12px #ffeb3b; }
+  50%  { color: #69f0ae; text-shadow: 0 0 12px #69f0ae; }
+  66%  { color: #40c4ff; text-shadow: 0 0 12px #40c4ff; }
+  83%  { color: #e040fb; text-shadow: 0 0 12px #e040fb; }
+  100% { color: #ff5252; text-shadow: 0 0 12px #ff5252; }
+}
+/* Prisma rainbow bands sweep across the background */
+body.prisma-running::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255,82,82,0.07) 0%,
+    rgba(255,152,0,0.07) 14%,
+    rgba(255,235,59,0.07) 28%,
+    rgba(105,240,174,0.07) 43%,
+    rgba(64,196,255,0.07) 57%,
+    rgba(224,64,251,0.07) 71%,
+    rgba(255,82,82,0.07) 85%,
+    rgba(255,152,0,0.07) 100%
+  );
+  background-size: 200% 200%;
+  animation: prismaBands 3s linear infinite;
+}
+@keyframes prismaBands {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 200%; }
+}
+
+/* 12. Chronos — Full vintage sepia time-warp overlay */
+#chronos-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 155;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  /* Aged parchment tint */
+  background: rgba(120, 80, 30, 0.18);
+  /* Vignette */
+  box-shadow: inset 0 0 80px rgba(60, 30, 5, 0.55);
+}
+#chronos-overlay.active {
+  opacity: 1;
+}
+/* Desaturate + sepia all content under chronos */
+body.chronos-running #main-content,
+body.chronos-running #scroll-overlay,
+body.chronos-running #video-bg {
+  filter: sepia(0.75) brightness(0.9) contrast(0.9);
+  transition: filter 0.8s ease;
+}
+body.chronos-running h1,
+body.chronos-running h2,
+body.chronos-running h3,
+body.chronos-running p,
+body.chronos-running span,
+body.chronos-running div {
+  font-family: 'IM Fell English', serif !important;
+  color: #5d3a1a !important;
+  letter-spacing: 0.03em;
+}
+body.chronos-running #hero-friend-name {
+  text-shadow: 3px 3px 0 rgba(80,40,10,0.3), 0 0 12px rgba(150,100,40,0.5) !important;
+}
+body.chronos-running #sparkle-canvas {
+  filter: sepia(0.8) brightness(0.85);
+}
+
+/* ── Fumos Mist Canvas (styled in JS, just ensure z-index stacking) ── */
+#fumos-canvas {
+  z-index: 160;
+}
+
+/* ── Glacius Ice Canvas ── */
+#glacius-canvas {
+  z-index: 161;
+}
+
+/* ── Herbivicus Botanical Border ── */
+#herbivicus-border {
+  position: fixed;
+  inset: 0;
+  z-index: 158;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  will-change: opacity;
+  transform: translate3d(0,0,0);
+}
+#herbivicus-border.active {
+  opacity: 1;
+}
+/* Subtle glow on text during herbivicus */
+body.herbivicus-running h1,
+body.herbivicus-running h2 {
+  text-shadow: 0 0 16px rgba(100, 200, 100, 0.7),
+               0 2px 4px rgba(0,0,0,0.8) !important;
+  transition: text-shadow 0.5s ease;
+}
+body.herbivicus-running #scroll-paper {
+  border-color: #66bb6a !important;
+  box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), inset 0 0 30px rgba(160, 230, 130, 0.08) !important;
+}
+
+/* ── Duro Stone Border ── */
+#duro-border {
+  position: fixed;
+  inset: 0;
+  z-index: 157;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  will-change: opacity;
+  transform: translate3d(0,0,0);
+}
+#duro-border.active {
+  opacity: 0.9;
+}
+body.duro-running h1,
+body.duro-running h2 {
+  text-shadow: 2px 2px 0 rgba(80,60,40,0.7),
+               0 0 12px rgba(141,110,99,0.5) !important;
+  color: #bcaaa4 !important;
+}
+body.duro-running #scroll-paper {
+  border-color: #8d6e63 !important;
+  box-shadow: 0 0 18px rgba(141,110,99,0.5), inset 0 0 0 2px rgba(141,110,99,0.15) !important;
+}
+
+/* ── Incendio Fire Strip ── */
+#incendio-strip {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: clamp(80px, 18vh, 160px);
+  z-index: 156;
+  pointer-events: none;
+  background-repeat: repeat-x;
+  background-position: bottom center;
+  background-size: auto 100%;
+  opacity: 0;
+  transform: translateY(30px) translate3d(0,0,0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+#incendio-strip.active {
+  opacity: 1;
+  transform: translateY(0) translate3d(0,0,0);
+  animation: fireFlicker 0.4s steps(2) infinite;
+}
+@keyframes fireFlicker {
+  0%   { filter: brightness(1.0) saturate(1.0); }
+  50%  { filter: brightness(1.15) saturate(1.2); }
+  100% { filter: brightness(0.95) saturate(0.9); }
+}
+body.incendio-running #main-content {
+  padding-bottom: calc(9rem + var(--sab));
+}
+
+/* ── Accio Card Summon Animation ── */
+#accio-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 170;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.02) translate3d(0,0,0);
+  filter: brightness(2.5) blur(8px);
+  width: clamp(180px, 45vw, 280px);
+  height: auto;
+  will-change: transform, opacity, filter;
+}
+#accio-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow:
+    0 0 40px rgba(255, 220, 100, 0.8),
+    0 0 80px rgba(255, 200, 50, 0.4),
+    0 20px 60px rgba(0,0,0,0.6);
+}
+#accio-card.accio-fly-in {
+  animation: accioFlyIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+#accio-card.accio-fall {
+  animation: accioFall 0.9s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+@keyframes accioFlyIn {
+  0% {
+    transform: translate(-50%, -50%) scale(0.01) translateZ(0);
+    filter: brightness(4) blur(18px);
+    opacity: 0.2;
+  }
+  60% {
+    filter: brightness(1.3) blur(2px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) translateZ(0);
+    filter: brightness(1) blur(0px);
+    opacity: 1;
+  }
+}
+@keyframes accioFall {
+  0% {
+    transform: translate(-50%, -50%) scale(1) translateZ(0);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  40% {
+    transform: translate(-50%, 80vh) scale(0.7) rotate(20deg) translateZ(0);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, 200vh) scale(0.3) rotate(45deg) translateZ(0);
+    opacity: 0;
+    filter: brightness(0.5) blur(6px);
+  }
+}
+
+/* ── Ventus Cyclone Text Effect ── */
+body.ventus-running #hero-friend-name,
+body.ventus-running h2,
+body.ventus-running #tagline {
+  animation: ventusSwirl 2s ease-in-out infinite !important;
+}
+@keyframes ventusSwirl {
+  0%   { transform: translateX(0) skewX(0deg); filter: blur(0); }
+  25%  { transform: translateX(-6px) skewX(-4deg); filter: blur(0.5px); }
+  50%  { transform: translateX(8px) skewX(3deg); filter: blur(0); }
+  75%  { transform: translateX(-4px) skewX(-2deg); }
+  100% { transform: translateX(0) skewX(0deg); filter: blur(0); }
+}
+body.ventus-running #video-bg {
+  animation: ventusShake 0.3s ease-in-out infinite;
+}
+@keyframes ventusShake {
+  0%  { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+  100%{ transform: translateX(0); }
+}
+body.ventus-running #sparkle-canvas {
+  animation: ventusWhoosh 1.5s ease-in-out infinite alternate;
+}
+@keyframes ventusWhoosh {
+  0%   { transform: scaleX(1); }
+  100% { transform: scaleX(1.04) translateX(6px); }
+}
+
+/* ── Fumos running body state ── */
+body.fumos-running #scroll-paper {
+  border-color: rgba(180, 200, 220, 0.5) !important;
+}
+
+/* ── Glacius Ice Freeze Effect ── */
+body.frozen-lock #scroll-paper {
+  border-color: #80deea !important;
+  box-shadow: 0 0 20px rgba(128, 222, 234, 0.5), inset 0 0 30px rgba(200, 240, 255, 0.1) !important;
+}
+body.frozen-lock h1 {
+  text-shadow: 0 0 12px rgba(128, 222, 234, 0.7), 2px 2px 0 rgba(100, 200, 230, 0.3) !important;
+  color: #b2ebf2 !important;
+}
+#ice-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 154;
+  opacity: 0;
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      rgba(200, 230, 255, 0.03) 0px,
+      rgba(200, 230, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(180, 220, 255, 0.02) 0px,
+      rgba(180, 220, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 20px
+    );
+  transition: opacity 0.8s ease;
+}
+#ice-overlay.frozen {
+  opacity: 1;
 }

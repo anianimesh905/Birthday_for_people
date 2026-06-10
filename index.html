@@ -332,6 +332,24 @@
   <!-- Sparkle Canvas Overlay -->
   <canvas id="sparkle-canvas"></canvas>
 
+  <!-- Fumos (Mist) Interactive Scratch Canvas -->
+  <canvas id="fumos-canvas" style="display:none;position:fixed;inset:0;width:100%;height:100%;z-index:160;pointer-events:none;"></canvas>
+
+  <!-- Glacius Interactive Ice Crack Canvas -->
+  <canvas id="glacius-canvas" style="display:none;position:fixed;inset:0;width:100%;height:100%;z-index:161;pointer-events:none;"></canvas>
+
+  <!-- Accio Card Container -->
+  <div id="accio-card" style="display:none;"></div>
+
+  <!-- Herbivicus Botanical Border -->
+  <div id="herbivicus-border" style="display:none;"></div>
+
+  <!-- Duro Stone Border -->
+  <div id="duro-border" style="display:none;"></div>
+
+  <!-- Incendio Fire Strip -->
+  <div id="incendio-strip" style="display:none;"></div>
+
   <!-- 🪄 Spell Input Modal -->
   <div id="spell-modal" role="dialog" aria-modal="true" aria-labelledby="spell-modal-title">
     <div id="spell-modal-bg"></div>
@@ -343,7 +361,45 @@
         <input type="text" id="spell-input-field" placeholder="e.g. Lumos" autocomplete="off" spellcheck="false" />
         <button id="spell-cast-action" aria-label="Cast spell">Cast 🪄</button>
       </div>
-      <p class="spell-help-text">Try: <strong>Lumos</strong>, <strong>Nox</strong>, <strong>Alohomora</strong>, <strong>Revelio</strong>, <strong>Expecto Patronum</strong>, <strong>Wingardium Leviosa</strong>, <strong>Incendio</strong>, <strong>Aguamenti</strong>, <strong>Glacius</strong>, <strong>Geminio</strong>, <strong>Orchideous</strong></p>
+      <div class="spell-help-container">
+        <p class="spell-help-title">✦ Speak Your Enchantments ✦</p>
+        <div class="spell-help-grid">
+          <div class="spell-help-col">
+            <span class="spell-cat">Standard:</span>
+            <div class="spell-tags">
+              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Lumos'">Lumos</span>
+              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Nox'">Nox</span>
+              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Revelio'">Revelio</span>
+              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Alohomora'">Alohomora</span>
+              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Specialis Revelio'">Specialis Revelio</span>
+            </div>
+          </div>
+          <div class="spell-help-col">
+            <span class="spell-cat">Charms:</span>
+            <div class="spell-tags">
+              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Expecto Patronum'">Expecto Patronum</span>
+              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Wingardium Leviosa'">Wingardium Leviosa</span>
+              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Confundo'">Confundo</span>
+              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Accio'">Accio</span>
+              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Depulso'">Depulso</span>
+            </div>
+          </div>
+          <div class="spell-help-col">
+            <span class="spell-cat">Elementals:</span>
+            <div class="spell-tags">
+              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Incendio'">Incendio</span>
+              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Aguamenti'">Aguamenti</span>
+              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Glacius'">Glacius</span>
+              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Ventus'">Ventus</span>
+              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Duro'">Duro</span>
+              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Herbivicus'">Herbivicus</span>
+              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Fumos'">Fumos</span>
+              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Prisma'">Prisma</span>
+              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Chronos'">Chronos</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -362,9 +418,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Flower Pile Layer (Orchideous Spell Flow) -->
-  <div id="flower-pile" aria-hidden="true"></div>
 
   <script src="script.js"></script>
 </body>

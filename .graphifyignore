@@ -1,0 +1,10 @@
+skills/
+skill_extracted/
+skill/
+image/
+images/
+videos/
+*.mp3
+*.mp4
+*.pdf
+graphify-out/

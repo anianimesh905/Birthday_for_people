@@ -144,6 +144,10 @@ Ani 🌻`,
   //   Supports .mp3 and .ogg formats. Set to "" to hide the music button.
 
   musicLabel: "🎵 Wingardium Leviosa",
+
+  accioImage: "accio_card.png",
+  // ^ The image that flies in from far away when you cast "Accio".
+  //   Replace "accio_card.png" with any image filename in the same folder as index.html.
   // ^ Label on the music button (before music starts playing).
 
   eyesOnlyMessage: `Dear Vanshika,

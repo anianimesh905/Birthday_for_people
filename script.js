@@ -37,12 +37,36 @@ function rand(min, max) {
   return min + Math.random() * (max - min); 
 }
 
+/* ── MODULE LEVEL STATE & CACHES ── */
+let _sharedAudioCtx = null;
+let _patronusInterval = null;
+let _aguamentiTimeout1 = null;
+let _aguamentiTimeout2 = null;
+let _confettiBurstActive = false;
+let _sealBurstActive = false;
+let _lastSpellCastTime = 0;
+
+function getAudioCtx() {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    if (!_sharedAudioCtx || _sharedAudioCtx.state === 'closed') {
+      _sharedAudioCtx = new AudioContextClass();
+    }
+    if (_sharedAudioCtx.state === 'suspended') {
+      _sharedAudioCtx.resume().catch(() => {});
+    }
+    return _sharedAudioCtx;
+  } catch (e) {
+    return null;
+  }
+}
+
 /* ── Procedural Web Audio Synthesis: Seal Crack Sound ── */
 function playCrackSound() {
   try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
+    const ctx = getAudioCtx();
+    if (!ctx) return;
     
     const bufferSize = ctx.sampleRate * 0.15;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -71,12 +95,6 @@ function playCrackSound() {
     gain.connect(ctx.destination);
     
     noiseNode.start();
-    
-    setTimeout(() => {
-      try {
-        ctx.close();
-      } catch (err) {}
-    }, 300);
   } catch (e) {
     // Fail silently in case browser blocks context
   }
@@ -85,9 +103,8 @@ function playCrackSound() {
 /* ── Procedural Web Audio Synthesis: Scroll Paper Sound ── */
 function playScrollSound() {
   try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
+    const ctx = getAudioCtx();
+    if (!ctx) return;
 
     const duration = 0.8;
     const bufferSize = ctx.sampleRate * duration;
@@ -142,10 +159,6 @@ function playScrollSound() {
     gain.connect(ctx.destination);
 
     noiseNode.start();
-
-    setTimeout(() => {
-      try { ctx.close(); } catch (err) {}
-    }, duration * 1000 + 100);
   } catch (e) {
     // Fail silently
   }
@@ -488,10 +501,13 @@ function initMagicParticles(opts = {}) {
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
 
   function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    ctx.scale(dpr, dpr);
   }
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas, { passive: true });
@@ -569,22 +585,62 @@ function initMagicParticles(opts = {}) {
         vy = rand(3.5, 6.5);
         vx = rand(-0.4, 0.4);
       } else if (window.activeSpellMode === 'glacius') {
-        vy = rand(-0.2, 0.2);
-        vx = rand(-0.2, 0.2);
+        vy = rand(0.5, 1.8);
+        vx = rand(-0.8, 0.8);
       } else if (window.activeSpellMode === 'patronus') {
         vy = rand(-1.2, -0.4);
         vx = rand(-0.8, 0.8);
-      } else if (window.activeSpellMode === 'orchideous') {
-        vy = rand(1.2, 2.8);
-        vx = rand(-1.5, 1.5);
+      } else if (window.activeSpellMode === 'ventus') {
+        vy = rand(-0.6, 0.6);
+        vx = rand(3.5, 6.5); // Fast blow to the right
+      } else if (window.activeSpellMode === 'duro') {
+        vy = rand(3.0, 5.0); // Heavy falling rocks
+        vx = rand(-0.5, 0.5);
+      } else if (window.activeSpellMode === 'fulgur') {
+        vy = rand(-2.0, 2.0); // Erratic lightning moves
+        vx = rand(-2.0, 2.0);
+      } else if (window.activeSpellMode === 'pyra') {
+        vy = rand(-1.5, -3.2); // Embers floating up
+        vx = rand(-0.8, 0.8);
+      } else if (window.activeSpellMode === 'herbivicus') {
+        vy = rand(-0.8, -1.8); // Leaves floating up slowly
+        vx = rand(-1.2, 1.2);
+      } else if (window.activeSpellMode === 'fumos') {
+        vy = rand(-0.5, -1.2); // Mist expands/drifts up
+        vx = rand(-0.8, 0.8);
+      } else if (window.activeSpellMode === 'prisma') {
+        vy = rand(-1.2, 1.2); // Rainbow sparkles float around
+        vx = rand(-1.2, 1.2);
+      } else if (window.activeSpellMode === 'chronos') {
+        vy = rand(-0.25, 0.25); // Extremely slow time distortion
+        vx = rand(-0.25, 0.25);
       }
       
       p.vx = vx; 
       p.vy = vy;
-      p.life = rand(1.5, 2.5); 
+      
+      // Dynamic particle lifetime
+      if (window.activeSpellMode === 'glacius') {
+        p.life = rand(5.0, 7.5);
+      } else if (window.activeSpellMode === 'chronos') {
+        p.life = rand(8.0, 11.0);
+      } else if (window.activeSpellMode === 'aguamenti' || window.activeSpellMode === 'fumos') {
+        p.life = rand(4.0, 5.5);
+      } else {
+        p.life = rand(1.5, 2.5);
+      }
+      
       p.age = 0;
-      p.size = rand(8, 14); 
-      p.isFlower = (window.activeSpellMode === 'orchideous');
+      
+      // Dynamic particle size
+      if (window.activeSpellMode === 'incendio' || window.activeSpellMode === 'fumos') {
+        p.size = rand(22, 36);
+      } else if (window.activeSpellMode === 'glacius' || window.activeSpellMode === 'herbivicus') {
+        p.size = rand(16, 26);
+      } else {
+        p.size = rand(8, 14);
+      }
+      p.isFlower = false;
       
       // Spell color customizations
       let color = isLumos ? '#FFF3CD' : palette.spark;
@@ -600,9 +656,29 @@ function initMagicParticles(opts = {}) {
       } else if (window.activeSpellMode === 'patronus') {
         const silverColors = ['#F5F5F7', '#E8E8F0', '#D0D8F0', '#FFFFFF'];
         color = silverColors[Math.floor(Math.random() * silverColors.length)];
-      } else if (window.activeSpellMode === 'orchideous') {
-        const flowerColors = ['#FFC0CB', '#FFB6C1', '#FF69B4', '#DA70D6', '#FFFFFF'];
-        color = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+      } else if (window.activeSpellMode === 'ventus') {
+        const windColors = ['#A3E4D7', '#E8F8F5', '#76D7C4', '#48C9B0'];
+        color = windColors[Math.floor(Math.random() * windColors.length)];
+      } else if (window.activeSpellMode === 'duro') {
+        const stoneColors = ['#8D6E63', '#A1887F', '#6D4C41', '#5D4037'];
+        color = stoneColors[Math.floor(Math.random() * stoneColors.length)];
+      } else if (window.activeSpellMode === 'fulgur') {
+        const lightColors = ['#FFF59D', '#FFEB3B', '#FDD835', '#FFFFFF'];
+        color = lightColors[Math.floor(Math.random() * lightColors.length)];
+      } else if (window.activeSpellMode === 'pyra') {
+        const emberColors = ['#FF5722', '#FF7043', '#FF8A65', '#FF3D00'];
+        color = emberColors[Math.floor(Math.random() * emberColors.length)];
+      } else if (window.activeSpellMode === 'herbivicus') {
+        const herbColors = ['#81C784', '#66BB6A', '#4CAF50', '#A5D6A7', '#C8E6C9'];
+        color = herbColors[Math.floor(Math.random() * herbColors.length)];
+      } else if (window.activeSpellMode === 'fumos') {
+        const mistColors = ['rgba(220, 220, 220, 0.25)', 'rgba(245, 245, 245, 0.2)', 'rgba(200, 200, 200, 0.25)'];
+        color = mistColors[Math.floor(Math.random() * mistColors.length)];
+      } else if (window.activeSpellMode === 'prisma') {
+        color = 'hsl(0, 95%, 70%)'; // Will cycle dynamically in updateParticle
+      } else if (window.activeSpellMode === 'chronos') {
+        const timeColors = ['#D4AF37', '#CD7F32', '#B8860B', '#AA7C11'];
+        color = timeColors[Math.floor(Math.random() * timeColors.length)];
       }
       p.color = color;
       
@@ -687,13 +763,16 @@ function initMagicParticles(opts = {}) {
 
   let lastSpawn = 0;
   function tickSpawner(now) {
-    const alive = particles.filter(p => p.active).length;
+    let alive = 0;
+    for (let i = 0; i < particles.length; i++) {
+      if (particles[i].active) alive++;
+    }
     const currentMax = window.maxParticlesLimit;
     if (alive >= currentMax) return;
     
     let currentInterval = SPAWN_INTERVAL;
-    if (window.activeSpellMode === 'incendio' || window.activeSpellMode === 'aguamenti' || window.activeSpellMode === 'orchideous') {
-      currentInterval = IS_MOBILE ? 50 : 25;
+    if (window.activeSpellMode === 'incendio' || window.activeSpellMode === 'aguamenti' || window.activeSpellMode === 'glacius') {
+      currentInterval = IS_MOBILE ? 75 : 40;
     }
     
     if (now - lastSpawn > currentInterval) { 
@@ -702,14 +781,36 @@ function initMagicParticles(opts = {}) {
           const cx = rand(0, canvas.width);
           const cy = canvas.height + 10;
           spawnSparkCluster(cx, cy, Math.floor(rand(2, 5)), false);
+
+          if (window.cachedSpellTargets && window.cachedSpellTargets.length > 0) {
+            window.cachedSpellTargets.forEach(rect => {
+              if (Math.random() < 0.25) {
+                const cx2 = rect.left + Math.random() * rect.width;
+                const cy2 = rect.top + Math.random() * rect.height;
+                spawnSparkCluster(cx2, cy2, 1, false);
+              }
+            });
+          }
         } else if (window.activeSpellMode === 'aguamenti') {
           const cx = rand(0, canvas.width);
           const cy = -10;
           spawnSparkCluster(cx, cy, Math.floor(rand(2, 5)), false);
-        } else if (window.activeSpellMode === 'orchideous') {
+        } else if (window.activeSpellMode === 'glacius') {
+          // Spawn snowflakes falling from the top
           const cx = rand(0, canvas.width);
-          const cy = -20;
-          spawnSparkCluster(cx, cy, Math.floor(rand(1, 3)), false);
+          const cy = -10;
+          spawnSparkCluster(cx, cy, 1, false);
+
+          // Spawn ice frosting sparks on cached targets
+          if (window.cachedSpellTargets && window.cachedSpellTargets.length > 0) {
+            window.cachedSpellTargets.forEach(rect => {
+              if (Math.random() < 0.3) {
+                const cx2 = rect.left + Math.random() * rect.width;
+                const cy2 = rect.top + Math.random() * rect.height;
+                spawnSparkCluster(cx2, cy2, 1, false);
+              }
+            });
+          }
         } else {
           const cx = window.isLumosActive ? window.lastLumosX : (window.innerWidth / 2);
           const cy = window.isLumosActive ? window.lastLumosY : (window.innerHeight / 2);
@@ -732,14 +833,31 @@ function initMagicParticles(opts = {}) {
     switch (p.type) {
       case 'A':
         if (window.activeSpellMode === 'glacius') {
-          p.x += p.vx * 0.15;
-          p.y += p.vy * 0.15;
-        } else if (window.activeSpellMode === 'aguamenti') {
+          p.x += p.vx * 0.22;
+          p.y += p.vy * 0.22;
+        } else if (window.activeSpellMode === 'aguamenti' || window.activeSpellMode === 'duro') {
           p.x += p.vx;
           p.y += p.vy;
         } else if (window.activeSpellMode === 'incendio') {
-          p.x += p.vx + Math.sin(p.age * 5.0) * 0.45;
+          p.x += p.vx + Math.sin(p.age * 6.0) * 0.45;
           p.y += p.vy;
+        } else if (window.activeSpellMode === 'ventus') {
+          p.x += p.vx;
+          p.y += p.vy + Math.sin(p.age * 4.5) * 1.3;
+        } else if (window.activeSpellMode === 'herbivicus') {
+          p.x += p.vx + Math.sin(p.age * 3.0) * 0.35;
+          p.y += p.vy;
+        } else if (window.activeSpellMode === 'fumos') {
+          p.x += p.vx;
+          p.y += p.vy;
+        } else if (window.activeSpellMode === 'prisma') {
+          const hue = (p.age * 160) % 360;
+          p.color = `hsl(${hue}, 95%, 70%)`;
+          p.x += p.vx;
+          p.y += p.vy;
+        } else if (window.activeSpellMode === 'chronos') {
+          p.x += p.vx * 0.08;
+          p.y += p.vy * 0.08;
         } else {
           p.x += p.vx; 
           p.y += p.vy;
@@ -786,17 +904,125 @@ function initMagicParticles(opts = {}) {
       case 'A': {
         ctx.translate(p.x, p.y); 
         ctx.rotate(p.rotation);
-        ctx.font = `${p.size}px serif`; 
-        ctx.fillStyle = p.color;
-        ctx.textAlign = 'center'; 
-        ctx.textBaseline = 'middle';
-        if (p.isFlower) {
-          const flowers = ['🌸', '🌺', '🌼', '🌹', '🍀'];
-          if (!p.flowerChar) {
-            p.flowerChar = flowers[Math.floor(Math.random() * flowers.length)];
+        if (window.activeSpellMode === 'aguamenti') {
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(0, -p.size * 0.75);
+          ctx.lineTo(0, p.size * 0.75);
+          ctx.stroke();
+        } else if (window.activeSpellMode === 'incendio') {
+          const r = p.size * 0.5;
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+          
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 0.4, 0, Math.PI * 2);
+          ctx.fillStyle = '#FFFF90';
+          ctx.fill();
+        } else if (window.activeSpellMode === 'glacius') {
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = 1.5;
+          const r = p.size * 0.55;
+          ctx.beginPath();
+          for (let i = 0; i < 3; i++) {
+            const angle = (i * Math.PI) / 3;
+            const x1 = Math.cos(angle) * r;
+            const y1 = Math.sin(angle) * r;
+            ctx.moveTo(-x1, -y1);
+            ctx.lineTo(x1, y1);
           }
-          ctx.fillText(p.flowerChar, 0, 0);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 0.2, 0, Math.PI * 2);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fill();
+        } else if (window.activeSpellMode === 'ventus') {
+          // Draw a leaf vector path
+          const r = p.size * 0.55;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.moveTo(0, -r);
+          ctx.quadraticCurveTo(r * 0.55, 0, 0, r);
+          ctx.quadraticCurveTo(-r * 0.55, 0, 0, -r);
+          ctx.fill();
+        } else if (window.activeSpellMode === 'duro') {
+          // Draw a stone polygon shard
+          const r = p.size * 0.45;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.moveTo(0, -r);
+          ctx.lineTo(r, -r * 0.25);
+          ctx.lineTo(r * 0.35, r);
+          ctx.lineTo(-r * 0.65, r * 0.3);
+          ctx.closePath();
+          ctx.fill();
+        } else if (window.activeSpellMode === 'fulgur') {
+          // Draw lightning zig-zag
+          const r = p.size * 0.6;
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(-r * 0.2, -r);
+          ctx.lineTo(r * 0.35, -r * 0.1);
+          ctx.lineTo(-r * 0.35, r * 0.1);
+          ctx.lineTo(r * 0.1, r);
+          ctx.stroke();
+        } else if (window.activeSpellMode === 'pyra') {
+          // Draw glowing fire ember
+          const r = p.size * 0.5;
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+          
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 0.35, 0, Math.PI * 2);
+          ctx.fillStyle = '#FFF59D'; // bright hot core
+          ctx.fill();
+        } else if (window.activeSpellMode === 'herbivicus') {
+          // Draw simple flower shape (4 petals and a center)
+          const r = p.size * 0.5;
+          const pr = r * 0.45;
+          ctx.fillStyle = p.color;
+          for (let i = 0; i < 4; i++) {
+            const angle = (i * Math.PI) / 2;
+            ctx.beginPath();
+            ctx.arc(Math.cos(angle) * pr, Math.sin(angle) * pr, pr, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.beginPath();
+          ctx.arc(0, 0, pr * 0.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#FFF59D'; // yellow center core
+          ctx.fill();
+        } else if (window.activeSpellMode === 'fumos') {
+          // Draw expanding mist cloud (fuzzy circle using low opacity fill)
+          const progressF = p.age / p.life;
+          const rF = p.size * 0.55 * (1.0 + progressF * 1.5);
+          ctx.beginPath();
+          ctx.arc(0, 0, rF, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+        } else if (window.activeSpellMode === 'chronos') {
+          // Draw clock inspired Roman cross vector
+          const r = p.size * 0.45;
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 0.75, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(0, -r); ctx.lineTo(0, r);
+          ctx.moveTo(-r, 0); ctx.lineTo(r, 0);
+          ctx.stroke();
         } else {
+          ctx.font = `${p.size}px serif`; 
+          ctx.fillStyle = p.color;
+          ctx.textAlign = 'center'; 
+          ctx.textBaseline = 'middle';
           ctx.fillText('✦', 0, 0);
         }
         break;
@@ -1008,8 +1234,9 @@ function initParallax() {
   }, { passive: true });
 
   window.addEventListener("deviceorientation", (e) => {
-    let gamma = e.gamma || 0;
-    let beta = e.beta || 0;
+    let gamma = e.gamma;
+    let beta = e.beta;
+    if (gamma === null || beta === null || !isFinite(gamma) || !isFinite(beta)) return;
 
     if (beta < -30) beta = -30;
     if (beta > 60) beta = 60;
@@ -1022,12 +1249,14 @@ function initParallax() {
   }, { passive: true });
 
   function updateParallax() {
-    currentMx += (targetMx - currentMx) * 0.08;
-    currentMy += (targetMy - currentMy) * 0.08;
-    
-    document.documentElement.style.setProperty("--mx", currentMx.toFixed(2));
-    document.documentElement.style.setProperty("--my", currentMy.toFixed(2));
-    
+    const dx = targetMx - currentMx;
+    const dy = targetMy - currentMy;
+    if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
+      currentMx += dx * 0.08;
+      currentMy += dy * 0.08;
+      document.documentElement.style.setProperty("--mx", currentMx.toFixed(2));
+      document.documentElement.style.setProperty("--my", currentMy.toFixed(2));
+    }
     requestAnimationFrame(updateParallax);
   }
   requestAnimationFrame(updateParallax);
@@ -1054,6 +1283,10 @@ function initScrollReveal() {
 
 /* ── Dynamic Seal Crack Particle Burst ── */
 function burstSealParticles(cx, cy) {
+  if (_sealBurstActive) return;
+  _sealBurstActive = true;
+  setTimeout(() => { _sealBurstActive = false; }, 800);
+
   const count = 18;
   const houseColor = window.currentHouseAccent || "#D3A625";
   for (let i = 0; i < count; i++) {
@@ -1085,6 +1318,10 @@ function burstSealParticles(cx, cy) {
 
 /* ── Confetti Particle Burst ── */
 function spawnConfetti() {
+  if (_confettiBurstActive) return;
+  _confettiBurstActive = true;
+  setTimeout(() => { _confettiBurstActive = false; }, 3200);
+
   const housePrimary = window.currentHousePrimary || "#740001";
   const houseAccent = window.currentHouseAccent || "#D3A625";
   const colors = [
@@ -1339,7 +1576,6 @@ function initHouseSelector(siteContent) {
     };
 
     badge.addEventListener('click', handleSelection);
-    badge.addEventListener('touchend', handleSelection);
   });
 
   // Handle bottom-left house selector re-trigger
@@ -1362,7 +1598,6 @@ function initHouseSelector(siteContent) {
     };
     
     switcherBtn.addEventListener('click', handleSwitch);
-    switcherBtn.addEventListener('touchend', handleSwitch);
   }
 }
 
@@ -1901,8 +2136,11 @@ async function startPreloader() {
 
 
 
+  const abortCtrl = new AbortController();
+
   const fallbackTimeout = setTimeout(() => {
     if (!preloadCompleted) {
+      abortCtrl.abort();
       completePreloading();
     }
   }, 15000);
@@ -2006,7 +2244,7 @@ async function startPreloader() {
 
   assets.forEach(async (asset) => {
     try {
-      const response = await fetch(asset.url);
+      const response = await fetch(asset.url, { signal: abortCtrl.signal });
       if (!response.ok) throw new Error(`HTTP error ${response.status}`);
       
       const reader = response.body.getReader();
@@ -2087,9 +2325,8 @@ function handleLumosMove(e) {
 
 function playSpellSound(isLumos) {
   try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
+    const ctx = getAudioCtx();
+    if (!ctx) return;
     
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -2122,10 +2359,6 @@ function playSpellSound(isLumos) {
       osc.start(now);
       osc.stop(now + 0.7);
     }
-    
-    setTimeout(() => {
-      try { ctx.close(); } catch(e) {}
-    }, 1100);
   } catch (e) {
     // Fail silently
   }
@@ -2182,12 +2415,18 @@ function toggleLumosSpell(activate) {
 function showSpellToast(text) {
   const toast = document.getElementById("house-toast");
   if (!toast) return;
+  toast.style.background = "";
+  toast.style.color = "";
+  toast.style.borderColor = "";
+
+  clearTimeout(toastTimer);
+  toast.classList.remove("visible");
+  void toast.offsetWidth;
   toast.textContent = text;
-  toast.className = "show";
-  setTimeout(() => {
-    if (toast.textContent === text) {
-      toast.className = "";
-    }
+  toast.classList.add("visible");
+
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("visible");
   }, 2200);
 }
 
@@ -2205,36 +2444,30 @@ function activateTouchBlocker(durationMs) {
   }, durationMs);
 }
 
-function triggerOrchideousPile() {
-  const pile = document.getElementById("flower-pile");
-  if (!pile) return;
-  
-  pile.innerHTML = "";
-  pile.className = "";
-  
-  const flowers = ['🌸', '🌺', '🌼', '🌹', '🌻', '🌷', '🏵️', '🍀'];
-  for (let i = 0; i < 45; i++) {
-    const flowerSpan = document.createElement("span");
-    flowerSpan.textContent = flowers[Math.floor(Math.random() * flowers.length)];
-    flowerSpan.style.margin = "0 -8px";
-    flowerSpan.style.transform = `rotate(${rand(-25, 25)}deg) translateY(${rand(0, 15)}px) scale(${rand(0.8, 1.2)})`;
-    pile.appendChild(flowerSpan);
-  }
-  
-  void pile.offsetWidth;
-  pile.classList.add("fill-up");
-  
-  setTimeout(() => {
-    pile.classList.remove("fill-up");
-    pile.classList.add("fall-down");
-    setTimeout(() => {
-      pile.innerHTML = "";
-      pile.className = "";
-    }, 1500);
-  }, 5000);
+window.cachedSpellTargets = [];
+function cacheSpellTargets(selector) {
+  window.cachedSpellTargets = [];
+  const targets = document.querySelectorAll(selector);
+  targets.forEach(el => {
+    if (el.offsetWidth > 0 && el.offsetHeight > 0) {
+      const rect = el.getBoundingClientRect();
+      window.cachedSpellTargets.push({
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height
+      });
+    }
+  });
 }
 
+
+
 function triggerPatronusFlight() {
+  if (_patronusInterval) {
+    clearInterval(_patronusInterval);
+    _patronusInterval = null;
+  }
   document.querySelectorAll(".patronus-element").forEach(el => el.remove());
 
   const animals = [
@@ -2253,10 +2486,11 @@ function triggerPatronusFlight() {
   });
 
   let startTime = Date.now();
-  let trailInterval = setInterval(() => {
+  _patronusInterval = setInterval(() => {
     let elapsed = Date.now() - startTime;
     if (elapsed > 13000) {
-      clearInterval(trailInterval);
+      clearInterval(_patronusInterval);
+      _patronusInterval = null;
       return;
     }
     
@@ -2274,42 +2508,15 @@ function triggerPatronusFlight() {
   }, 40);
 
   setTimeout(() => {
+    if (_patronusInterval) {
+      clearInterval(_patronusInterval);
+      _patronusInterval = null;
+    }
     document.querySelectorAll(".patronus-element").forEach(el => el.remove());
   }, 13000);
 }
 
-function spawnGeminioDecoys() {
-  document.querySelectorAll(".geminio-decoy").forEach(el => el.remove());
-  const count = 10;
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  for (let i = 0; i < count; i++) {
-    const decoy = document.createElement("div");
-    decoy.className = "geminio-decoy";
-    const x = Math.max(20, Math.min(w - 120, Math.random() * (w - 80)));
-    const y = Math.max(20, Math.min(h - 120, Math.random() * (h - 80)));
-    decoy.style.left = `${x}px`;
-    decoy.style.top = `${y}px`;
-    const rot = Math.floor(Math.random() * 60 - 30);
-    decoy.style.transform = `rotate(${rot}deg)`;
-    
-    const handlePop = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      decoy.classList.add("burst");
-      if (typeof playCrackSound === "function") playCrackSound();
-      window.dispatchEvent(new CustomEvent('envelopeTapped', {
-        detail: { x: x + 40, y: y + 30 }
-      }));
-      setTimeout(() => decoy.remove(), 300);
-    };
 
-    decoy.addEventListener("click", handlePop);
-    decoy.addEventListener("touchend", handlePop);
-    
-    document.body.appendChild(decoy);
-  }
-}
 
 function triggerRevelioSweep() {
   const sweep = document.createElement("div");
@@ -2472,58 +2679,40 @@ function castSpellText(spellText) {
   } 
   else if (txt === "wingardium leviosa") {
     window.activeSpellMode = "levitation";
-    const levTargets = ["#envelope-wrapper", "#spell-btn", "#music-btn", "#house-switch-btn"];
-    levTargets.forEach(sel => {
-      const el = document.querySelector(sel);
-      if (el) el.classList.add("levitating");
-    });
+    document.body.classList.add("levitation-running");
     showSpellToast("Wingardium Leviosa! 💫");
     setTimeout(() => {
-      levTargets.forEach(sel => {
-        const el = document.querySelector(sel);
-        if (el) el.classList.remove("levitating");
-      });
       if (window.activeSpellMode === "levitation") window.activeSpellMode = "";
+      document.body.classList.remove("levitation-running");
     }, 8000);
   } 
-  else if (txt === "incendio") {
-    window.activeSpellMode = "incendio";
-    window.maxParticlesLimit = 180;
-    if (typeof window.startMagicParticlesLoop === 'function') {
-      window.startMagicParticlesLoop();
-    }
-    document.body.classList.add("incendio-running");
-    activateTouchBlocker(8000);
-    showSpellToast("Incendio! 🔥");
-    setTimeout(() => {
-      if (window.activeSpellMode === "incendio") {
-        window.activeSpellMode = "";
-        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
-      }
-      document.body.classList.remove("incendio-running");
-    }, 8000);
+  else if (txt === "incendio_LEGACY_REMOVED") {
+    // Handled below with PNG fire strip
   } 
   else if (txt === "aguamenti") {
+    if (_aguamentiTimeout1) clearTimeout(_aguamentiTimeout1);
+    if (_aguamentiTimeout2) clearTimeout(_aguamentiTimeout2);
+ 
+    const oldWater = document.getElementById("water-level");
+    if (oldWater) oldWater.remove();
+ 
     window.activeSpellMode = "aguamenti";
-    window.maxParticlesLimit = 220;
+    window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 90;
     if (typeof window.startMagicParticlesLoop === 'function') {
       window.startMagicParticlesLoop();
     }
     document.body.classList.add("aguamenti-running");
-    activateTouchBlocker(10000);
     showSpellToast("Aguamenti! 💧");
     
-    let water = document.getElementById("water-level");
-    if (!water) {
-      water = document.createElement("div");
-      water.id = "water-level";
-      document.body.appendChild(water);
-    }
+    const water = document.createElement("div");
+    water.id = "water-level";
+    document.body.appendChild(water);
+    
     water.className = "";
     void water.offsetWidth;
     water.classList.add("rising");
     
-    setTimeout(() => {
+    _aguamentiTimeout1 = setTimeout(() => {
       if (window.activeSpellMode === "aguamenti") {
         window.activeSpellMode = "";
         window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
@@ -2533,64 +2722,508 @@ function castSpellText(spellText) {
         water.classList.add("falling");
       }
     }, 8000);
-
-    setTimeout(() => {
+ 
+    _aguamentiTimeout2 = setTimeout(() => {
       document.body.classList.remove("aguamenti-running");
       if (water && water.parentNode) {
         water.remove();
       }
+      _aguamentiTimeout1 = null;
+      _aguamentiTimeout2 = null;
     }, 10000);
   } 
-  else if (txt === "glacius") {
-    window.activeSpellMode = "glacius";
-    window.maxParticlesLimit = 120;
+  else if (txt === "glacius_LEGACY_REMOVED") {
+    // Handled below with interactive ice-scratch canvas
+  } 
+  else if (txt === "confundo") {
+    window.activeSpellMode = "confundo";
+    document.body.classList.add("confundo-running");
+    showSpellToast("Confundo! 🌀");
+    setTimeout(() => {
+      if (window.activeSpellMode === "confundo") {
+        window.activeSpellMode = "";
+      }
+      document.body.classList.remove("confundo-running");
+    }, 6000);
+  }
+  else if (txt === "specialis revelio") {
+    window.activeSpellMode = "revelio";
+    showSpellToast("Specialis Revelio! 🔍");
+    
+    let scanLine = document.getElementById("revelio-scan-line");
+    if (!scanLine) {
+      scanLine = document.createElement("div");
+      scanLine.id = "revelio-scan-line";
+      document.body.appendChild(scanLine);
+    }
+    
+    const selectors = [
+      "h1", "h2", "h3", 
+      "#envelope-wrapper", "#treasure-chest-wrapper", 
+      "p", "button:not(#spell-touch-blocker)", ".badge-img", "#scroll-paper"
+    ];
+    const targetElements = [];
+    selectors.forEach(sel => {
+      document.querySelectorAll(sel).forEach(el => {
+        if (el.offsetWidth > 0 && el.offsetHeight > 0) {
+          const rect = el.getBoundingClientRect();
+          targetElements.push({ element: el, top: rect.top + window.scrollY });
+        }
+      });
+    });
+    
+    targetElements.sort((a, b) => a.top - b.top);
+    
+    const viewportHeight = window.innerHeight;
+    targetElements.forEach(item => {
+      const fraction = Math.min(1, Math.max(0, item.top / (viewportHeight || 1)));
+      const delay = fraction * 2200;
+      setTimeout(() => {
+        if (window.activeSpellMode === "revelio") {
+          item.element.classList.add("revelio-pulse");
+          setTimeout(() => {
+            item.element.classList.remove("revelio-pulse");
+          }, 800);
+        }
+      }, delay);
+    });
+    
+    setTimeout(() => {
+      if (window.activeSpellMode === "revelio") {
+        window.activeSpellMode = "";
+      }
+      if (scanLine && scanLine.parentNode) {
+        scanLine.remove();
+      }
+    }, 2800);
+  }
+  else if (txt === "depulso" || txt === "epulso") {
+    window.activeSpellMode = "depulso";
+    document.body.classList.add("depulso-running");
+    showSpellToast("Depulso! 💨");
+    setTimeout(() => {
+      if (window.activeSpellMode === "depulso") {
+        window.activeSpellMode = "";
+      }
+      document.body.classList.remove("depulso-running");
+    }, 5000);
+  }
+  else if (txt === "accio") {
+    showSpellToast("Accio! 🧲");
+    
+    const accioCard = document.getElementById('accio-card');
+    if (accioCard) {
+      const c = window._bdContent || {};
+      const imgSrc = c.accioImage || 'accio_card.png';
+      accioCard.innerHTML = `<img src="${imgSrc}" alt="Accio card" id="accio-card-img">`;
+      accioCard.style.display = 'block';
+      accioCard.className = '';
+      void accioCard.offsetWidth;
+      accioCard.classList.add('accio-fly-in');
+      
+      // Summon sparkles on arrival
+      setTimeout(() => {
+        if (typeof window.spawnSparkCluster === 'function') {
+          for (let i = 0; i < 5; i++) {
+            window.spawnSparkCluster(
+              window.innerWidth / 2 + rand(-60, 60),
+              window.innerHeight / 2 + rand(-80, 80),
+              3, true
+            );
+          }
+        }
+      }, 900);
+      
+      // Hold then fall
+      setTimeout(() => {
+        accioCard.classList.remove('accio-fly-in');
+        void accioCard.offsetWidth;
+        accioCard.classList.add('accio-fall');
+        setTimeout(() => {
+          accioCard.style.display = 'none';
+          accioCard.className = '';
+          accioCard.innerHTML = '';
+        }, 900);
+      }, 9000);
+    }
+  } 
+  
+  /* ==========================================
+     Elemental Spells — handled below
+     ========================================== */
+
+  else if (txt === "herbivicus" || txt === "flora") {
+    window.activeSpellMode = "herbivicus";
+    window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 50;
     if (typeof window.startMagicParticlesLoop === 'function') {
       window.startMagicParticlesLoop();
     }
+    document.body.classList.add("herbivicus-running");
+    showSpellToast("Herbivicus! 🌿");
+    
+    // Show PNG botanical border overlay
+    const herBorder = document.getElementById('herbivicus-border');
+    if (herBorder) {
+      herBorder.style.backgroundImage = 'url(herbivicus_border.png)';
+      herBorder.style.display = 'block';
+      void herBorder.offsetWidth;
+      herBorder.classList.add('active');
+    }
+    
+    setTimeout(() => {
+      if (window.activeSpellMode === "herbivicus") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      document.body.classList.remove("herbivicus-running");
+      if (herBorder) {
+        herBorder.classList.remove('active');
+        setTimeout(() => { herBorder.style.display = 'none'; }, 800);
+      }
+    }, 10000);
+  }
+
+  else if (txt === "duro" || txt === "terram") {
+    window.activeSpellMode = "duro";
+    window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 50;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    document.body.classList.add("duro-running");
+    if (typeof playCrackSound === "function") playCrackSound();
+    document.body.classList.add("shake-screen");
+    setTimeout(() => document.body.classList.remove("shake-screen"), 300);
+    showSpellToast("Duro! 🪨");
+    
+    // Show PNG stone border overlay
+    const duroBorder = document.getElementById('duro-border');
+    if (duroBorder) {
+      duroBorder.style.backgroundImage = 'url(duro_border.png)';
+      duroBorder.style.display = 'block';
+      void duroBorder.offsetWidth;
+      duroBorder.classList.add('active');
+    }
+    
+    setTimeout(() => {
+      if (window.activeSpellMode === "duro") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      document.body.classList.remove("duro-running");
+      if (duroBorder) {
+        duroBorder.classList.remove('active');
+        setTimeout(() => { duroBorder.style.display = 'none'; }, 800);
+      }
+    }, 10000);
+  }
+
+  else if (txt === "incendio") {
+    window.activeSpellMode = "incendio";
+    window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 70;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    cacheSpellTargets('#envelope-wrapper, #treasure-chest-wrapper, h1, button:not(#spell-touch-blocker)');
+    document.body.classList.add("incendio-running");
+    showSpellToast("Incendio! 🔥");
+    
+    // Show fire strip at bottom
+    const strip = document.getElementById('incendio-strip');
+    if (strip) {
+      strip.style.backgroundImage = 'url(incendio_fire.png)';
+      strip.style.display = 'block';
+      void strip.offsetWidth;
+      strip.classList.add('active');
+    }
+    
+    setTimeout(() => {
+      if (window.activeSpellMode === "incendio") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      document.body.classList.remove("incendio-running");
+      window.cachedSpellTargets = [];
+      if (strip) {
+        strip.classList.remove('active');
+        setTimeout(() => { strip.style.display = 'none'; }, 800);
+      }
+    }, 10000);
+  }
+
+  else if (txt === "ventus") {
+    window.activeSpellMode = "ventus";
+    window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 60;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    document.body.classList.add("ventus-running");
+    showSpellToast("Ventus! 🍃");
+    setTimeout(() => {
+      if (window.activeSpellMode === "ventus") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      document.body.classList.remove("ventus-running");
+    }, 10000);
+  }
+
+  else if (txt === "glacius") {
+    window.activeSpellMode = "glacius";
+    window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 55;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    cacheSpellTargets('#envelope-wrapper, #treasure-chest-wrapper, h1, button:not(#spell-touch-blocker), p');
+    
+    let ice = document.getElementById("ice-overlay");
+    if (!ice) {
+      ice = document.createElement("div");
+      ice.id = "ice-overlay";
+      document.body.appendChild(ice);
+    }
+    void ice.offsetWidth;
+    ice.classList.add("frozen");
     document.body.classList.add("frozen-lock");
-    activateTouchBlocker(8000);
     if (typeof playCrackSound === "function") playCrackSound();
     showSpellToast("Glacius! ❄️");
+    
+    // Activate interactive scratch-clear canvas
+    activateGlaciusCanvas();
+    
     setTimeout(() => {
       if (window.activeSpellMode === "glacius") {
         window.activeSpellMode = "";
         window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
       }
       document.body.classList.remove("frozen-lock");
-    }, 8000);
-  } 
-  else if (txt === "geminio") {
-    spawnGeminioDecoys();
-    showSpellToast("Geminio! ✉️");
-  } 
-  else if (txt === "orchideous") {
-    window.activeSpellMode = "orchideous";
-    window.maxParticlesLimit = 180;
-    if (typeof window.startMagicParticlesLoop === 'function') {
-      window.startMagicParticlesLoop();
-    }
-    triggerOrchideousPile();
-    showSpellToast("Orchideous! 🌸");
-    
-    const w = window.innerWidth;
-    for (let i = 0; i < 15; i++) {
-      setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('envelopeTapped', {
-          detail: { x: Math.random() * w, y: -20 }
-        }));
-      }, i * 80);
-    }
-    
-    setTimeout(() => {
-      if (window.activeSpellMode === "orchideous") {
-        window.activeSpellMode = "";
-        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      window.cachedSpellTargets = [];
+      deactivateGlaciusCanvas();
+      if (ice) {
+        ice.classList.remove("frozen");
+        setTimeout(() => {
+          if (ice && ice.parentNode) ice.remove();
+        }, 1500);
       }
-    }, 6000);
+    }, 12000);
   }
+  
   else if (txt) {
     showSpellToast("Fizzled... Try another spell!");
   }
+}
+
+/* ── Android-Optimized Interactive Pointer Trails for Active Spells ── */
+let _lastTrailSpawnTime = 0;
+let _lastTrailX = 0;
+let _lastTrailY = 0;
+
+function handleGeneralPointerMove(e) {
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+  const y = e.touches ? e.touches[0].clientY : e.clientY;
+  
+  window.lastLumosX = x;
+  window.lastLumosY = y;
+  
+  // Only spawn drag trails if an active spell mode is running (excluding Lumos/Nox which have custom tracking)
+  if (window.activeSpellMode && window.activeSpellMode !== 'none' && window.activeSpellMode !== 'patronus') {
+    const now = performance.now();
+    const timeDelta = now - _lastTrailSpawnTime;
+    
+    const dx = x - _lastTrailX;
+    const dy = y - _lastTrailY;
+    const distance = Math.sqrt(dx*dx + dy*dy);
+    
+    // Strict Android throttle: only spawn if 60ms elapsed OR user dragged at least 25px
+    if (timeDelta > 60 || distance > 25) {
+      if (typeof window.spawnSparkCluster === 'function') {
+        window.spawnSparkCluster(x, y, Math.floor(rand(1, 3)), false);
+      }
+      _lastTrailSpawnTime = now;
+      _lastTrailX = x;
+      _lastTrailY = y;
+    }
+  }
+}
+
+window.addEventListener("mousemove", handleGeneralPointerMove, { passive: true });
+window.addEventListener("touchmove", handleGeneralPointerMove, { passive: true });
+
+/* ── Glacius Interactive Ice-Scratch Canvas ── */
+let _glaciusCanvas = null;
+let _glaciusCtx = null;
+let _glaciusRAF = null;
+
+function activateGlaciusCanvas() {
+  const canvas = document.getElementById('glacius-canvas');
+  if (!canvas) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  
+  // Fill with icy blue-white layer
+  ctx.fillStyle = 'rgba(200, 235, 255, 0.72)';
+  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  
+  // Draw ice crack lines across the surface
+  ctx.strokeStyle = 'rgba(160, 210, 240, 0.6)';
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i < 18; i++) {
+    const sx = rand(0, window.innerWidth);
+    const sy = rand(0, window.innerHeight);
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    let cx = sx, cy = sy;
+    for (let j = 0; j < 5; j++) {
+      cx += rand(-60, 60);
+      cy += rand(-60, 60);
+      ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+  }
+  
+  _glaciusCanvas = canvas;
+  _glaciusCtx = ctx;
+  
+  // Touch/drag erase handler
+  function eraseIce(e) {
+    if (window.activeSpellMode !== 'glacius') return;
+    if (e.cancelable) e.preventDefault();
+    const touch = e.touches ? e.touches[0] : e;
+    const rect = canvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    const r = 45; // eraser radius
+    _glaciusCtx.save();
+    _glaciusCtx.globalCompositeOperation = 'destination-out';
+    _glaciusCtx.beginPath();
+    _glaciusCtx.arc(x, y, r, 0, Math.PI * 2);
+    _glaciusCtx.fill();
+    _glaciusCtx.restore();
+  }
+  canvas.style.pointerEvents = 'auto';
+  canvas.addEventListener('touchmove', eraseIce, { passive: false });
+  canvas.addEventListener('mousemove', eraseIce, { passive: true });
+  canvas._eraseIce = eraseIce;
+}
+
+function deactivateGlaciusCanvas() {
+  const canvas = document.getElementById('glacius-canvas');
+  if (!canvas) return;
+  if (canvas._eraseIce) {
+    canvas.removeEventListener('touchmove', canvas._eraseIce);
+    canvas.removeEventListener('mousemove', canvas._eraseIce);
+    canvas._eraseIce = null;
+  }
+  // Fade out then hide
+  canvas.style.transition = 'opacity 1s ease';
+  canvas.style.opacity = '0';
+  setTimeout(() => {
+    canvas.style.display = 'none';
+    canvas.style.opacity = '1';
+    canvas.style.transition = '';
+    canvas.style.pointerEvents = 'none';
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }, 1000);
+  _glaciusCanvas = null;
+  _glaciusCtx = null;
+}
+
+/* ── Fumos Interactive Mist-Scratch Canvas ── */
+let _fumosCanvas = null;
+let _fumosCtx = null;
+
+function activateFumosCanvas() {
+  const canvas = document.getElementById('fumos-canvas');
+  if (!canvas) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  
+  // Fill with thick mist layer
+  const grad = ctx.createRadialGradient(
+    window.innerWidth/2, window.innerHeight/2, 20,
+    window.innerWidth/2, window.innerHeight/2, window.innerWidth * 0.8
+  );
+  grad.addColorStop(0, 'rgba(255,255,255,0.0)');
+  grad.addColorStop(0.4, 'rgba(230,240,255,0.65)');
+  grad.addColorStop(1, 'rgba(200,220,240,0.88)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  
+  // Animate mist wisps
+  let mistAge = 0;
+  function animateMist() {
+    if (window.activeSpellMode !== 'fumos') return;
+    mistAge += 0.01;
+    // Re-draw subtle swirling effect on the mist surface (very light, performance-safe)
+    ctx.save();
+    ctx.globalAlpha = 0.015;
+    ctx.fillStyle = `rgba(200,220,255,0.3)`;
+    for (let i = 0; i < 3; i++) {
+      const mx = rand(0, window.innerWidth);
+      const my = rand(0, window.innerHeight);
+      ctx.beginPath();
+      ctx.arc(mx, my, rand(40, 100), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    _glaciusRAF = requestAnimationFrame(animateMist);
+  }
+  animateMist();
+  
+  _fumosCanvas = canvas;
+  _fumosCtx = ctx;
+  
+  // Touch/drag erase handler — reveal scene through mist
+  function eraseMist(e) {
+    if (window.activeSpellMode !== 'fumos') return;
+    if (e.cancelable) e.preventDefault();
+    const touch = e.touches ? e.touches[0] : e;
+    const rect = canvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    const r = 55;
+    _fumosCtx.save();
+    _fumosCtx.globalCompositeOperation = 'destination-out';
+    _fumosCtx.beginPath();
+    _fumosCtx.arc(x, y, r, 0, Math.PI * 2);
+    _fumosCtx.fill();
+    _fumosCtx.restore();
+  }
+  canvas.style.pointerEvents = 'auto';
+  canvas.addEventListener('touchmove', eraseMist, { passive: false });
+  canvas.addEventListener('mousemove', eraseMist, { passive: true });
+  canvas._eraseMist = eraseMist;
+}
+
+function deactivateFumosCanvas() {
+  if (_glaciusRAF) { cancelAnimationFrame(_glaciusRAF); _glaciusRAF = null; }
+  const canvas = document.getElementById('fumos-canvas');
+  if (!canvas) return;
+  if (canvas._eraseMist) {
+    canvas.removeEventListener('touchmove', canvas._eraseMist);
+    canvas.removeEventListener('mousemove', canvas._eraseMist);
+    canvas._eraseMist = null;
+  }
+  canvas.style.transition = 'opacity 1.5s ease';
+  canvas.style.opacity = '0';
+  setTimeout(() => {
+    canvas.style.display = 'none';
+    canvas.style.opacity = '1';
+    canvas.style.transition = '';
+    canvas.style.pointerEvents = 'none';
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }, 1500);
+  _fumosCanvas = null;
+  _fumosCtx = null;
 }
 
 /* ── DOM Init ── */
