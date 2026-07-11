@@ -19,7 +19,7 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0,
                  user-scalable=no, viewport-fit=cover,
                  interactive-widget=resizes-content" />
-  <meta name="theme-color" content="#0d1b2a" />
+  <meta name="theme-color" content="#1A472A" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -28,11 +28,17 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Dancing+Script:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Dancing+Script:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <script src="content.js"></script>
 </head>
 <body>
+  <script>
+    (function() {
+      var defaultHouse = (typeof BIRTHDAY_CONTENT !== 'undefined' && BIRTHDAY_CONTENT.defaultHouse) || 'Slytherin';
+      document.body.classList.add('theme-' + defaultHouse.toLowerCase());
+    })();
+  </script>
 
   <!-- Premium preloader screen -->
   <div id="loading-screen" role="dialog" aria-modal="true" aria-label="Loading Hogwarts Scrapbook">
@@ -51,7 +57,7 @@
           <polygon points="50,46 51.5,48.5 54,50 51.5,51.5 50,54 48.5,51.5 46,50 48.5,48.5" fill="currentColor" opacity="0.9" />
         </svg>
       </div>
-      <h2 id="loading-title">For Vanshika Singh</h2>
+      <div id="loading-title">For Ayushi Mishra</div>
       <p id="loading-subtitle">An owl is en route from Hogwarts…</p>
       
       <div id="loading-solemn-swear">"I solemnly swear that I am up to no good"</div>
@@ -80,7 +86,7 @@
 
     <section id="hero">
       <p id="greeting-label" class="reveal reveal-delay-1">⚡ Happy Birthday ⚡</p>
-      <h1 id="hero-friend-name" class="reveal-glow reveal-delay-2">Vanshika Singh</h1>
+      <h1 id="hero-friend-name" class="reveal-glow reveal-delay-2">Ayushi Mishra</h1>
       <p id="birthday-date" class="reveal reveal-delay-3">2 June</p>
     </section>
 
@@ -141,9 +147,9 @@
             <div class="env-watermark" aria-hidden="true">⚡</div>
 
             <!-- Cursive address block -->
-            <div class="env-address" aria-label="Addressed to Vanshika Singh">
+            <div class="env-address" aria-label="Addressed to Ayushi Mishra">
               <span class="env-address-to">To:</span>
-              <span class="env-address-name">Vanshika Singh</span>
+              <span class="env-address-name">Ayushi Mishra</span>
               <span class="env-address-line2">The Bedroom</span>
             </div>
 
@@ -172,7 +178,7 @@
         </div><!-- /envelope-wrapper -->
 
         <!-- Treasure Chest (Hidden by default, revealed in place of envelope by Revelio spell) -->
-        <div id="treasure-chest-wrapper" class="hidden">
+        <div id="treasure-chest-wrapper" class="hidden" tabindex="0" role="button" aria-label="Locked treasure chest">
           <!-- Padlock element -->
           <div id="chest-padlock">
             <div class="padlock-shackle"></div>
@@ -272,29 +278,32 @@
   <!-- House toast notification -->
   <div id="house-toast" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Music Button -->
-  <button id="music-btn" aria-label="Toggle background music">
-    <span class="music-icon">🎵</span>
-    <span id="music-btn-text" class="music-text">Play Birthday Song</span>
-    <span class="eq-visualizer" aria-hidden="true">
-      <span class="eq-bar bar1"></span>
-      <span class="eq-bar bar2"></span>
-      <span class="eq-bar bar3"></span>
-      <span class="eq-bar bar4"></span>
-    </span>
-  </button>
+  <!-- 🪄 Bottom Glassmorphic Control Dock -->
+  <div class="bottom-control-dock" role="toolbar" aria-label="Hogwarts Control Dock">
+    <!-- House Switcher Button (Sorting Hat) -->
+    <button id="house-switch-btn" aria-label="Re-sort Hogwarts House" title="Sorting Hat">
+      <span class="switcher-icon">🧙‍♂️</span>
+      <span id="house-switch-btn-text" class="switcher-text">Sorting Hat</span>
+    </button>
 
-  <!-- House Switcher Button (Bottom-Left) -->
-  <button id="house-switch-btn" aria-label="Re-sort Hogwarts House" title="Sorting Hat">
-    <span class="switcher-icon">🧙‍♂️</span>
-    <span id="house-switch-btn-text" class="switcher-text">Sorting Hat</span>
-  </button>
+    <!-- Spell Caster Button (Wand) -->
+    <button id="spell-btn" aria-label="Cast Spell" title="Wand">
+      <span class="spell-icon">🪄</span>
+      <span id="spell-btn-text" class="spell-text">Cast Spell</span>
+    </button>
 
-  <!-- Spell Caster Button (Bottom-Center) -->
-  <button id="spell-btn" aria-label="Cast Spell" title="Wand">
-    <span class="spell-icon">🪄</span>
-    <span id="spell-btn-text" class="spell-text">Cast Spell</span>
-  </button>
+    <!-- Music Button -->
+    <button id="music-btn" aria-label="Toggle background music">
+      <span class="music-icon">🎵</span>
+      <span id="music-btn-text" class="music-text">Play Song</span>
+      <span class="eq-visualizer" aria-hidden="true">
+        <span class="eq-bar bar1"></span>
+        <span class="eq-bar bar2"></span>
+        <span class="eq-bar bar3"></span>
+        <span class="eq-bar bar4"></span>
+      </span>
+    </button>
+  </div>
 
   <!-- 🏰 Center Glassmorphic House Selector Overlay -->
   <div id="house-selector-overlay" role="dialog" aria-modal="true" aria-labelledby="selector-title">
@@ -329,75 +338,90 @@
     </div>
   </div>
 
-  <!-- Sparkle Canvas Overlay -->
-  <canvas id="sparkle-canvas"></canvas>
+  <!-- Grouped Magical Overlays & Canvases -->
+  <div id="magic-overlays" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:160;">
+    <!-- Sparkle Canvas Overlay -->
+    <canvas id="sparkle-canvas"></canvas>
 
-  <!-- Fumos (Mist) Interactive Scratch Canvas -->
-  <canvas id="fumos-canvas" style="display:none;position:fixed;inset:0;width:100%;height:100%;z-index:160;pointer-events:none;"></canvas>
+    <!-- Fumos (Mist) Interactive Scratch Canvas -->
+    <canvas id="fumos-canvas" style="display:none;position:absolute;inset:0;width:100%;height:100%;z-index:160;pointer-events:none;"></canvas>
 
-  <!-- Glacius Interactive Ice Crack Canvas -->
-  <canvas id="glacius-canvas" style="display:none;position:fixed;inset:0;width:100%;height:100%;z-index:161;pointer-events:none;"></canvas>
+    <!-- Glacius Interactive Ice Crack Canvas -->
+    <canvas id="glacius-canvas" style="display:none;position:absolute;inset:0;width:100%;height:100%;z-index:161;pointer-events:none;"></canvas>
+
+    <!-- Chronos Full Screen Overlay -->
+    <div id="chronos-overlay"></div>
+  </div>
 
   <!-- Accio Card Container -->
   <div id="accio-card" style="display:none;"></div>
 
+  <!-- Prisma Flying Box -->
+  <div id="prisma-box"></div>
+
   <!-- Herbivicus Botanical Border -->
   <div id="herbivicus-border" style="display:none;"></div>
 
-  <!-- Duro Stone Border -->
-  <div id="duro-border" style="display:none;"></div>
+  <!-- Amoris Hearts Overlay -->
+  <div id="amoris-overlay" style="display:none;position:fixed;inset:0;pointer-events:none;z-index:155;"></div>
 
   <!-- Incendio Fire Strip -->
   <div id="incendio-strip" style="display:none;"></div>
 
-  <!-- 🪄 Spell Input Modal -->
+  <!-- 🪄 Spell Input Modal — Android Bottom Sheet -->
   <div id="spell-modal" role="dialog" aria-modal="true" aria-labelledby="spell-modal-title">
     <div id="spell-modal-bg"></div>
     <div id="spell-modal-card">
+      <!-- Drag handle (Android/iOS bottom sheet indicator) -->
+      <div class="sheet-handle" aria-hidden="true"></div>
       <button id="spell-modal-close" aria-label="Close text dialog">✕</button>
-      <h3 id="spell-modal-title">Speak Your Charm</h3>
-      <p class="spell-modal-subtitle">Speak your spell to unlock magic</p>
+      <h3 id="spell-modal-title">✦ Cast Your Spell ✦</h3>
+      <p class="spell-modal-subtitle">Type a spell or tap one below to cast magic</p>
       <div class="spell-input-group">
-        <input type="text" id="spell-input-field" placeholder="e.g. Lumos" autocomplete="off" spellcheck="false" />
+        <label for="spell-input-field" class="sr-only">Enter spell name</label>
+        <input type="text" id="spell-input-field" placeholder="e.g. Expecto Patronum"
+               autocomplete="off" spellcheck="false"
+               inputmode="text" enterkeyhint="done" />
         <button id="spell-cast-action" aria-label="Cast spell">Cast 🪄</button>
       </div>
       <div class="spell-help-container">
-        <p class="spell-help-title">✦ Speak Your Enchantments ✦</p>
         <div class="spell-help-grid">
+
+          <!-- Row 1: Unlocking Spells -->
           <div class="spell-help-col">
-            <span class="spell-cat">Standard:</span>
+            <span class="spell-cat">🔑 Unlock:</span>
             <div class="spell-tags">
-              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Lumos'">Lumos</span>
-              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Nox'">Nox</span>
-              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Revelio'">Revelio</span>
-              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Alohomora'">Alohomora</span>
-              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Specialis Revelio'">Specialis Revelio</span>
+              <span class="spell-tag" data-spell="Lumos" onclick="fillSpell(this)">Lumos</span>
+              <span class="spell-tag" data-spell="Nox" onclick="fillSpell(this)">Nox</span>
+              <span class="spell-tag" data-spell="Revelio" onclick="fillSpell(this)">Revelio</span>
+              <span class="spell-tag" data-spell="Alohomora" onclick="fillSpell(this)">Alohomora</span>
             </div>
           </div>
+
+          <!-- Row 2: Classic Charms -->
           <div class="spell-help-col">
-            <span class="spell-cat">Charms:</span>
+            <span class="spell-cat">✨ Charms:</span>
             <div class="spell-tags">
-              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Expecto Patronum'">Expecto Patronum</span>
-              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Wingardium Leviosa'">Wingardium Leviosa</span>
-              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Confundo'">Confundo</span>
-              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Accio'">Accio</span>
-              <span class="spell-tag" onclick="document.getElementById('spell-input-field').value='Depulso'">Depulso</span>
+              <span class="spell-tag" data-spell="Expecto Patronum" onclick="fillSpell(this)">Expecto Patronum</span>
+              <span class="spell-tag" data-spell="Wingardium Leviosa" onclick="fillSpell(this)">Wingardium Leviosa</span>
+              <span class="spell-tag" data-spell="Accio" onclick="fillSpell(this)">Accio</span>
+              <span class="spell-tag love" data-spell="Amoris" onclick="fillSpell(this)">Amoris 💕</span>
             </div>
           </div>
+
+          <!-- Row 3: Elemental & Celestial -->
           <div class="spell-help-col">
-            <span class="spell-cat">Elementals:</span>
+            <span class="spell-cat">🌿 Elemental:</span>
             <div class="spell-tags">
-              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Incendio'">Incendio</span>
-              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Aguamenti'">Aguamenti</span>
-              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Glacius'">Glacius</span>
-              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Ventus'">Ventus</span>
-              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Duro'">Duro</span>
-              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Herbivicus'">Herbivicus</span>
-              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Fumos'">Fumos</span>
-              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Prisma'">Prisma</span>
-              <span class="spell-tag elemental" onclick="document.getElementById('spell-input-field').value='Chronos'">Chronos</span>
+              <span class="spell-tag elemental" data-spell="Incendio" onclick="fillSpell(this)">Incendio 🔥</span>
+              <span class="spell-tag elemental" data-spell="Aguamenti" onclick="fillSpell(this)">Aguamenti 💧</span>
+              <span class="spell-tag elemental" data-spell="Glacius" onclick="fillSpell(this)">Glacius ❄️</span>
+              <span class="spell-tag elemental" data-spell="Herbivicus" onclick="fillSpell(this)">Herbivicus 🌿</span>
+              <span class="spell-tag elemental" data-spell="Prisma" onclick="fillSpell(this)">Prisma 🌈</span>
+              <span class="spell-tag star" data-spell="Stellaris" onclick="fillSpell(this)">Stellaris ✨</span>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -406,7 +430,7 @@
   <!-- Treasure Scroll Reading Overlay (shown after chest is unlocked) -->
   <div id="treasure-overlay" class="hidden">
     <div id="treasure-container">
-      <button id="treasure-close" title="Close">✕</button>
+      <button id="treasure-close" title="Close" aria-label="Close treasure chest">✕</button>
       
       <!-- Secret Scroll (floats up after Alohomora) -->
       <div id="treasure-scroll" class="hidden-scroll">
@@ -418,6 +442,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Tactile Parchment Noise Overlay -->
+  <div id="noise-overlay" aria-hidden="true"></div>
 
   <script src="script.js"></script>
 </body>

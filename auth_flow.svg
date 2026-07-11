@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" width="100%" height="100%" style="background-color: #1A1510; font-family: 'Lora', serif;">
+  <defs>
+    <!-- Glow effect -->
+    <filter id="gold-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="green-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="blue-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="red-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <!-- Arrowhead definition -->
+    <marker id="arrow-gold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#D4AF37" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2E7D32" />
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#C62828" />
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0277BD" />
+    </marker>
+  </defs>
+
+  <!-- Title Card -->
+  <text x="400" y="35" text-anchor="middle" fill="#D4AF37" font-size="20" font-weight="bold" font-family="'Cinzel', serif" letter-spacing="2" filter="url(#gold-glow)">HOGWARTS BIRTHDAY SCRAPBOOK</text>
+  <text x="400" y="55" text-anchor="middle" fill="#E4F0E7" font-size="12" font-style="italic" letter-spacing="1">Core Authentication &amp; Initialization Flow (incl. WebAuthn Biometrics)</text>
+
+  <!-- START -->
+  <g transform="translate(400, 110)">
+    <ellipse cx="0" cy="0" rx="60" ry="25" fill="#2D2214" stroke="#D4AF37" stroke-width="2" filter="url(#gold-glow)" />
+    <text x="0" y="4" text-anchor="middle" fill="#FFF8E1" font-size="12" font-weight="bold" font-family="'Cinzel', serif">START</text>
+  </g>
+  
+  <line x1="400" y1="135" x2="400" y2="180" stroke="#D4AF37" stroke-width="2" marker-end="url(#arrow-gold)" />
+
+  <!-- PRELOADER -->
+  <g transform="translate(260, 180)">
+    <rect x="0" y="0" width="280" height="60" rx="10" fill="#2D2214" stroke="#D4AF37" stroke-width="2" />
+    <text x="140" y="26" text-anchor="middle" fill="#FFF8E1" font-size="13" font-weight="bold">Parallel Preloader System</text>
+    <text x="140" y="44" text-anchor="middle" fill="#C5B29B" font-size="11">Stream video/audio cache concurrently</text>
+  </g>
+
+  <line x1="400" y1="240" x2="400" y2="285" stroke="#D4AF37" stroke-width="2" marker-end="url(#arrow-gold)" />
+
+  <!-- DECISION 1 -->
+  <g transform="translate(400, 335)">
+    <!-- Rhombus points: (0, -50), (100, 0), (0, 50), (-100, 0) -->
+    <polygon points="0,-45 90,0 0,45 -90,0" fill="#2D2214" stroke="#D4AF37" stroke-width="2" />
+    <text x="0" y="-5" text-anchor="middle" fill="#FFF8E1" font-size="12" font-weight="bold">Preload Done</text>
+    <text x="0" y="12" text-anchor="middle" fill="#FFF8E1" font-size="12" font-weight="bold">in &lt; 15s?</text>
+  </g>
+
+  <!-- Connectors from Decision 1 -->
+  <!-- YES (Left) -->
+  <path d="M 310 335 L 220 335 L 220 420" fill="none" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrow-green)" />
+  <text x="250" y="325" text-anchor="middle" fill="#4CAF50" font-size="12" font-weight="bold">YES</text>
+
+  <!-- NO (Right) -->
+  <path d="M 490 335 L 580 335 L 580 420" fill="none" stroke="#C62828" stroke-width="2" marker-end="url(#arrow-red)" />
+  <text x="550" y="325" text-anchor="middle" fill="#EF4444" font-size="12" font-weight="bold">NO</text>
+
+  <!-- YES PATH: Audio Init -->
+  <g transform="translate(110, 420)">
+    <rect x="0" y="0" width="220" height="60" rx="8" fill="#1C3322" stroke="#2E7D32" stroke-width="2" filter="url(#green-glow)" />
+    <text x="110" y="26" text-anchor="middle" fill="#E8F5E9" font-size="12" font-weight="bold">Play Procedural Audio</text>
+    <text x="110" y="44" text-anchor="middle" fill="#A5D6A7" font-size="10.5">Synthesize wax crack &amp; paper rustle</text>
+  </g>
+
+  <!-- NO PATH: Fallback -->
+  <g transform="translate(470, 420)">
+    <rect x="0" y="0" width="220" height="60" rx="8" fill="#3D1D20" stroke="#C62828" stroke-width="2" filter="url(#red-glow)" />
+    <text x="110" y="26" text-anchor="middle" fill="#FFEBEE" font-size="12" font-weight="bold">Fallback Recovery</text>
+    <text x="110" y="44" text-anchor="middle" fill="#EF9A9A" font-size="10.5">Abort stream, load on-demand</text>
+  </g>
+
+  <!-- Paths merging into Envelope Screen -->
+  <path d="M 220 480 L 220 525 L 260 525" fill="none" stroke="#2E7D32" stroke-width="2" />
+  <path d="M 580 480 L 580 525 L 540 525" fill="none" stroke="#C62828" stroke-width="2" />
+  <line x1="400" y1="525" x2="400" y2="535" stroke="#D4AF37" stroke-width="2" />
+
+  <!-- ENVELOPE SCREEN -->
+  <g transform="translate(260, 535)">
+    <rect x="0" y="0" width="280" height="60" rx="8" fill="#2D2214" stroke="#D4AF37" stroke-width="2" />
+    <text x="140" y="26" text-anchor="middle" fill="#FFF8E1" font-size="13" font-weight="bold">Show Envelope Scene</text>
+    <text x="140" y="44" text-anchor="middle" fill="#C5B29B" font-size="11">Display sealed letter &amp; delivery owl</text>
+  </g>
+
+  <line x1="400" y1="595" x2="400" y2="640" stroke="#D4AF37" stroke-width="2" marker-end="url(#arrow-gold)" />
+
+  <!-- BIOMETRIC SENSOR CHECK -->
+  <g transform="translate(250, 640)">
+    <rect x="0" y="0" width="300" height="60" rx="8" fill="#142A3D" stroke="#0277BD" stroke-width="2" filter="url(#blue-glow)" />
+    <text x="150" y="26" text-anchor="middle" fill="#E1F5FE" font-size="13" font-weight="bold">WebAuthn Biometric Check</text>
+    <text x="150" y="44" text-anchor="middle" fill="#81D4FA" font-size="11">Detect Face ID / Touch ID hardware support</text>
+  </g>
+
+  <line x1="400" y1="700" x2="400" y2="745" stroke="#0277BD" stroke-width="2" marker-end="url(#arrow-blue)" />
+
+  <!-- DECISION 2 -->
+  <g transform="translate(400, 795)">
+    <polygon points="0,-45 90,0 0,45 -90,0" fill="#2D2214" stroke="#0277BD" stroke-width="2" />
+    <text x="0" y="-5" text-anchor="middle" fill="#FFF8E1" font-size="12" font-weight="bold">Biometrics OK</text>
+    <text x="0" y="12" text-anchor="middle" fill="#FFF8E1" font-size="12" font-weight="bold">&amp; Authenticated?</text>
+  </g>
+
+  <!-- Connectors from Decision 2 -->
+  <!-- YES (Left) -->
+  <path d="M 310 795 L 220 795 L 220 880" fill="none" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrow-green)" />
+  <text x="250" y="785" text-anchor="middle" fill="#4CAF50" font-size="12" font-weight="bold">YES</text>
+
+  <!-- NO (Right) -->
+  <path d="M 490 795 L 580 795 L 580 880" fill="none" stroke="#C62828" stroke-width="2" marker-end="url(#arrow-red)" />
+  <text x="550" y="785" text-anchor="middle" fill="#EF4444" font-size="12" font-weight="bold">NO</text>
+
+  <!-- YES PATH: Auto-Unseal -->
+  <g transform="translate(110, 880)">
+    <rect x="0" y="0" width="220" height="60" rx="8" fill="#1C3322" stroke="#2E7D32" stroke-width="2" filter="url(#green-glow)" />
+    <text x="110" y="26" text-anchor="middle" fill="#E8F5E9" font-size="12" font-weight="bold">Auto-Unseal Envelope</text>
+    <text x="110" y="44" text-anchor="middle" fill="#A5D6A7" font-size="10.5">Decrypt message, crack wax seal</text>
+  </g>
+
+  <!-- NO PATH: Sorting Hat Fallback -->
+  <g transform="translate(470, 880)">
+    <rect x="0" y="0" width="220" height="60" rx="8" fill="#3D1D20" stroke="#C62828" stroke-width="2" filter="url(#red-glow)" />
+    <text x="110" y="26" text-anchor="middle" fill="#FFEBEE" font-size="12" font-weight="bold">Manual Crest Sorting</text>
+    <text x="110" y="44" text-anchor="middle" fill="#EF9A9A" font-size="10.5">Select house badges, manual tap</text>
+  </g>
+
+  <!-- Paths merging into Open Scroll -->
+  <path d="M 220 940 L 220 985 L 260 985" fill="none" stroke="#2E7D32" stroke-width="2" />
+  <path d="M 580 940 L 580 985 L 540 985" fill="none" stroke="#C62828" stroke-width="2" />
+  <line x1="400" y1="985" x2="400" y2="995" stroke="#D4AF37" stroke-width="2" />
+
+  <!-- REVEAL HOGWARTS SCROLL -->
+  <g transform="translate(260, 995)">
+    <rect x="0" y="0" width="280" height="60" rx="8" fill="#2D2214" stroke="#D4AF37" stroke-width="2" />
+    <text x="140" y="26" text-anchor="middle" fill="#FFF8E1" font-size="13" font-weight="bold">Reveal Hogwarts Scroll</text>
+    <text x="140" y="44" text-anchor="middle" fill="#C5B29B" font-size="11">Play unroll &amp; typewriter staggers</text>
+  </g>
+
+  <line x1="400" y1="1055" x2="400" y2="1100" stroke="#D4AF37" stroke-width="2" marker-end="url(#arrow-gold)" />
+
+  <!-- END -->
+  <g transform="translate(400, 1125)">
+    <ellipse cx="0" cy="0" rx="60" ry="25" fill="#2D2214" stroke="#D4AF37" stroke-width="2" filter="url(#gold-glow)" />
+    <text x="0" y="4" text-anchor="middle" fill="#FFF8E1" font-size="12" font-weight="bold" font-family="'Cinzel', serif">END</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(20, 1160)" font-size="10" fill="#C5B29B">
+    <rect x="0" y="0" width="12" height="12" rx="2" fill="#2D2214" stroke="#D4AF37" stroke-width="1" />
+    <text x="18" y="10">Core Flow</text>
+    
+    <rect x="110" y="0" width="12" height="12" rx="2" fill="#1C3322" stroke="#2E7D32" stroke-width="1" />
+    <text x="128" y="10">Success Path</text>
+    
+    <rect x="230" y="0" width="12" height="12" rx="2" fill="#3D1D20" stroke="#C62828" stroke-width="1" />
+    <text x="248" y="10">Fallback Path</text>
+    
+    <rect x="350" y="0" width="12" height="12" rx="2" fill="#142A3D" stroke="#0277BD" stroke-width="1" />
+    <text x="368" y="10">Biometrics (WebAuthn)</text>
+  </g>
+</svg>

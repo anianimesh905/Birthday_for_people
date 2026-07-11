@@ -3,7 +3,7 @@
    ============================================================ */
 
 /* ── Fonts Import ── */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Jost:wght@200;300;400;500&family=Herr+Von+Muellerhoff&display=swap');
+/* ── Fonts are loaded via <link> in index.html head for optimal performance ── */
 
 /* ── Reset & Core Defaults ── */
 *, *::before, *::after {
@@ -32,56 +32,56 @@ html {
   --my: 0;
 
   /* Default/Gryffindor fallback values for root */
-  --house-primary: #740001;
-  --house-accent:  #D3A625;
-  --house-overlay: rgba(116, 0, 1, 0.32);
-  --house-text:    #F5E6C8;
-  --house-glow:    0 0 10px #D3A625, 0 0 28px rgba(211, 166, 37, 0.45), 0 0 6px rgba(211, 166, 37, 0.25) inset;
+  --house-primary: oklch(28% 0.16 29);
+  --house-accent:  oklch(72% 0.16 82);
+  --house-overlay: oklch(28% 0.16 29 / 32%);
+  --house-text:    oklch(92% 0.04 86);
+  --house-glow:    0 0 10px oklch(72% 0.16 82), 0 0 28px oklch(72% 0.16 82 / 45%), 0 0 6px oklch(72% 0.16 82 / 25%) inset;
 }
 
-/* House Specific Tokens */
+/* House Specific Tokens (OKLCH Calibrated) */
 .theme-gryffindor {
-  --house-primary   : #740001;                 /* deep scarlet */
-  --house-accent    : #D3A625;                 /* Gryffindor gold */
-  --house-overlay   : rgba(116, 0, 1, 0.32);   /* Lowered opacity for video visibility */
-  --house-text      : #F5E6C8;                 /* warm parchment cream */
-  --house-glow      : 0 0 10px #D3A625,
-                      0 0 28px rgba(211, 166, 37, 0.45),
-                      0 0 6px  rgba(211, 166, 37, 0.25) inset;
-  --badge-accent    : #D3A625;
+  --house-primary   : oklch(28% 0.16 29);                 /* deep scarlet */
+  --house-accent    : oklch(72% 0.16 82);                 /* Gryffindor gold */
+  --house-overlay   : oklch(28% 0.16 29 / 32%);           /* Lowered opacity for video visibility */
+  --house-text      : oklch(92% 0.04 86);                 /* warm parchment cream */
+  --house-glow      : 0 0 10px oklch(72% 0.16 82),
+                      0 0 28px oklch(72% 0.16 82 / 45%),
+                      0 0 6px  oklch(72% 0.16 82 / 25%) inset;
+  --badge-accent    : oklch(72% 0.16 82);
 }
 
 .theme-slytherin {
-  --house-primary   : #1A472A;                 /* deep forest green */
-  --house-accent    : #E4F0E7;                 /* Slytherin silver accent */
-  --house-overlay   : rgba(26, 71, 42, 0.32);   /* Lowered opacity for video visibility */
-  --house-text      : #E4F0E7;                 /* pale mint-white */
-  --house-glow      : 0 0 10px #E4F0E7,
-                      0 0 28px rgba(228, 240, 231, 0.40),
-                      0 0 6px  rgba(228, 240, 231, 0.20) inset;
-  --badge-accent    : #E4F0E7;
+  --house-primary   : oklch(31% 0.08 142);                 /* deep forest green */
+  --house-accent    : oklch(94% 0.015 145);                 /* Slytherin silver accent */
+  --house-overlay   : oklch(31% 0.08 142 / 32%);           /* Lowered opacity for video visibility */
+  --house-text      : oklch(94% 0.015 145);                 /* pale mint-white */
+  --house-glow      : 0 0 10px oklch(94% 0.015 145),
+                      0 0 28px oklch(94% 0.015 145 / 40%),
+                      0 0 6px  oklch(94% 0.015 145 / 20%) inset;
+  --badge-accent    : oklch(94% 0.015 145);
 }
 
 .theme-ravenclaw {
-  --house-primary   : #0E1A40;                 /* Ravenclaw navy */
-  --house-accent    : #CDD8F5;                 /* antique bronze accent */
-  --house-overlay   : rgba(14, 26, 64, 0.32);   /* Lowered opacity for video visibility */
-  --house-text      : #CDD8F5;                 /* pale periwinkle */
-  --house-glow      : 0 0 10px #CDD8F5,
-                      0 0 28px rgba(205, 216, 245, 0.45),
-                      0 0 6px  rgba(205, 216, 245, 0.25) inset;
-  --badge-accent    : #CDD8F5;
+  --house-primary   : oklch(18% 0.08 262);                 /* Ravenclaw navy */
+  --house-accent    : oklch(50% 0.10 70);                 /* Ravenclaw bronze accent */
+  --house-overlay   : oklch(18% 0.08 262 / 32%);           /* Lowered opacity for video visibility */
+  --house-text      : oklch(86% 0.04 254);                 /* pale periwinkle */
+  --house-glow      : 0 0 10px oklch(86% 0.04 254),
+                      0 0 28px oklch(86% 0.04 254 / 45%),
+                      0 0 6px  oklch(86% 0.04 254 / 25%) inset;
+  --badge-accent    : oklch(86% 0.04 254);
 }
 
 .theme-hufflepuff {
-  --house-primary   : #ECB939;                 /* Hufflepuff yellow */
-  --house-accent    : #ECB939;                 /* near-black badger brown accent */
-  --house-overlay   : rgba(190, 140, 20, 0.28); /* Lowered opacity for video visibility */
-  --house-text      : #1A1510;                 /* very dark brown */
-  --house-glow      : 0 0 10px #1A1510,
-                      0 0 28px rgba(26, 21, 16, 0.45),
-                      0 0 6px  rgba(26, 21, 16, 0.20) inset;
-  --badge-accent    : #1A1510;
+  --house-primary   : oklch(78% 0.18 86);                 /* Hufflepuff yellow */
+  --house-accent    : oklch(28% 0 0);                 /* near-black badger brown accent */
+  --house-overlay   : oklch(64% 0.15 84 / 28%); /* Lowered opacity for video visibility */
+  --house-text      : oklch(18% 0.01 65);                 /* very dark brown */
+  --house-glow      : 0 0 10px oklch(78% 0.18 86),
+                      0 0 28px oklch(78% 0.18 86 / 45%),
+                      0 0 6px  oklch(78% 0.18 86 / 20%) inset;
+  --badge-accent    : oklch(28% 0 0);
 }
 
 body {
@@ -101,29 +101,33 @@ body {
   transition: background-color 0.6s ease, color 0.4s ease;
 }
 
-/* Atmospheric Film Grain Overlay */
-body::before {
-  content: '';
+/* Atmospheric Film Grain Overlay - GPU Hardware Accelerated for Smooth Android Playback */
+#noise-overlay {
   position: fixed;
-  inset: 0;
+  inset: -50px;
+  width: calc(100% + 100px);
+  height: calc(100% + 100px);
   pointer-events: none;
-  z-index: 9999;
-  opacity: 0.02;
+  z-index: 200000;
+  opacity: 0.024;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 200px 200px;
-  animation: grain 4s steps(3) infinite;
+  animation: grain 0.8s steps(4) infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
 /* Disable film grain overlay when the letter is open to prevent background vibration and scroll lag */
-body.letter-open::before {
+body.letter-open #noise-overlay {
   animation: none !important;
   display: none !important;
 }
 @keyframes grain {
-  0%   { background-position: 0 0; }
-  33%  { background-position: -8% -12%; }
-  66%  { background-position: 12% 8%; }
-  100% { background-position: 0 0; }
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(-10px, -15px, 0); }
+  50%  { transform: translate3d(15px, 10px, 0); }
+  75%  { transform: translate3d(-12px, 8px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 
 /* ── Immersive Video Background ── */
@@ -299,9 +303,9 @@ body.letter-open::before {
 #hero-friend-name {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: clamp(2.5rem, 10vw, 5.5rem);
-  line-height: 1.1;
-  letter-spacing: 0.05em;
+  font-size: clamp(2.5rem, 9.5vw, 5.0rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
   color: var(--house-accent);
   text-shadow: 
@@ -748,7 +752,7 @@ body.letter-open::before {
 
 #scroll-overlay.open { 
   opacity: 1; 
-  pointer-events: all; 
+  pointer-events: auto; 
 }
 
 #scroll-container {
@@ -845,7 +849,9 @@ body.letter-open::before {
   position        : absolute;
   inset: 0;
   z-index         : -1;
-  border: 1px solid rgba(139, 101, 55, 0.25);
+  border: 1.5px solid rgba(139, 101, 55, 0.35);
+  outline: 4px solid rgba(139, 101, 55, 0.08);
+  outline-offset: -6px;
   box-shadow: 0 35px 80px rgba(0,0,0,0.6);
   will-change     : transform;
   transform       : translate3d(0, 0, 0);
@@ -1220,7 +1226,7 @@ body.letter-open::before {
   justify-content: center;
   position: relative;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(255, 255, 255, 0.02);
   aspect-ratio: 1 / 1.15;
   width: 100%;
@@ -1384,91 +1390,61 @@ body.letter-open::before {
    🎵 MUSIC TOGGLE BUTTON
    ============================================================ */
 
-#music-btn {
+.bottom-control-dock {
   position: fixed;
   bottom: calc(1.2rem + var(--sab));
-  right:  calc(1.2rem + var(--sar));
-  z-index: 50;
-  min-height: 44px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  z-index: 50000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   background: rgba(0, 0, 0, 0.28);
   border: 1.5px solid var(--house-accent);
+  border-radius: 100px;
+  padding: 6px 12px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: var(--house-glow);
+  opacity: 0;
+  animation: dock-arrive 1.5s 1.2s ease-out forwards;
+  transition: background-color 0.3s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  will-change: transform, opacity;
+}
+
+@keyframes dock-arrive {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.bottom-control-dock button {
+  background: transparent;
+  border: none;
+  min-height: 40px;
   border-radius: 50px;
-  padding: 0.65rem 1.2rem;
+  padding: 0.5rem 1.0rem;
   font-family: 'Lora', serif;
   font-weight: 300;
   font-size: 0.72rem;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   color: var(--house-accent);
   cursor: pointer;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
-  opacity: 0;
-  animation: btn-arrive 1.5s 1.2s ease-out forwards;
-  -webkit-tap-highlight-color: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: var(--house-glow);
-}
-
-/* ============================================================
-   🧙‍♂️ HOUSE SWITCHER BUTTON (Sorting Hat)
-   ============================================================ */
-
-#house-switch-btn {
-  position: fixed;
-  bottom: calc(1.2rem + var(--sab));
-  left:  calc(1.2rem + var(--sal));
-  z-index: 50;
-  min-height: 44px;
-  background: rgba(0, 0, 0, 0.28);
-  border: 1.5px solid var(--house-accent);
-  border-radius: 50px;
-  padding: 0.65rem 1.2rem;
-  font-family: 'Lora', serif;
-  font-weight: 300;
-  font-size: 0.72rem;
-  letter-spacing: 0.15em;
-  color: var(--house-accent);
-  cursor: pointer;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
-  opacity: 0;
-  animation: btn-arrive 1.5s 1.2s ease-out forwards;
   -webkit-tap-highlight-color: transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: var(--house-glow);
+  transition: background-color 0.3s ease, transform 0.2s ease, color 0.4s ease;
 }
 
-#house-switch-btn:hover,
-#house-switch-btn:focus {
-  background-color : rgba(0, 0, 0, 0.50);
-  transform        : scale(1.06);
+.bottom-control-dock button:hover,
+.bottom-control-dock button:focus {
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.04);
 }
 
-#house-switch-btn:active { 
-  transform: scale(0.96); 
-}
-
-@keyframes btn-arrive {
-  from { opacity:0; transform:translateY(12px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-
-#music-btn:hover,
-#music-btn:focus {
-  background-color : rgba(0, 0, 0, 0.50);
-  transform        : scale(1.06);
-}
-
-#music-btn:active { 
-  transform: scale(0.96); 
+.bottom-control-dock button:active {
+  transform: scale(0.96);
 }
 
 #music-btn.playing {
@@ -1607,6 +1583,19 @@ body.letter-open::before {
   outline-offset: 4px;
 }
 
+/* Screen Reader Only — visually hidden but accessible to assistive tech */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 
 /* ============================================================
    ⌛ PRELOADING SCREEN (HOGWARTS PRELOADER)
@@ -1641,13 +1630,16 @@ body.letter-open::before {
 #loading-card {
   position: relative;
   z-index: 10;
-  background: rgba(248, 240, 218, 0.7); /* warm parchment card look */
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(62, 39, 20, 0.15);
+  background: rgba(248, 240, 218, 0.75); /* warm parchment card look */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(62, 39, 20, 0.16);
+  outline: 4px solid rgba(62, 39, 20, 0.04);
+  outline-offset: -5px;
   box-shadow: 
-    0 24px 55px rgba(62, 39, 20, 0.18),
-    inset 0 0 25px rgba(255, 255, 255, 0.45);
+    0 24px 60px rgba(62, 39, 20, 0.20),
+    0 4px 10px rgba(62, 39, 20, 0.05),
+    inset 0 0 35px rgba(255, 255, 255, 0.55);
   border-radius: 24px;
   padding: 3.5rem 2.2rem;
   width: min(390px, 88vw);
@@ -1722,11 +1714,13 @@ body.letter-open::before {
 
 #loading-progress-bar {
   height: 100%;
-  width: 0%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
   background: linear-gradient(90deg, #8c1d1d 0%, #d4a373 100%);
   border-radius: 10px;
   position: relative;
-  transition: width 0.25s cubic-bezier(0.1, 0.8, 0.2, 1);
+  transition: transform 0.25s cubic-bezier(0.1, 0.8, 0.2, 1);
   box-shadow: 
     0 0 8px rgba(140, 29, 29, 0.4),
     0 0 16px rgba(140, 29, 29, 0.2);
@@ -1796,29 +1790,31 @@ body.letter-open::before {
   }
 }
 
-/* Android-first compact floating actions for narrow viewports */
-@media (max-width: 480px) {
-  #music-btn-text, 
-  #house-switch-btn-text,
-  .eq-visualizer {
-    display: none !important;
+/* Compact bottom dock overrides for mobile viewports */
+@media (max-width: 768px) {
+  .bottom-control-dock {
+    padding: 6px 8px;
+    gap: 8px;
+    bottom: calc(0.8rem + var(--sab));
   }
-  
-  #music-btn, 
-  #house-switch-btn {
-    width: 48px;
-    height: 48px;
+  .bottom-control-dock button {
     padding: 0;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 48px;
   }
-
-  .music-icon,
-  .switcher-icon {
-    font-size: 1.2rem;
+  .bottom-control-dock button span,
+  .bottom-control-dock .eq-visualizer {
+    display: none !important;
+  }
+  .bottom-control-dock button .music-icon,
+  .bottom-control-dock button .switcher-icon,
+  .bottom-control-dock button .spell-icon {
+    font-size: 1.15rem;
     margin: 0;
     line-height: 1;
   }
@@ -1880,13 +1876,14 @@ body.letter-open::before {
    📱 MOBILE & ANDROID PERFORMANCE OPTIMIZATIONS
    ============================================================ */
 @media (max-width: 768px) {
+  /* Keep animated film grain active but hardware accelerated on mobile/Android */
   body::before {
-    display: none !important; /* Disable animated film grain on mobile */
+    display: block !important;
   }
   #scroll-overlay {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(6, 3, 1, 0.92) !important; /* Rich, deep background without expensive blurs */
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    background: rgba(6, 3, 1, 0.85) !important; /* Slightly translucent glassmorphism */
   }
   #scroll-paper {
     background-image: repeating-linear-gradient(
@@ -1894,30 +1891,36 @@ body.letter-open::before {
       transparent,
       transparent          26px,
       rgba(139,101,55,0.07) 27px
-    ) !important; /* Remove heavy SVG noise background filter on mobile */
+    ) !important;
   }
   #scroll-paper-bg {
-    filter: none !important; /* Disable feTurbulence & feDisplacementMap completely on mobile to prevent GPU lag */
-    border: 2px solid rgba(139, 101, 55, 0.45) !important; /* Solid border substitute */
+    filter: url(#deckle-edge) !important; /* Restore beautiful vintage torn edges on Android */
+    border: 1px solid rgba(139, 101, 55, 0.25) !important;
   }
   #scroll-flap-top, #scroll-flap-bottom {
-    filter: none !important; /* Disable SVG turbulence displacement on flap animations */
-    background-image: none !important; /* Remove SVG noise texture entirely on flaps for mobile */
+    filter: url(#deckle-edge) !important; /* Restore deckled edges on scroll flaps */
   }
   #music-btn, #house-switch-btn, #house-toast, #scroll-close {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(10, 8, 6, 0.92) !important; /* Hard dark contrast theme without filter overhead */
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+    background: rgba(10, 8, 6, 0.82) !important; /* Translucent premium glassmorphism buttons */
   }
   #water-level {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(10, 80, 180, 0.75) !important;
+    backdrop-filter: blur(2.5px) !important;
+    -webkit-backdrop-filter: blur(2.5px) !important;
+    background: linear-gradient(to top, rgba(10, 80, 180, 0.65), rgba(30, 144, 255, 0.45), rgba(0, 191, 255, 0.15)) !important; /* Transparent aquatic layer */
   }
   #ice-overlay {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: radial-gradient(circle, rgba(255,255,255,0.2) 20%, rgba(200,240,255,0.4) 60%, rgba(150,220,255,0.8) 100%) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 20%, rgba(200,240,255,0.4) 60%, rgba(150,220,255,0.8) 100%) !important; /* Translucent frosted ice layer */
+  }
+  /* Restore the full fire flicker animation on Android body and overlays */
+  body.incendio-running {
+    box-shadow: inset 0 0 70px rgba(255, 69, 0, 0.4) !important;
+  }
+  body.incendio-running::after {
+    opacity: 1 !important;
   }
 }
 
@@ -1938,8 +1941,30 @@ body.letter-open::before {
   height: clamp(12px, 2.6vw, 16px);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.5s ease;
   z-index: 10;
+  animation: footprint-ink-fade 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes footprint-ink-fade {
+  0% {
+    opacity: 0;
+    filter: blur(2px) brightness(1.2);
+    transform: scale(0.85);
+  }
+  15% {
+    opacity: 0.75;
+    filter: blur(0.2px) brightness(1);
+    transform: scale(1);
+  }
+  70% {
+    opacity: 0.70;
+    filter: blur(0.4px);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(2.5px) brightness(0.8);
+    transform: scale(0.95);
+  }
 }
 
 
@@ -2103,63 +2128,15 @@ body.letter-open::before {
 }
 
 
-/* ============================================================
-   🪄 SPELL CASTER BOTTOM BUTTON & MODAL
-   ============================================================ */
-#spell-btn {
-  position: fixed;
-  bottom: calc(1.2rem + var(--sab));
-  left: 50%;
-  transform: translateX(-50%) translateY(0);
-  z-index: 50;
-  min-height: 44px;
-  background: rgba(0, 0, 0, 0.28);
-  border: 1.5px solid var(--house-accent);
-  border-radius: 50px;
-  padding: 0.65rem 1.2rem;
-  font-family: 'Lora', serif;
-  font-weight: 300;
-  font-size: 0.72rem;
-  letter-spacing: 0.15em;
-  color: var(--house-accent);
-  cursor: pointer;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
-  opacity: 0;
-  animation: btn-arrive-center 1.5s 1.2s ease-out forwards;
-  -webkit-tap-highlight-color: transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: var(--house-glow);
-}
-
-#spell-btn:hover,
-#spell-btn:focus {
-  background-color : rgba(0, 0, 0, 0.50);
-  transform        : translateX(-50%) scale(1.06);
-}
-
-#spell-btn:active { 
-  transform: translateX(-50%) scale(0.96); 
-}
-
-@keyframes btn-arrive-center {
-  from { opacity:0; transform:translateX(-50%) translateY(12px); }
-  to   { opacity:1; transform:translateX(-50%) translateY(0); }
-}
-
 /* 🔮 Spell Cast Popup Modal */
 #spell-modal {
   position: fixed;
   inset: 0;
-  z-index: 60000; /* above buttons but below loaders */
+  z-index: 60000;
   display: none;
-  align-items: center;
+  align-items: flex-end;   /* Bottom sheet: anchored to bottom */
   justify-content: center;
-  padding: 1rem;
+  padding: 0;
 }
 
 #spell-modal.open {
@@ -2177,24 +2154,41 @@ body.letter-open::before {
 #spell-modal-card {
   position: relative;
   z-index: 10;
-  background: radial-gradient(circle, #fcf4e0 60%, #eedeb3 100%);
-  border: 2.5px solid #cbb88a;
-  box-shadow: 
-    0 24px 60px rgba(0,0,0,0.65), 
-    inset 0 0 20px rgba(255,255,255,0.4);
-  border-radius: 20px;
-  padding: 3.2rem 2.4rem;
-  width: min(550px, 94vw); /* Enlarged spell modal card */
+  background: radial-gradient(160% 100% at 50% 100%, #fcf4e0 70%, #eedeb3 100%);
+  border: 1px solid rgba(62, 39, 20, 0.16);
+  outline: 4px solid rgba(62, 39, 20, 0.04);
+  outline-offset: -5px;
+  border-bottom: none;
+  box-shadow:
+    0 -8px 45px rgba(0,0,0,0.55),
+    inset 0 0 25px rgba(255,255,255,0.45);
+  border-radius: 28px 28px 0 0;  /* Bottom sheet rounded top */
+  padding: 0.6rem 1.6rem 2.4rem;
+  padding-bottom: calc(2.4rem + env(safe-area-inset-bottom, 0px));
+  width: 100%;
+  max-width: 100vw;
   text-align: center;
   color: #3e2714;
-  transform: scale(0.9);
-  opacity: 0;
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+  transform: translateY(100%);  /* starts off-screen below */
+  transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  max-height: 92svh;
+  overflow-y: auto;
 }
 
 #spell-modal.open #spell-modal-card {
-  transform: scale(1);
-  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Bottom Sheet drag handle ── */
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(140, 112, 80, 0.35);
+  border-radius: 2px;
+  margin: 8px auto 14px;
+  flex-shrink: 0;
 }
 
 #spell-modal-close {
@@ -2218,9 +2212,9 @@ body.letter-open::before {
 #spell-modal-title {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: 1.6rem; /* Grander title */
+  font-size: clamp(1.15rem, 5vw, 1.5rem);
   letter-spacing: 0.06em;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.15rem;
   margin-top: 0;
   color: #520000;
 }
@@ -2228,9 +2222,9 @@ body.letter-open::before {
 .spell-modal-subtitle {
   font-family: 'Lora', serif;
   font-style: italic;
-  font-size: 0.92rem; /* Larger subtitle */
+  font-size: clamp(0.78rem, 3.5vw, 0.92rem);
   color: #6b4e33;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.2rem;
   margin-top: 0;
 }
 
@@ -2251,11 +2245,13 @@ body.letter-open::before {
   border: none;
   outline: none;
   font-family: 'Lora', serif;
-  font-size: 1.2rem; /* Larger typing font */
+  font-size: clamp(1rem, 4.5vw, 1.2rem);
   padding: 10px 14px;
   color: #3e2714;
   user-select: text;
   -webkit-user-select: text;
+  /* Android keyboard push-up fix */
+  -webkit-tap-highlight-color: transparent;
 }
 
 #spell-input-field::placeholder {
@@ -2307,9 +2303,12 @@ body.letter-open::before {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  max-height: 200px;
+  max-height: 38svh;   /* more room on tall Android screens */
   overflow-y: auto;
-  padding-right: 6px;
+  padding-right: 4px;
+  /* smooth native scroll on Android Chrome */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .spell-help-grid::-webkit-scrollbar {
@@ -2349,22 +2348,39 @@ body.letter-open::before {
 }
 
 .spell-tag {
+  position: relative;
   background: #fdfaf0;
   border: 1px solid rgba(203, 184, 138, 0.6);
-  border-radius: 6px;
+  border-radius: 20px;  /* pill shape — more modern on Android */
   color: #5c3e21;
   font-family: 'Lora', serif;
-  font-size: 0.78rem;
-  padding: 4px 10px;
+  font-size: clamp(0.72rem, 3vw, 0.82rem);
+  padding: 6px 13px;
   cursor: pointer;
   user-select: none;
-  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;  /* suppress Android blue flash */
+  touch-action: manipulation;               /* no double-tap delay on Android */
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+}
+
+/* Expand touch target to 44px on mobile viewports for accessibility */
+.spell-tag::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
 }
 
 .spell-tag:hover {
-  background: #740001;
-  color: #ffd700;
-  border-color: #ffd700;
+  background: var(--house-primary);
+  color: var(--house-accent);
+  border-color: var(--house-accent);
   transform: translateY(-1.5px);
 }
 
@@ -2378,13 +2394,42 @@ body.letter-open::before {
   color: #0b519e;
 }
 
-.spell-tag.elemental:hover {
+.spell-tag.elemental:hover,
+.spell-tag.elemental:active {
   background: #0b519e;
   color: #fff;
   border-color: #0b519e;
 }
 
-/* Mobile responsive circle overrides */
+/* Amoris — pink love spell */
+.spell-tag.love {
+  background: #fff0f5;
+  border-color: rgba(255, 105, 135, 0.55);
+  color: #c0305a;
+}
+
+.spell-tag.love:hover,
+.spell-tag.love:active {
+  background: #c0305a;
+  color: #fff;
+  border-color: #c0305a;
+}
+
+/* Stellaris — deep celestial spell */
+.spell-tag.star {
+  background: #f2eeff;
+  border-color: rgba(120, 80, 220, 0.5);
+  color: #5b2db0;
+}
+
+.spell-tag.star:hover,
+.spell-tag.star:active {
+  background: #5b2db0;
+  color: #e8d9ff;
+  border-color: #5b2db0;
+}
+
+/* Mobile responsive spell modal overrides */
 @media (max-width: 768px) {
   #spell-btn {
     backdrop-filter: none !important;
@@ -2392,8 +2437,17 @@ body.letter-open::before {
     background: rgba(10, 8, 6, 0.92) !important;
   }
   #spell-modal-bg {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+  /* Input group full row on mobile */
+  .spell-input-group {
+    flex-direction: row;
+  }
+  #spell-cast-action {
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 0.88rem;
   }
 }
 
@@ -2424,14 +2478,7 @@ body.letter-open::before {
    🔮 PREMIUM SPELL VISUALS & ANIMATIONS
    ============================================================ */
 
-/* Wingardium Leviosa bobbing classes */
-.levitating {
-  animation: hoverBob 3.2s ease-in-out infinite alternate !important;
-}
-@keyframes hoverBob {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-16px); }
-}
+/* Wingardium Leviosa bobbing class - renamed or removed */
 
 /* Glacius frosted glass vignette overlay */
 body.frosted::after {
@@ -2513,7 +2560,7 @@ body.frosted::after {
 }
 #treasure-overlay:not(.hidden) {
   opacity: 1;
-  pointer-events: all;
+  pointer-events: auto;
 }
 #treasure-container {
   position: relative;
@@ -2521,9 +2568,8 @@ body.frosted::after {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 90vw;
-  max-width: 480px;
-  height: 480px;
+  max-width: 90%;
+  width: 380px;
   transform-style: preserve-3d;
 }
 #treasure-close {
@@ -2538,7 +2584,7 @@ body.frosted::after {
   border-radius: 50%;
   cursor: pointer;
   font-size: 1.15rem;
-  transition: all 0.25s ease;
+  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
   z-index: 310;
   display: flex;
   align-items: center;
@@ -2729,7 +2775,7 @@ body.frosted::after {
 #treasure-scroll.show-scroll {
   transform: scale(1) translateY(-40px);
   opacity: 1;
-  pointer-events: all;
+  pointer-events: auto;
 }
 
 .scroll-paper-mini {
@@ -2789,7 +2835,7 @@ body.frosted::after {
   inset: 0;
   z-index: 10000;
   background: transparent;
-  pointer-events: all !important;
+  pointer-events: auto !important;
   cursor: wait;
 }
 
@@ -2798,14 +2844,14 @@ body.patronus-active::after {
   content: '';
   position: fixed;
   inset: 0;
-  background: rgba(4, 8, 16, 0.72); /* 70% dimming */
+  background: radial-gradient(circle, rgba(128, 222, 234, 0.15) 0%, rgba(5, 20, 30, 0.65) 100%);
   pointer-events: none;
   z-index: 175;
-  animation: dimFadeIn 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: patronusDimPulse 0.3s infinite alternate ease-in-out;
 }
-@keyframes dimFadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+@keyframes patronusDimPulse {
+  0% { opacity: 0.85; }
+  100% { opacity: 0.95; }
 }
 
 /* 3 Patronus Animals Flying paths */
@@ -2854,6 +2900,52 @@ body.frozen-lock #scroll-paper {
   text-shadow: 0 0 10px rgba(173, 216, 230, 0.85) !important;
   transition: filter 1.2s ease, color 1.2s ease, border-color 1.2s ease, transform 1.2s ease !important;
   transform: scale(0.97) !important; /* icy contraction */
+}
+
+/* Confundo confusion rotation */
+body.confundo-running #envelope-wrapper,
+body.confundo-running #treasure-chest-wrapper,
+body.confundo-running #scroll-paper,
+body.confundo-running h1,
+body.confundo-running h2 {
+  animation: confundoSpin 2.5s ease-in-out infinite alternate;
+}
+@keyframes confundoSpin {
+  0% { transform: rotate(-3deg) scale(0.98); filter: blur(0.5px); }
+  50% { transform: rotate(3deg) scale(1.02); filter: blur(1.5px); }
+  100% { transform: rotate(-2deg) scale(0.97); filter: blur(0px); }
+}
+
+/* Accio element flight */
+body.accio-flying-in #envelope-wrapper,
+body.accio-flying-in #treasure-chest-wrapper,
+body.accio-flying-in #scroll-paper {
+  animation: accioShake 0.4s ease infinite;
+}
+@keyframes accioShake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(0px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(2px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(2px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+/* Depulso element push */
+body.depulso-flying #envelope-wrapper,
+body.depulso-flying #treasure-chest-wrapper,
+body.depulso-flying #scroll-paper {
+  animation: depulsoPush 1.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+@keyframes depulsoPush {
+  0% { transform: scale(1) translate3d(0, 0, 0); opacity: 1; }
+  30% { transform: scale(0.85) translate3d(0, 40px, 0); opacity: 0.9; }
+  100% { transform: scale(1.6) translate3d(0, -600px, 0); opacity: 0; }
 }
 
 /* ============================================================
@@ -2986,30 +3078,27 @@ body.levitation-running::after {
   animation: dimFadeIn 0.6s ease forwards;
 }
 
-/* Incendio dimming light overlay */
+/* Incendio dimming light overlay - Optimized box-shadow animation using opacity to run at 60fps on Android */
 body.incendio-running::after {
   content: '';
   position: fixed;
   inset: 0;
+  box-shadow: inset 0 0 100px rgba(255, 69, 0, 0.65);
   background: radial-gradient(circle, rgba(255, 69, 0, 0.15) 0%, rgba(20, 5, 0, 0.68) 100%);
   pointer-events: none;
   z-index: 175;
-  animation: fireDimPulse 0.2s infinite alternate ease-in-out;
+  animation: fireDimPulse 0.25s infinite alternate ease-in-out;
+  will-change: opacity;
+  transform: translate3d(0, 0, 0);
 }
 
 @keyframes fireDimPulse {
-  0% { opacity: 0.82; }
-  100% { opacity: 0.95; }
+  0% { opacity: 0.72; }
+  100% { opacity: 0.98; }
 }
 
 body.incendio-running {
-  box-shadow: inset 0 0 100px rgba(255, 69, 0, 0.5) !important;
-  animation: bodyFireFlicker 0.15s infinite alternate !important;
-}
-
-@keyframes bodyFireFlicker {
-  0% { box-shadow: inset 0 0 80px rgba(255, 69, 0, 0.4); }
-  100% { box-shadow: inset 0 0 120px rgba(255, 69, 0, 0.75); }
+  box-shadow: inset 0 0 70px rgba(255, 69, 0, 0.4) !important;
 }
 
 /* Incendio burning visual overrides */
@@ -3096,24 +3185,7 @@ body.aguamenti-running p {
   transition: transform 2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
 }
 
-/* Glacius frosted overlay */
-#ice-overlay {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0) 25%, rgba(200,240,255,0.18) 60%, rgba(100,180,240,0.45) 100%);
-  box-shadow: inset 0 0 100px rgba(70,130,180,0.5);
-  backdrop-filter: blur(2.5px) saturate(0.3) contrast(1.1);
-  -webkit-backdrop-filter: blur(2.5px) saturate(0.3) contrast(1.1);
-  z-index: 185;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.5s ease;
-  will-change: opacity;
-  transform: translate3d(0, 0, 0);
-}
-#ice-overlay.frozen {
-  opacity: 1;
-}
+/* First definition of ice-overlay removed to resolve duplication. Placed lower in the file. */
 
 /* Glacius freezing visuals overrides */
 body.frozen-lock #envelope-wrapper,
@@ -3264,9 +3336,7 @@ body.accio-running #scroll-paper {
    🪄 Android Optimized Spells Styling (Ventus, Duro, Fulgur, Pyra, etc.)
    ========================================================================== */
 
-#sparkle-canvas {
-  will-change: transform; /* GPU Acceleration for canvas */
-}
+/* Duplicate sparkle-canvas definition removed. */
 
 /* 1. Ventus (Wind) */
 body.ventus-running #envelope-wrapper,
@@ -3296,108 +3366,8 @@ body.duro-running p {
   text-shadow: 0 2px 2px rgba(0,0,0,0.15) !important;
 }
 
-/* 3. Fulgur (Lightning) */
-body.fulgur-running::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: #fff;
-  opacity: 0;
-  z-index: 9999;
-  pointer-events: none;
-  animation: fulgurFlash 0.3s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
-}
-@keyframes fulgurFlash {
-  0% { opacity: 0.85; }
-  30% { opacity: 0.15; }
-  50% { opacity: 0.7; }
-  100% { opacity: 0; }
-}
+/* Removed spells (caligo, solis, obscuro, cryo, polaris, fulgur) CSS cleaned up — these spells are no longer active */
 
-/* 4. Pyra (Embers) */
-body.pyra-running #envelope-wrapper,
-body.pyra-running #treasure-chest-wrapper,
-body.pyra-running #scroll-paper {
-  border-color: #ff5722 !important;
-  box-shadow: 0 0 18px rgba(255, 87, 34, 0.6) !important;
-}
-body.pyra-running h1,
-body.pyra-running h2 {
-  color: #ff5722 !important;
-  text-shadow: 0 0 10px rgba(255, 87, 34, 0.5) !important;
-}
-
-/* 5. Herbivicus (Nature) */
-body.herbivicus-running #envelope-wrapper,
-body.herbivicus-running #treasure-chest-wrapper,
-body.herbivicus-running #scroll-paper {
-  border-color: #2e7d32 !important;
-  box-shadow: 0 0 18px rgba(46, 125, 50, 0.3) !important;
-}
-body.herbivicus-running h1,
-body.herbivicus-running h2,
-body.herbivicus-running p {
-  color: #1b5e20 !important;
-}
-
-/* 6. Caligo (Mist) */
-body.caligo-running::after {
-  content: '';
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  height: 35vh;
-  background: linear-gradient(to top, rgba(230,230,230,0.55), rgba(230,230,230,0));
-  z-index: 170;
-  pointer-events: none;
-}
-
-/* 7. Solis (Sunbeam) */
-body.solis-running::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at 80% 20%, rgba(255,224,130,0.25), transparent 70%);
-  z-index: 170;
-  pointer-events: none;
-}
-body.solis-running h1,
-body.solis-running h2 {
-  color: #ffb300 !important;
-  text-shadow: 0 0 12px rgba(255, 179, 0, 0.6) !important;
-}
-
-/* 8. Obscuro (Darkness) */
-body.obscuro-running::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle, transparent 35%, rgba(6, 2, 14, 0.82) 100%);
-  z-index: 170;
-  pointer-events: none;
-}
-
-/* 9. Cryo (Frost) */
-body.cryo-running #envelope-wrapper,
-body.cryo-running #treasure-chest-wrapper,
-body.cryo-running #scroll-paper {
-  border-color: #4dd0e1 !important;
-  box-shadow: 0 0 15px rgba(77, 208, 225, 0.5) !important;
-}
-body.cryo-running h1,
-body.cryo-running h2 {
-  color: #e0f7fa !important;
-  text-shadow: 0 0 10px rgba(77, 208, 225, 0.6) !important;
-}
-
-/* 10. Polaris (Magnetic) */
-body.polaris-running #envelope-wrapper,
-body.polaris-running #treasure-chest-wrapper,
-body.polaris-running #scroll-paper {
-  border-color: #00e5ff !important;
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.45) !important;
-}
-
-/* 11. Prisma (Rainbow) — enhanced */
 body.prisma-running h1,
 body.prisma-running h2 {
   animation: prismaShift 5s linear infinite !important;
@@ -3440,7 +3410,7 @@ body.prisma-running::after {
   100% { background-position: 200% 200%; }
 }
 
-/* 12. Chronos — Full vintage sepia time-warp overlay */
+/* 12. Chronos — Full vintage black & white noise overlay */
 #chronos-overlay {
   position: fixed;
   inset: 0;
@@ -3448,19 +3418,27 @@ body.prisma-running::after {
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.8s ease;
-  /* Aged parchment tint */
-  background: rgba(120, 80, 30, 0.18);
-  /* Vignette */
-  box-shadow: inset 0 0 80px rgba(60, 30, 5, 0.55);
+  background: rgba(0, 0, 0, 0.05);
 }
 #chronos-overlay.active {
-  opacity: 1;
+  opacity: 0.25;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.7) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 80% 40%, rgba(0,0,0,0.8) 1.2px, transparent 1.2px),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.6) 1.8px, transparent 1.8px),
+    linear-gradient(rgba(0,0,0,0.15) 50%, transparent 50%);
+  background-size: 300px 300px, 250px 250px, 350px 350px, 100% 4px;
+  animation: chronosNoise 0.25s steps(4) infinite;
 }
-/* Desaturate + sepia all content under chronos */
-body.chronos-running #main-content,
-body.chronos-running #scroll-overlay,
-body.chronos-running #video-bg {
-  filter: sepia(0.75) brightness(0.9) contrast(0.9);
+@keyframes chronosNoise {
+  0% { background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px; }
+  25% { background-position: 50px 100px, -30px 40px, 80px -120px, 0px 1px; }
+  50% { background-position: -80px 40px, 120px -80px, -40px 60px, 0px -1px; }
+  75% { background-position: 110px -50px, -60px 120px, 50px 80px, 0px 2px; }
+  100% { background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px; }
+}
+body.chronos-running {
+  filter: grayscale(100%) contrast(1.1) brightness(0.95);
   transition: filter 0.8s ease;
 }
 body.chronos-running h1,
@@ -3468,16 +3446,119 @@ body.chronos-running h2,
 body.chronos-running h3,
 body.chronos-running p,
 body.chronos-running span,
-body.chronos-running div {
+body.chronos-running div,
+body.chronos-running button {
   font-family: 'IM Fell English', serif !important;
-  color: #5d3a1a !important;
   letter-spacing: 0.03em;
 }
+/* For light parchment scrolls, force dark ink */
+body.chronos-running #scroll-paper,
+body.chronos-running #scroll-paper h1,
+body.chronos-running #scroll-paper h2,
+body.chronos-running #scroll-paper h3,
+body.chronos-running #scroll-paper p,
+body.chronos-running #scroll-paper span,
+body.chronos-running .scroll-paper-mini,
+body.chronos-running .scroll-paper-mini h1,
+body.chronos-running .scroll-paper-mini h2,
+body.chronos-running .scroll-paper-mini h3,
+body.chronos-running .scroll-paper-mini p,
+body.chronos-running .scroll-paper-mini span {
+  color: #1a1a1a !important;
+  text-shadow: none !important;
+}
+/* For dark background areas, explicitly style light text to maintain high contrast */
+body.chronos-running #main-content,
+body.chronos-running #main-content p,
+body.chronos-running #main-content h1,
+body.chronos-running #main-content h2,
+body.chronos-running #main-content span,
+body.chronos-running #house-selector-overlay,
+body.chronos-running #house-selector-overlay h1,
+body.chronos-running #house-selector-overlay h2,
+body.chronos-running #house-selector-overlay h3,
+body.chronos-running #house-selector-overlay span {
+  color: #e8e8e8 !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
+}
+body.chronos-running #scroll-paper {
+  border: 3px double #111 !important;
+  background: #fcfbf8 !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 50px rgba(0,0,0,0.15) !important;
+}
 body.chronos-running #hero-friend-name {
-  text-shadow: 3px 3px 0 rgba(80,40,10,0.3), 0 0 12px rgba(150,100,40,0.5) !important;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.3) !important;
 }
 body.chronos-running #sparkle-canvas {
-  filter: sepia(0.8) brightness(0.85);
+  filter: brightness(0.85);
+}
+
+
+/* ══════════════════════════════════════════════
+   💕 AMORIS — Floating Hearts Spell
+   ══════════════════════════════════════════════ */
+
+@keyframes heart-float {
+  0%   { transform: translateY(0) scale(0.8) rotate(-8deg); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 0.7; }
+  100% { transform: translateY(-90vh) scale(1.3) rotate(12deg); opacity: 0; }
+}
+
+.amoris-heart {
+  position: absolute;
+  font-size: clamp(1.2rem, 4vw, 2.2rem);
+  pointer-events: none;
+  animation: heart-float linear forwards;
+  will-change: transform, opacity;
+}
+
+body.amoris-running {
+  --sparkle-tint: rgba(255, 150, 180, 0.45);
+}
+
+/* ══════════════════════════════════════════════
+   ✨ STELLARIS — Starry Night Spell
+   ══════════════════════════════════════════════ */
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.7); }
+  50%       { opacity: 1;   transform: scale(1.2); }
+}
+
+@keyframes shooting-star {
+  0%   { transform: translate(0, 0) rotate(-30deg) scaleX(0); opacity: 0; }
+  5%   { opacity: 1; transform: translate(0, 0) rotate(-30deg) scaleX(1); }
+  100% { transform: translate(200px, 120px) rotate(-30deg) scaleX(0.5); opacity: 0; }
+}
+
+.stellaris-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  pointer-events: none;
+  animation: star-twinkle ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.stellaris-shooter {
+  position: absolute;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.9), transparent);
+  pointer-events: none;
+  animation: shooting-star ease-in forwards;
+  will-change: transform, opacity;
+}
+
+body.stellaris-running {
+  --sparkle-tint: rgba(140, 100, 255, 0.4);
+}
+
+body.stellaris-running #main-content,
+body.stellaris-running #envelope-wrapper {
+  filter: brightness(0.82) saturate(0.7) hue-rotate(220deg);
+  transition: filter 1.2s ease;
 }
 
 /* ── Fumos Mist Canvas (styled in JS, just ensure z-index stacking) ── */
@@ -3517,6 +3598,60 @@ body.herbivicus-running h2 {
 body.herbivicus-running #scroll-paper {
   border-color: #66bb6a !important;
   box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), inset 0 0 30px rgba(160, 230, 130, 0.08) !important;
+}
+/* Leaf/plant decorations on text during Herbivicus */
+body.herbivicus-running h1::after,
+body.herbivicus-running h2::after {
+  content: '';
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background-image: url('herbivicus_leaf.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-left: 8px;
+  vertical-align: middle;
+  opacity: 0.85;
+}
+body.herbivicus-running p::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-image: url('herbivicus_leaf.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-right: 6px;
+  vertical-align: middle;
+  opacity: 0.8;
+}
+body.herbivicus-running #scroll-paper::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 45px;
+  height: 45px;
+  background-image: url('herbivicus_leaf.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 5;
+  opacity: 0.9;
+  transform: rotate(-30deg);
+}
+body.herbivicus-running #scroll-paper::after {
+  content: '';
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 45px;
+  height: 45px;
+  background-image: url('herbivicus_leaf.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 5;
+  opacity: 0.9;
+  transform: rotate(150deg);
 }
 
 /* ── Duro Stone Border ── */
@@ -3687,7 +3822,7 @@ body.frozen-lock h1 {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 154;
+  z-index: 185; /* Must be above ice particles from sparkle canvas (150) but below Glacius scratch canvas (161) - reviewed */
   opacity: 0;
   background: 
     repeating-linear-gradient(
@@ -3703,9 +3838,69 @@ body.frozen-lock h1 {
       rgba(180, 220, 255, 0.02) 1px,
       transparent 1px,
       transparent 20px
-    );
+    ),
+    radial-gradient(circle, rgba(255,255,255,0) 25%, rgba(200,240,255,0.18) 60%, rgba(100,180,240,0.45) 100%);
+  box-shadow: inset 0 0 100px rgba(70,130,180,0.5);
+  backdrop-filter: blur(2.5px) saturate(0.3) contrast(1.1);
+  -webkit-backdrop-filter: blur(2.5px) saturate(0.3) contrast(1.1);
   transition: opacity 0.8s ease;
+  will-change: opacity;
+  transform: translate3d(0, 0, 0);
 }
 #ice-overlay.frozen {
   opacity: 1;
+}
+
+/* ── Prisma Flying Box ── */
+#prisma-box {
+  position: fixed;
+  width: 90px;
+  height: 90px;
+  bottom: -120px;
+  right: -120px;
+  z-index: 156;
+  pointer-events: none;
+  border: 3px solid transparent;
+  border-image: linear-gradient(135deg, #ff5252, #ff9800, #ffeb3b, #69f0ae, #40c4ff, #e040fb) 1;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.25), inset 0 0 15px rgba(255, 255, 255, 0.15);
+  display: none;
+  transform: rotate(0deg);
+}
+body.prisma-running #prisma-box {
+  display: block;
+  animation: prismaBoxMove 8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+@keyframes prismaBoxMove {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.6);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    scale: 1;
+  }
+  90% {
+    opacity: 1;
+    scale: 1;
+  }
+  100% {
+    transform: translate(-125vw, -125vh) rotate(720deg) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* Accessibility: Support prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  #sparkle-canvas, #fumos-canvas, #glacius-canvas {
+    display: none !important;
+  }
 }

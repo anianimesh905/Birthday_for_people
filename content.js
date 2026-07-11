@@ -13,8 +13,11 @@
 // ════════════════════════════════════════════
 
 const BIRTHDAY_CONTENT = {
-  friendName: "Vanshika Singh",
+  friendName: "Ayushi Mishra",
   // ^ The birthday person's name — shown in letter salutation and page header.
+
+  friendAddressLine: "The Bedroom",
+  // ^ The second line of the address written on the envelope (e.g. "The Bedroom" or "The Library").
 
   birthdayDate: "2 June",
   // ^ The date shown inside the Hogwarts letter (any format works,
@@ -81,16 +84,16 @@ const BIRTHDAY_CONTENT = {
   // Each message is shown when that house is selected. Written as a magical letter.
   // We use backticks ` ` here to allow multi-line formatting easily.
 
-  slytherinMessage: `Dear Vanshika Singh ( Alt. Narcissa Malfoy, but significantly less judgmental ),
+  slytherinMessage: `Dear Ayushi Mishra ( Alt. Narcissa Malfoy, but significantly less judgmental ),
 
-To the most cunning, ambitious and greatest pride women for the world. I present you with the happiest birthday. Your brilliance is unmatched with the pride of conquering the dungeons of Slytherin. You have always known what you want and moved toward it with a quiet, elegant determination that most people can only admire from a distance. That is my rare and precious gift to you.
+To the most cunning, ambitious and greatest pride of women in the world. I present you with the happiest birthday. Your brilliance is unmatched with the pride of conquering the dungeons of Slytherin. You have always known what you want and moved toward it with a quiet, elegant determination that most people can only admire from a distance. That is my rare and precious gift to you.
 
-May this birthday be your best in your life — crafted, as always, entirely on your own terms. And you can have the green foggy forest too huihuihuihui.
+May this birthday be the best of your life — crafted, as always, entirely on your own terms. And you can have the green foggy forest too huihuihuihui.
 
-With evil and Voldmort serpent's smile ( MuHeHeHeHeHeHe ),
+With evil and Voldemort's serpent smile ( MuHeHeHeHeHeHe ),
 Ani 🐍`,
 
-  gryffindorMessage: `Dear Vanshika Singh (Alt. Hermione granger with black hair),
+  gryffindorMessage: `Dear Ayushi Mishra (Alt. Hermione Granger with black hair),
 
 To the most daring soul I know — the one who charges first into the world of adventure with a big laugh and a beautiful heart — happy birthday! You are the reminder to everyone around you that everything is possible, your determination has always pushed me, I will forever be grateful to you; The world is a braver, warmer place with you in it.
 
@@ -99,18 +102,18 @@ Wishing you the best gryffindor style birthday filled with golden light, and a w
 With pride and a heart full of Gryffindor fire,
 Ani ✨`,
 
-  ravenclawMessage: `Dear Vanshika Singh ( Alt. Cho Chang with a library card addiction ),
+  ravenclawMessage: `Dear Ayushi Mishra ( Alt. Cho Chang with a library card addiction ),
 
-To a mind and beauty as vast as the night sky over the Astronomy Tower — happy birthday. You have always been keen sighted person and seen what others overlook, found questions no one asked, and chased dreams quietly and wonderfully.
+To a mind and beauty as vast as the night sky over the Astronomy Tower — happy birthday. You have always been a keen-sighted person and seen what others overlook, found questions no one asked, and chased dreams quietly and wonderfully.
 
 May the year ahead bring you beautiful solutions to your problems, unexpected discoveries, and all the books you've been meaning to read.
 
 With warmth and the deepest respect from the stars behind this,
 Ani 📚`,
 
-  hufflepuffMessage: `Dear Vanshika Singh ( Alt. Nymphadora Tonks ),
+  hufflepuffMessage: `Dear Ayushi Mishra ( Alt. Nymphadora Tonks ),
 
-To the truest friend in all of Hogwarts — the one who shows up without being asked, the one who remembers every small things that matter most, and the one whose kindness makes every room feel like home — happiest birthday to the one and all V.A.N.S.H.I.K.A S.I.N.G.H.
+To the truest friend in all of Hogwarts — the one who shows up without being asked, the one who remembers every small thing that matters most, and the one whose kindness makes every room feel like home — happiest birthday to the one and all A.Y.U.S.H.I M.I.S.H.R.A.
 
 There is no one like you in this whole world, you are one and only.
 
@@ -150,9 +153,9 @@ Ani 🌻`,
   //   Replace "accio_card.png" with any image filename in the same folder as index.html.
   // ^ Label on the music button (before music starts playing).
 
-  eyesOnlyMessage: `Dear Vanshika,
+  eyesOnlyMessage: `Dear Ayushi,
 
-This is a secret message just for you, hidden behind the Hogwart's letter. 
+This is a secret message just for you, hidden behind the Hogwarts letter. 
 
 Well the birthday is already over and I don't know what to say. So if there is anything you want to say to me, you can say it.
 

@@ -13,6 +13,13 @@ window.addEventListener("orientationchange", () => setTimeout(setVh, 300), { pas
 
 /* ── PRELOADED ASSET REGISTRY ── */
 const PRELOADED_ASSETS = {};
+const leafImg = new Image();
+leafImg.onerror = () => console.warn('herbivicus_leaf.png missing');
+leafImg.src = 'herbivicus_leaf.png';
+
+const pebbleImg = new Image();
+pebbleImg.onerror = () => console.warn('duro_pebble.png missing');
+pebbleImg.src = 'duro_pebble.png';
 
 const DEFAULT_SIZES = {
   "gryffindor.mp4": 2716980,
@@ -22,14 +29,37 @@ const DEFAULT_SIZES = {
   "birthday.mp3"   : 4824920
 };
 
-/* ── HTML escaping helper ── */
-function _escapeHtml(str) {
-  if (!str) return '';
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+
+/* ── Keyboard Focus Trap Helper ── */
+function trapFocus(modalEl) {
+  const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  
+  modalEl.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    
+    const focusables = Array.from(modalEl.querySelectorAll(focusableSelectors))
+      .filter(el => el.offsetWidth > 0 && el.offsetHeight > 0);
+      
+    if (focusables.length === 0) {
+      e.preventDefault();
+      return;
+    }
+    
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        last.focus();
+        e.preventDefault();
+      }
+    } else {
+      if (document.activeElement === last) {
+        first.focus();
+        e.preventDefault();
+      }
+    }
+  });
 }
 
 /* ── Simple random number helper ── */
@@ -287,15 +317,46 @@ function setupMusic(file, label) {
 
   let playing = false;
   let started = false;
+  let gainNode = null;
   let fadeInterval = null;
 
+  try {
+    const ctx = getAudioCtx();
+    if (ctx) {
+      const source = ctx.createMediaElementSource(audio);
+      gainNode = ctx.createGain();
+      source.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
+    }
+  } catch (e) {
+    // Fail silently, fallback to standard HTML5 audio volume
+  }
+
   function fadeInVolume() {
-    if (fadeInterval) clearInterval(fadeInterval);
+    if (fadeInterval) {
+      clearInterval(fadeInterval);
+      fadeInterval = null;
+    }
+
+    if (gainNode) {
+      try {
+        const ctx = getAudioCtx();
+        if (ctx) {
+          gainNode.gain.cancelScheduledValues(ctx.currentTime);
+          gainNode.gain.setValueAtTime(0, ctx.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 1.5);
+          audio.volume = 1;
+          return;
+        }
+      } catch (e) {}
+    }
+
+    // Fallback: low-frequency timer fade-in
     audio.volume = 0;
     const startTime = Date.now();
     const duration = 1500;
     const targetVolume = 0.5;
-    
     fadeInterval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       if (elapsed >= duration) {
@@ -305,7 +366,7 @@ function setupMusic(file, label) {
       } else {
         audio.volume = (elapsed / duration) * targetVolume;
       }
-    }, 30);
+    }, 50);
   }
 
   function startMusic() {
@@ -503,22 +564,26 @@ function initMagicParticles(opts = {}) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
+  let isMobile = window.innerWidth < 768;
   function resizeCanvas() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = window.innerWidth * dpr;
     canvas.height = window.innerHeight * dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset before scaling to prevent accumulation on orientation change
     ctx.scale(dpr, dpr);
+    
+    // Dynamically update isMobile
+    isMobile = window.innerWidth < 768;
+    window.maxParticlesLimit = isMobile ? 60 : 120;
   }
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas, { passive: true });
 
-  const IS_MOBILE = window.innerWidth < 768;
-  window.maxParticlesLimit = IS_MOBILE ? 20 : 80;
-  const SPAWN_INTERVAL = IS_MOBILE ? 400 : 180;
+  const SPAWN_INTERVAL = isMobile ? 180 : 100;
 
   const PALETTES = {
     gryffindor: { spark: '#D3A625', orb: 'rgba(116, 0, 1, 0.60)',   star: '#D3A625', bolt: '#FFD700' },
-    slytherin:  { spark: '#AAAAAA', orb: 'rgba(26, 71, 42, 0.50)',  star: '#AAAAAA', bolt: '#C0C0C0' },
+    slytherin:  { spark: '#E4F0E7', orb: 'rgba(26, 71, 42, 0.50)',  star: '#E4F0E7', bolt: '#E4F0E7' },
     ravenclaw:  { spark: '#946B2D', orb: 'rgba(14, 26, 64, 0.60)',  star: '#946B2D', bolt: '#B8A060' },
     hufflepuff: { spark: '#ECB939', orb: 'rgba(255, 255, 200, 0.50)', star: '#ECB939', bolt: '#FFE066' },
   };
@@ -767,12 +832,13 @@ function initMagicParticles(opts = {}) {
     for (let i = 0; i < particles.length; i++) {
       if (particles[i].active) alive++;
     }
-    const currentMax = window.maxParticlesLimit;
+    // Override spell limits to at least 60 on mobile Android to ensure high-performance density
+    const currentMax = isMobile ? Math.max(window.maxParticlesLimit, 60) : window.maxParticlesLimit;
     if (alive >= currentMax) return;
     
     let currentInterval = SPAWN_INTERVAL;
     if (window.activeSpellMode === 'incendio' || window.activeSpellMode === 'aguamenti' || window.activeSpellMode === 'glacius') {
-      currentInterval = IS_MOBILE ? 75 : 40;
+      currentInterval = isMobile ? 35 : 20;
     }
     
     if (now - lastSpawn > currentInterval) { 
@@ -950,16 +1016,9 @@ function initMagicParticles(opts = {}) {
           ctx.quadraticCurveTo(-r * 0.55, 0, 0, -r);
           ctx.fill();
         } else if (window.activeSpellMode === 'duro') {
-          // Draw a stone polygon shard
-          const r = p.size * 0.45;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.moveTo(0, -r);
-          ctx.lineTo(r, -r * 0.25);
-          ctx.lineTo(r * 0.35, r);
-          ctx.lineTo(-r * 0.65, r * 0.3);
-          ctx.closePath();
-          ctx.fill();
+          // Draw real pebble image particle!
+          const r = p.size * 0.65;
+          ctx.drawImage(pebbleImg, -r, -r, r * 2, r * 2);
         } else if (window.activeSpellMode === 'fulgur') {
           // Draw lightning zig-zag
           const r = p.size * 0.6;
@@ -984,20 +1043,9 @@ function initMagicParticles(opts = {}) {
           ctx.fillStyle = '#FFF59D'; // bright hot core
           ctx.fill();
         } else if (window.activeSpellMode === 'herbivicus') {
-          // Draw simple flower shape (4 petals and a center)
-          const r = p.size * 0.5;
-          const pr = r * 0.45;
-          ctx.fillStyle = p.color;
-          for (let i = 0; i < 4; i++) {
-            const angle = (i * Math.PI) / 2;
-            ctx.beginPath();
-            ctx.arc(Math.cos(angle) * pr, Math.sin(angle) * pr, pr, 0, Math.PI * 2);
-            ctx.fill();
-          }
-          ctx.beginPath();
-          ctx.arc(0, 0, pr * 0.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#FFF59D'; // yellow center core
-          ctx.fill();
+          // Draw real leaf image particle!
+          const r = p.size * 0.75;
+          ctx.drawImage(leafImg, -r, -r, r * 2, r * 2);
         } else if (window.activeSpellMode === 'fumos') {
           // Draw expanding mist cloud (fuzzy circle using low opacity fill)
           const progressF = p.age / p.life;
@@ -1006,6 +1054,17 @@ function initMagicParticles(opts = {}) {
           ctx.arc(0, 0, rF, 0, Math.PI * 2);
           ctx.fillStyle = p.color;
           ctx.fill();
+        } else if (window.activeSpellMode === 'prisma') {
+          // Draw a beautiful glowing mini-rainbow arc
+          const r = p.size * 0.7;
+          ctx.lineWidth = 2.5;
+          const colors = ['#ff5252', '#ff9800', '#ffeb3b', '#69f0ae', '#40c4ff', '#e040fb'];
+          for (let i = 0; i < colors.length; i++) {
+            ctx.strokeStyle = colors[i];
+            ctx.beginPath();
+            ctx.arc(0, r * 0.3, r - i * 1.5, Math.PI, 2 * Math.PI, false);
+            ctx.stroke();
+          }
         } else if (window.activeSpellMode === 'chronos') {
           // Draw clock inspired Roman cross vector
           const r = p.size * 0.45;
@@ -1081,7 +1140,7 @@ function initMagicParticles(opts = {}) {
     const detail = e.detail || {};
     const bx = typeof detail.x === 'number' ? detail.x : canvas.width / 2;
     const by = typeof detail.y === 'number' ? detail.y : canvas.height / 2;
-    const BURST_COUNT = IS_MOBILE ? 20 : 40;
+    const BURST_COUNT = isMobile ? 20 : 40;
     let emitted = 0;
     for (let i = 0; i < particles.length && emitted < BURST_COUNT; i++) {
       if (!particles[i].active) {
@@ -1112,12 +1171,55 @@ function initMagicParticles(opts = {}) {
   let lastTime = 0;
   let rafId = null;
 
+  function drawLargeRainbowOverlay() {
+    ctx.save();
+    const time = performance.now() * 0.001;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Use layout coordinates (device independent)
+    const cw = canvas.width / dpr;
+    const ch = canvas.height / dpr;
+    const centerX = cw / 2;
+    const centerY = ch * 1.1;
+    const baseRadius = Math.min(cw, ch) * 0.58;
+    const pulse = Math.sin(time * 2.2) * 15;
+    const radius = baseRadius + pulse;
+    
+    ctx.lineWidth = 12;
+    ctx.globalAlpha = 0.18;
+    
+    const colors = ['#ff5252', '#ff9800', '#ffeb3b', '#69f0ae', '#40c4ff', '#e040fb'];
+    for (let i = 0; i < colors.length; i++) {
+      ctx.strokeStyle = colors[i];
+      ctx.shadowColor = colors[i];
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius - i * 12, Math.PI, 2 * Math.PI, false);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   function loop(now) {
     const dt = Math.min((now - lastTime) / 1000, 0.1);
     lastTime = now;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    if (!IS_MOBILE || window.isLumosActive) {
+    if (window.activeSpellMode === 'prisma') {
+      drawLargeRainbowOverlay();
+      
+      const pBox = document.getElementById('prisma-box');
+      if (pBox) {
+        const rect = pBox.getBoundingClientRect();
+        if (rect.right > 0 && rect.bottom > 0 && rect.left < window.innerWidth && rect.top < window.innerHeight) {
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          spawnSparkCluster(cx, cy, 1, false);
+        }
+      }
+    }
+    
+    // Allow spawner on: desktop always, mobile during Lumos or active spell mode
+    if (!isMobile || window.isLumosActive || (window.activeSpellMode && window.activeSpellMode !== 'none')) {
       tickSpawner(now);
     }
     
@@ -1130,7 +1232,7 @@ function initMagicParticles(opts = {}) {
       }
     }
 
-    if (activeCount === 0 && (IS_MOBILE || !document.hasFocus()) && !window.isLumosActive) {
+    if (activeCount === 0 && (isMobile || !document.hasFocus()) && !window.isLumosActive) {
       isLoopRunning = false;
       rafId = null;
       return;
@@ -1139,7 +1241,7 @@ function initMagicParticles(opts = {}) {
     rafId = requestAnimationFrame(loop);
   }
 
-  if (!IS_MOBILE) {
+  if (!isMobile) {
     startLoop();
   }
 
@@ -1249,6 +1351,10 @@ function initParallax() {
   }, { passive: true });
 
   function updateParallax() {
+    if (document.hidden) {
+      requestAnimationFrame(updateParallax);
+      return;
+    }
     const dx = targetMx - currentMx;
     const dy = targetMy - currentMy;
     if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
@@ -1260,6 +1366,26 @@ function initParallax() {
     requestAnimationFrame(updateParallax);
   }
   requestAnimationFrame(updateParallax);
+}
+
+/* ── Magnetic Hover Physics on Controls ── */
+function initMagneticButtons() {
+  const buttons = document.querySelectorAll(".bottom-control-dock button");
+  
+  buttons.forEach(btn => {
+    btn.addEventListener("mousemove", (e) => {
+      if (window.innerWidth <= 768) return; // Disable on touch screen widths
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      
+      btn.style.transform = `translate3d(${x * 0.35}px, ${y * 0.35}px, 0) scale(1.06)`;
+    }, { passive: true });
+    
+    btn.addEventListener("mouseleave", () => {
+      btn.style.transform = "";
+    }, { passive: true });
+  });
 }
 
 /* ── Scroll elements reveals ── */
@@ -1436,7 +1562,7 @@ const HOUSES = {
   slytherin: {
     label: 'Slytherin',
     primary: '#1A472A',
-    accent: '#AAAAAA',
+    accent: '#E4F0E7',
     toastBg: 'rgba(26,71,42,0.92)',
     message: 'slytherinMessage',
     video: 'slytherinVideo',
@@ -1534,6 +1660,9 @@ function initHouseSelector(siteContent) {
   const badges = document.querySelectorAll('.house-badge');
   if (!overlay) return;
 
+  // Trap keyboard focus inside house selector
+  trapFocus(overlay);
+
   const savedHouse = sessionStorage.getItem('selectedHouse');
 
   if (savedHouse) {
@@ -1549,6 +1678,12 @@ function initHouseSelector(siteContent) {
     
     const defaultHouse = ((siteContent && siteContent.defaultHouse) || 'Slytherin').toLowerCase();
     selectHouse(defaultHouse, { siteContent, silent: true });
+    
+    // Focus default badge
+    setTimeout(() => {
+      const defaultBadge = Array.from(badges).find(b => b.getAttribute('data-house') === defaultHouse);
+      if (defaultBadge) defaultBadge.focus();
+    }, 200);
   }
 
   badges.forEach(badge => {
@@ -1668,7 +1803,7 @@ function initEnvelope() {
         const addrLine2 = document.querySelector(".env-address-line2");
         
         if (addrTo) addrTo.textContent = "Personal:";
-        if (addrName) addrName.textContent = "Vanshika Singh";
+        if (addrName) addrName.textContent = window._bdContent?.friendName || "Ayushi Mishra";
         if (addrLine2) addrLine2.textContent = "For Your Eyes Only";
         
         // Change wax seal to Heart
@@ -1710,11 +1845,15 @@ function initEnvelope() {
     }
     
     const isPersonal = envelope.classList.contains("eyes-only");
+    const closeBtn = document.getElementById("scroll-close");
     
     if (opened) {
       overlay.classList.add("open");
       document.body.classList.add("letter-open");
       startAmbientWaves();
+      setTimeout(() => {
+        if (closeBtn) closeBtn.focus();
+      }, 150);
       setTimeout(() => {
         if (paper) {
           paper.classList.add("unfolded");
@@ -1776,6 +1915,9 @@ function initEnvelope() {
       overlay.classList.add("open");
       document.body.classList.add("letter-open");
       startAmbientWaves();
+      setTimeout(() => {
+        if (closeBtn) closeBtn.focus();
+      }, 150);
 
       setTimeout(() => {
         if (paper) {
@@ -1804,7 +1946,7 @@ function initEnvelope() {
       let msg = "";
       
       if (isPersonal) {
-        msg = c2.eyesOnlyMessage || "Dear Vanshika, Happy Birthday!";
+        msg = c2.eyesOnlyMessage || `Dear ${c2.friendName || "Ayushi"}, Happy Birthday!`;
         overlay.classList.add("eyes-only-modal");
         
         // Update headers to personal private context
@@ -1833,8 +1975,22 @@ function initEnvelope() {
     stopAmbientWaves();
     if (paper) paper.classList.remove("unfolded");
     
+    // Restore focus to envelope wrapper
+    if (wrapper) wrapper.focus();
+    
     // Sequential envelope morphing is disabled to use the Revelio/Alohomora chest instead!
     firstLetterRead = true;
+  }
+
+  // Trap keyboard focus inside scroll overlay
+  trapFocus(overlay);
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closeModal);
+    closeBtn.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      closeModal();
+    });
   }
 
   wrapper.addEventListener("touchend", (e) => {
@@ -1849,14 +2005,6 @@ function initEnvelope() {
     }
   });
 
-  if (closeBtn) {
-    closeBtn.addEventListener("touchend", (e) => {
-      e.preventDefault();
-      closeModal();
-    });
-    closeBtn.addEventListener("click", closeModal);
-  }
-
   overlay.addEventListener("touchend", (e) => {
     if (e.target === overlay) {
       e.preventDefault();
@@ -1867,7 +2015,7 @@ function initEnvelope() {
     if (e.target === overlay) closeModal();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeModal();
+    if (e.key === "Escape" && overlay.classList.contains("open")) closeModal();
   });
 
   // Live update of scroll content if house changes when scroll is already open
@@ -1896,6 +2044,7 @@ function initializeMainApp() {
 
   // Setup dynamic content details
   if (c.friendName) {
+    document.title = `Happy Birthday, ${c.friendName}! ⚡ A Letter from Hogwarts`;
     const heroName = document.getElementById("hero-friend-name");
     if (heroName) heroName.textContent = c.friendName;
     const heroDate = document.getElementById("birthday-date");
@@ -1905,6 +2054,9 @@ function initializeMainApp() {
 
     const addrName = document.querySelector(".env-address-name");
     if (addrName) addrName.textContent = c.friendName;
+
+    const addrLine2 = document.querySelector(".env-address-line2");
+    if (addrLine2) addrLine2.textContent = c.friendAddressLine || "The Bedroom";
 
     const hint = document.getElementById("envelope-hint");
     if (hint && c.openingCharm) hint.textContent = c.openingCharm;
@@ -1926,6 +2078,7 @@ function initializeMainApp() {
   initEnvelope();
   initScrollReveal();
   initParallax();
+  initMagneticButtons();
   initSwipeDismiss();
   initMagicParticles({ canvasId: 'sparkle-canvas' });
 
@@ -1938,10 +2091,16 @@ function initializeMainApp() {
   const spellBg = document.getElementById("spell-modal-bg");
 
   if (spellBtn && spellModal) {
+    // Trap keyboard focus inside spell modal
+    trapFocus(spellModal);
+
     const openSpellModal = (e) => {
       e.preventDefault();
       e.stopPropagation();
       spellModal.classList.add("open");
+      if (window.location.hash !== "#spell-modal") {
+        history.pushState({ modalOpen: true }, "", "#spell-modal");
+      }
       if (spellInput) {
         spellInput.value = "";
         setTimeout(() => spellInput.focus(), 150);
@@ -1950,6 +2109,11 @@ function initializeMainApp() {
 
     const closeSpellModal = () => {
       spellModal.classList.remove("open");
+      if (window.location.hash === "#spell-modal") {
+        history.back();
+      }
+      // Restore focus to spell button
+      if (spellBtn) spellBtn.focus();
     };
 
     spellBtn.addEventListener("click", openSpellModal);
@@ -1970,6 +2134,12 @@ function initializeMainApp() {
         closeSpellModal();
       });
     }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && spellModal.classList.contains("open")) {
+        closeSpellModal();
+      }
+    });
 
     const executeSpell = () => {
       if (spellInput) {
@@ -1997,12 +2167,20 @@ function initializeMainApp() {
     }
   }
 
-  // Disallow long presses triggering context menus
-  document.addEventListener("contextmenu", (e) => e.preventDefault());
+  // Disallow long presses triggering context menus, except on inputs to allow paste
+  document.addEventListener("contextmenu", (e) => {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable) {
+      return;
+    }
+    e.preventDefault();
+  });
 
-  // Prevent double tap zooms
+  // Prevent double tap zooms, except on inputs to allow word selection
   let lastTap = 0;
   document.addEventListener("touchend", (e) => {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable) {
+      return;
+    }
     const now = Date.now();
     if (now - lastTap < 300) e.preventDefault();
     lastTap = now;
@@ -2011,11 +2189,22 @@ function initializeMainApp() {
   initTreasureBox();
 }
 
+/* ── fillSpell: used by spell-tag onclick handlers to populate the input ── */
+function fillSpell(el) {
+  const field = document.getElementById('spell-input-field');
+  if (field && el) {
+    // Use data-spell attribute for clean spell name, strip any trailing emojis as fallback
+    field.value = (el.dataset && el.dataset.spell) || el.textContent.trim().replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim();
+    field.focus();
+  }
+}
+
 /* ── Preloader File Downloads ── */
 async function startPreloader() {
   const c = typeof BIRTHDAY_CONTENT !== "undefined" ? BIRTHDAY_CONTENT : {};
 
   const friendName = c.friendName || "Sofia";
+  document.title = `Happy Birthday, ${friendName}! ⚡ A Letter from Hogwarts`;
   const loadingTitle = document.getElementById("loading-title");
   if (loadingTitle) {
     loadingTitle.textContent = `For ${friendName}`;
@@ -2153,7 +2342,7 @@ async function startPreloader() {
     const progressBar = document.getElementById("loading-progress-bar");
     const percentageLabel = document.getElementById("loading-percentage");
     
-    if (progressBar) progressBar.style.width = `${percent}%`;
+    if (progressBar) progressBar.style.transform = `scaleX(${Math.min(0.99, ratio)})`;
     if (percentageLabel) percentageLabel.textContent = `${percent}%`;
 
     let currentLoadingAsset = null;
@@ -2192,7 +2381,7 @@ async function startPreloader() {
     const statusLabel = document.getElementById("loading-status");
     const subtitle = document.getElementById("loading-subtitle");
 
-    if (progressBar) progressBar.style.width = "100%";
+    if (progressBar) progressBar.style.transform = "scaleX(1)";
     if (percentageLabel) percentageLabel.textContent = "100%";
     
     if (statusLabel) {
@@ -2261,7 +2450,15 @@ async function startPreloader() {
         updateProgressUI();
       }
       
-      const blob = new Blob(chunks);
+      let contentType = response.headers.get("content-type");
+      if (!contentType) {
+        if (asset.url.endsWith(".mp4")) {
+          contentType = "video/mp4";
+        } else if (asset.url.endsWith(".mp3")) {
+          contentType = "audio/mp3";
+        }
+      }
+      const blob = new Blob(chunks, contentType ? { type: contentType } : {});
       const objectUrl = URL.createObjectURL(blob);
       PRELOADED_ASSETS[asset.id] = objectUrl;
     } catch (err) {
@@ -2562,19 +2759,32 @@ function initTreasureBox() {
   const chestWrapper = document.getElementById("treasure-chest-wrapper");
   if (!overlay || !closeBtn || !chestWrapper) return;
   
-  closeBtn.addEventListener("click", () => {
+  // Focus trapping for treasure overlay
+  trapFocus(overlay);
+
+  const closeTreasure = () => {
     overlay.classList.add("hidden");
+    if (window.location.hash === "#treasure-overlay") {
+      history.back();
+    }
     if (window.chestUnlocked) {
       resetChestToEnvelope();
     }
-  });
+    // Return focus to chest
+    if (chestWrapper) chestWrapper.focus();
+  };
+
+  closeBtn.addEventListener("click", closeTreasure);
 
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) {
-      overlay.classList.add("hidden");
-      if (window.chestUnlocked) {
-        resetChestToEnvelope();
-      }
+      closeTreasure();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !overlay.classList.contains("hidden")) {
+      closeTreasure();
     }
   });
   
@@ -2588,15 +2798,63 @@ function initTreasureBox() {
       const scroll = document.getElementById("treasure-scroll");
       if (overlay && scroll) {
         overlay.classList.remove("hidden");
+        if (window.location.hash !== "#treasure-overlay") {
+          history.pushState({ treasureOpen: true }, "", "#treasure-overlay");
+        }
         scroll.classList.remove("hidden-scroll");
         scroll.classList.add("show-scroll");
+        setTimeout(() => {
+          if (closeBtn) closeBtn.focus();
+        }, 100);
       }
+    }
+  });
+
+  // Keyboard support for activating the chest
+  chestWrapper.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      chestWrapper.click();
     }
   });
 }
 
 function castSpellText(spellText) {
   const txt = (spellText || "").trim().toLowerCase();
+  
+  // Clean up previous visual spell states if casting a new visual spell
+  const visualSpells = [
+    "expecto patronum", "wingardium leviosa", "incendio", "aguamenti",
+    "herbivicus", "glacius", "prisma", "amoris", "stellaris"
+  ];
+  
+  if (visualSpells.includes(txt)) {
+    const spellClasses = [
+      "patronus-active", "levitation-running", "incendio-running",
+      "aguamenti-running", "herbivicus-running",
+      "frozen-lock", "prisma-running", "amoris-running", "stellaris-running"
+    ];
+    document.body.classList.remove(...spellClasses);
+
+    // Clean up spell overlay nodes
+    const water = document.getElementById("water-level");
+    if (water) water.remove();
+    const ice = document.getElementById("ice-overlay");
+    if (ice) ice.classList.remove("frozen");
+    const accioCard = document.getElementById("accio-card");
+    if (accioCard) accioCard.classList.remove("accio-fly-in");
+    const prismaBox = document.getElementById("prisma-box");
+    if (prismaBox) document.body.classList.remove("prisma-running");
+    // Clean amoris hearts
+    const amorisOverlay = document.getElementById("amoris-overlay");
+    if (amorisOverlay) { amorisOverlay.innerHTML = ''; amorisOverlay.style.display = 'none'; }
+    // Clean stellaris stars
+    const stellarisOverlay = document.getElementById("stellaris-overlay");
+    if (stellarisOverlay) { stellarisOverlay.innerHTML = ''; stellarisOverlay.style.display = 'none'; }
+    // Reset filter applied by stellaris
+    document.getElementById('main-content') && (document.getElementById('main-content').style.filter = '');
+    document.getElementById('envelope-wrapper') && (document.getElementById('envelope-wrapper').style.filter = '');
+  }
   
   if (txt === "lumos") {
     toggleLumosSpell(true);
@@ -2606,7 +2864,7 @@ function castSpellText(spellText) {
   } 
   else if (txt === "alohomora") {
     if (!window.revelioCast) {
-      showSpellToast("Search the box first before opening you cheater BOOO...");
+      showSpellToast("Reveal the chest first using 'Revelio' before trying to open it!");
     } else if (window.revelioCast && !window.chestUnlocked) {
       const chest = document.getElementById("treasure-chest");
       const overlay = document.getElementById("treasure-overlay");
@@ -2627,13 +2885,16 @@ function castSpellText(spellText) {
         }
         
         const c = window._bdContent || {};
-        const msg = c.eyesOnlyMessage || "Dear Vanshika, wishing you the most magical and beautiful birthday yet! ✦";
+        const msg = c.eyesOnlyMessage || `Dear ${c.friendName || "Ayushi"}, wishing you the most magical and beautiful birthday yet! ✦`;
         msgContent.innerHTML = `<p>${msg.replace(/\n/g, "</p><p>")}</p>`;
         
         if (typeof playCrackSound === "function") playCrackSound();
         
         setTimeout(() => {
           overlay.classList.remove("hidden");
+          if (window.location.hash !== "#treasure-overlay") {
+            history.pushState({ treasureOpen: true }, "", "#treasure-overlay");
+          }
           scroll.classList.remove("hidden-scroll");
           scroll.classList.add("show-scroll");
         }, 1200);
@@ -2686,9 +2947,7 @@ function castSpellText(spellText) {
       document.body.classList.remove("levitation-running");
     }, 8000);
   } 
-  else if (txt === "incendio_LEGACY_REMOVED") {
-    // Handled below with PNG fire strip
-  } 
+  /* Incendio legacy check removed */ 
   else if (txt === "aguamenti") {
     if (_aguamentiTimeout1) clearTimeout(_aguamentiTimeout1);
     if (_aguamentiTimeout2) clearTimeout(_aguamentiTimeout2);
@@ -2732,9 +2991,7 @@ function castSpellText(spellText) {
       _aguamentiTimeout2 = null;
     }, 10000);
   } 
-  else if (txt === "glacius_LEGACY_REMOVED") {
-    // Handled below with interactive ice-scratch canvas
-  } 
+  /* Glacius legacy check removed */ 
   else if (txt === "confundo") {
     window.activeSpellMode = "confundo";
     document.body.classList.add("confundo-running");
@@ -2797,7 +3054,7 @@ function castSpellText(spellText) {
       }
     }, 2800);
   }
-  else if (txt === "depulso" || txt === "epulso") {
+  else if (txt === "depulso") {
     window.activeSpellMode = "depulso";
     document.body.classList.add("depulso-running");
     showSpellToast("Depulso! 💨");
@@ -3006,7 +3263,188 @@ function castSpellText(spellText) {
       }
     }, 12000);
   }
-  
+  else if (txt === "fumos") {
+    window.activeSpellMode = "fumos";
+    window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 60;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    document.body.classList.add("fumos-running");
+    showSpellToast("Fumos! 💨");
+    activateFumosCanvas();
+    
+    setTimeout(() => {
+      if (window.activeSpellMode === "fumos") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      document.body.classList.remove("fumos-running");
+      deactivateFumosCanvas();
+    }, 12000);
+  }
+  else if (txt === "prisma") {
+    window.activeSpellMode = "prisma";
+    window.maxParticlesLimit = (window.innerWidth < 768) ? 35 : 95;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    document.body.classList.add("prisma-running");
+    showSpellToast("Prisma! 🌈");
+    
+    setTimeout(() => {
+      if (window.activeSpellMode === "prisma") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      document.body.classList.remove("prisma-running");
+      // Force clear the sparkle canvas so no static rainbow overlay stays on screen
+      const canvas = document.getElementById('sparkle-canvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }, 12000);
+  }
+  else if (txt === "chronos") {
+    window.activeSpellMode = "chronos";
+    window.maxParticlesLimit = (window.innerWidth < 768) ? 15 : 50;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    document.body.classList.add("chronos-running");
+    const overlay = document.getElementById("chronos-overlay");
+    if (overlay) {
+      overlay.classList.add("active");
+    }
+    showSpellToast("Chronos! ⏳");
+    
+    setTimeout(() => {
+      if (window.activeSpellMode === "chronos") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      document.body.classList.remove("chronos-running");
+      if (overlay) {
+        overlay.classList.remove("active");
+      }
+    }, 12000);
+  }
+
+  /* ══════════════════════════════════════════
+     💕 AMORIS — Floating Hearts
+     ══════════════════════════════════════════ */
+  else if (txt === "amoris") {
+    window.activeSpellMode = "amoris";
+    document.body.classList.add("amoris-running");
+    showSpellToast("Amoris! 💕 Love is in the air!");
+
+    const overlay = document.getElementById("amoris-overlay");
+    if (overlay) {
+      overlay.style.display = 'block';
+      const hearts = ["💕","💗","💖","💓","💞","❤️","🌸","💝"];
+      const count = (window.innerWidth < 480) ? 18 : 32;
+      for (let i = 0; i < count; i++) {
+        const h = document.createElement("span");
+        h.className = "amoris-heart";
+        h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+        h.style.left = (Math.random() * 95) + "vw";
+        h.style.bottom = (Math.random() * 10) + "vh";
+        const dur = (3.5 + Math.random() * 4.5).toFixed(2);
+        const delay = (Math.random() * 5).toFixed(2);
+        h.style.animationDuration = dur + "s";
+        h.style.animationDelay = delay + "s";
+        overlay.appendChild(h);
+      }
+    }
+
+    // Spawn sparkle cluster
+    if (typeof window.spawnSparkCluster === 'function') {
+      for (let i = 0; i < 6; i++) {
+        window.spawnSparkCluster(
+          window.innerWidth / 2 + (Math.random() - 0.5) * window.innerWidth * 0.6,
+          window.innerHeight * (0.3 + Math.random() * 0.5),
+          3, true
+        );
+      }
+    }
+
+    setTimeout(() => {
+      if (window.activeSpellMode === "amoris") window.activeSpellMode = "";
+      document.body.classList.remove("amoris-running");
+      if (overlay) { overlay.innerHTML = ''; overlay.style.display = 'none'; }
+    }, 10000);
+  }
+
+  /* ══════════════════════════════════════════
+     ✨ STELLARIS — Starry Night
+     ══════════════════════════════════════════ */
+  else if (txt === "stellaris") {
+    window.activeSpellMode = "stellaris";
+    window.maxParticlesLimit = (window.innerWidth < 768) ? 25 : 70;
+    if (typeof window.startMagicParticlesLoop === 'function') {
+      window.startMagicParticlesLoop();
+    }
+    document.body.classList.add("stellaris-running");
+    showSpellToast("Stellaris! ✨ The stars descend!");
+
+    // Create a stellaris overlay container
+    let stellarisOverlay = document.getElementById("stellaris-overlay");
+    if (!stellarisOverlay) {
+      stellarisOverlay = document.createElement("div");
+      stellarisOverlay.id = "stellaris-overlay";
+      Object.assign(stellarisOverlay.style, {
+        position: "fixed", inset: "0", pointerEvents: "none",
+        zIndex: "154", overflow: "hidden"
+      });
+      document.body.appendChild(stellarisOverlay);
+    }
+    stellarisOverlay.style.display = "block";
+
+    // Scatter static twinkle stars
+    const starCount = (window.innerWidth < 480) ? 40 : 90;
+    for (let i = 0; i < starCount; i++) {
+      const s = document.createElement("div");
+      s.className = "stellaris-star";
+      const size = (1 + Math.random() * 3).toFixed(1);
+      s.style.width = size + "px";
+      s.style.height = size + "px";
+      s.style.left = (Math.random() * 100) + "%";
+      s.style.top = (Math.random() * 100) + "%";
+      const dur = (1.2 + Math.random() * 3).toFixed(2);
+      const delay = (Math.random() * 4).toFixed(2);
+      s.style.animationDuration = dur + "s";
+      s.style.animationDelay = delay + "s";
+      stellarisOverlay.appendChild(s);
+    }
+
+    // Spawn 3 shooting stars
+    for (let i = 0; i < 3; i++) {
+      const ss = document.createElement("div");
+      ss.className = "stellaris-shooter";
+      ss.style.width = (60 + Math.random() * 80) + "px";
+      ss.style.left = (Math.random() * 70) + "%";
+      ss.style.top = (Math.random() * 50) + "%";
+      const delay2 = (i * 1.8 + Math.random()).toFixed(2);
+      ss.style.animationDuration = "1.4s";
+      ss.style.animationDelay = delay2 + "s";
+      stellarisOverlay.appendChild(ss);
+    }
+
+    setTimeout(() => {
+      if (window.activeSpellMode === "stellaris") {
+        window.activeSpellMode = "";
+        window.maxParticlesLimit = (window.innerWidth < 768) ? 20 : 80;
+      }
+      document.body.classList.remove("stellaris-running");
+      // Restore filters
+      const mc = document.getElementById('main-content');
+      const ew = document.getElementById('envelope-wrapper');
+      if (mc) mc.style.filter = '';
+      if (ew) ew.style.filter = '';
+      if (stellarisOverlay) { stellarisOverlay.innerHTML = ''; stellarisOverlay.style.display = 'none'; }
+    }, 12000);
+  }
+
   else if (txt) {
     showSpellToast("Fizzled... Try another spell!");
   }
@@ -3132,9 +3570,11 @@ function deactivateGlaciusCanvas() {
   _glaciusCtx = null;
 }
 
+
 /* ── Fumos Interactive Mist-Scratch Canvas ── */
 let _fumosCanvas = null;
 let _fumosCtx = null;
+let _fumosRAF = null; // Dedicated RAF handle for Fumos animation (separate from Glacius)
 
 function activateFumosCanvas() {
   const canvas = document.getElementById('fumos-canvas');
@@ -3146,15 +3586,8 @@ function activateFumosCanvas() {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
   
-  // Fill with thick mist layer
-  const grad = ctx.createRadialGradient(
-    window.innerWidth/2, window.innerHeight/2, 20,
-    window.innerWidth/2, window.innerHeight/2, window.innerWidth * 0.8
-  );
-  grad.addColorStop(0, 'rgba(255,255,255,0.0)');
-  grad.addColorStop(0.4, 'rgba(230,240,255,0.65)');
-  grad.addColorStop(1, 'rgba(200,220,240,0.88)');
-  ctx.fillStyle = grad;
+  // Fill with thick mist layer (solid semi-opaque light gray-blue)
+  ctx.fillStyle = 'rgba(235, 238, 245, 0.94)';
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
   
   // Animate mist wisps
@@ -3174,7 +3607,7 @@ function activateFumosCanvas() {
       ctx.fill();
     }
     ctx.restore();
-    _glaciusRAF = requestAnimationFrame(animateMist);
+    _fumosRAF = requestAnimationFrame(animateMist); // Fixed: use _fumosRAF not _glaciusRAF
   }
   animateMist();
   
@@ -3204,7 +3637,7 @@ function activateFumosCanvas() {
 }
 
 function deactivateFumosCanvas() {
-  if (_glaciusRAF) { cancelAnimationFrame(_glaciusRAF); _glaciusRAF = null; }
+  if (_fumosRAF) { cancelAnimationFrame(_fumosRAF); _fumosRAF = null; } // Fixed: cancel _fumosRAF not _glaciusRAF
   const canvas = document.getElementById('fumos-canvas');
   if (!canvas) return;
   if (canvas._eraseMist) {
@@ -3229,4 +3662,26 @@ function deactivateFumosCanvas() {
 /* ── DOM Init ── */
 document.addEventListener("DOMContentLoaded", () => {
   startPreloader();
+});
+
+/* ── PWA Android Back Navigation Handler ── */
+window.addEventListener("popstate", (e) => {
+  // Check if spell modal is open but hash has been popped
+  const spellModal = document.getElementById("spell-modal");
+  if (spellModal && spellModal.classList.contains("open") && window.location.hash !== "#spell-modal") {
+    spellModal.classList.remove("open");
+    const spellBtn = document.getElementById("spell-btn");
+    if (spellBtn) spellBtn.focus();
+  }
+
+  // Check if treasure overlay is open but hash has been popped
+  const treasureOverlay = document.getElementById("treasure-overlay");
+  if (treasureOverlay && !treasureOverlay.classList.contains("hidden") && window.location.hash !== "#treasure-overlay") {
+    treasureOverlay.classList.add("hidden");
+    if (window.chestUnlocked) {
+      resetChestToEnvelope();
+    }
+    const chestWrapper = document.getElementById("treasure-chest-wrapper");
+    if (chestWrapper) chestWrapper.focus();
+  }
 });
