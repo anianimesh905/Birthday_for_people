@@ -475,6 +475,22 @@ function initVideoBackground(cfg) {
   loadHouseVideo(defaultHouse, false);
 }
 
+/* ── Autoplay unlocker helper for mobile/Safari compliance ── */
+function unlockVideoAutoplay() {
+  const tryPlay = () => {
+    if (_activeVideo && _activeVideo.paused) {
+      _activeVideo.play()
+        .then(() => {
+          _activeVideo.classList.add('loaded');
+          _activeVideo.style.opacity = '1';
+        })
+        .catch(err => console.log("Gesture play failed:", err));
+    }
+  };
+  document.addEventListener('click', tryPlay, { once: true });
+  document.addEventListener('touchstart', tryPlay, { once: true });
+}
+
 function loadHouseVideo(houseName, animate) {
   const key = (houseName || '').toLowerCase();
   const c = window._bdContent || (typeof BIRTHDAY_CONTENT !== 'undefined' ? BIRTHDAY_CONTENT : {});
@@ -491,7 +507,8 @@ function loadHouseVideo(houseName, animate) {
   if (!currentTheme) return;
 
   const videoFile = c[currentTheme.video];
-  const videoSrc = PRELOADED_ASSETS[currentTheme.video] || (videoFile ? videoFile : null);
+  // ALWAYS bypass PRELOADED_ASSETS Blob for videos to avoid iOS Safari byte-range / memory Blob autoplay crashes.
+  const videoSrc = videoFile ? videoFile : null;
   const fallbackColor = c[currentTheme.fallback] || '#0d1b2a';
   const videoBg = document.getElementById('video-bg');
 
@@ -514,6 +531,7 @@ function loadHouseVideo(houseName, animate) {
   if (!animate) {
     // Initial display setup
     _activeVideo.src = videoSrc;
+    _activeVideo.muted = true;
     _activeVideo.load();
     _activeVideo.oncanplay = () => {
       _activeVideo.oncanplay = null;
@@ -522,7 +540,12 @@ function loadHouseVideo(houseName, animate) {
           _activeVideo.classList.add('loaded');
           _activeVideo.style.opacity = '1';
         })
-        .catch(applyFallback);
+        .catch(err => {
+          // Playback blocked by browser policy; keep video element visible and try on first click/touch
+          _activeVideo.classList.add('loaded');
+          _activeVideo.style.opacity = '1';
+          unlockVideoAutoplay();
+        });
     };
     _activeVideo.onerror = applyFallback;
     return;
@@ -532,6 +555,7 @@ function loadHouseVideo(houseName, animate) {
   _activeVideo.style.opacity = '0';
   setTimeout(() => {
     _bufferVideo.src = videoSrc;
+    _bufferVideo.muted = true;
     _bufferVideo.load();
     _bufferVideo.onerror = applyFallback;
     _bufferVideo.oncanplay = () => {
@@ -548,7 +572,19 @@ function loadHouseVideo(houseName, animate) {
             _bufferVideo = temp;
           }, 600);
         })
-        .catch(applyFallback);
+        .catch(err => {
+          // Playback blocked by browser policy; fade the first frame in and try on first click/touch
+          _bufferVideo.classList.add('loaded');
+          _bufferVideo.style.opacity = '1';
+          setTimeout(() => {
+            _activeVideo.pause();
+            _activeVideo.style.opacity = '0';
+            const temp = _activeVideo;
+            _activeVideo = _bufferVideo;
+            _bufferVideo = temp;
+            unlockVideoAutoplay();
+          }, 600);
+        });
     };
   }, 400);
 }
@@ -653,8 +689,8 @@ function initMagicParticles(opts = {}) {
         vy = rand(0.5, 1.8);
         vx = rand(-0.8, 0.8);
       } else if (window.activeSpellMode === 'patronus') {
-        vy = rand(-1.2, -0.4);
-        vx = rand(-0.8, 0.8);
+        vy = rand(-0.6, 0.6);
+        vx = rand(-3.0, -1.0); // Drift backward to the left
       } else if (window.activeSpellMode === 'ventus') {
         vy = rand(-0.6, 0.6);
         vx = rand(3.5, 6.5); // Fast blow to the right
@@ -924,6 +960,10 @@ function initMagicParticles(opts = {}) {
         } else if (window.activeSpellMode === 'chronos') {
           p.x += p.vx * 0.08;
           p.y += p.vy * 0.08;
+        } else if (window.activeSpellMode === 'patronus') {
+          // Helical/spiral fluid wisp trajectory
+          p.x += p.vx + Math.sin(p.age * 9.0) * 2.8;
+          p.y += p.vy + Math.cos(p.age * 9.0) * 2.8;
         } else {
           p.x += p.vx; 
           p.y += p.vy;
@@ -2302,7 +2342,6 @@ async function startPreloader() {
   const activeVideoUrl = c[activeVideoId] || `videos/${activeHouse}.mp4`;
 
   const assets = [
-    { id: activeVideoId, url: activeVideoUrl },
     { id: 'musicFile',       url: c.musicFile       || 'birthday.mp3'         }
   ].filter(asset => asset.url);
 
@@ -2573,6 +2612,23 @@ function toggleLumosSpell(activate) {
     lumosGlow = document.createElement("div");
     lumosGlow.id = "lumos-glow";
     
+    // Inject floating dust particles container
+    const dustContainer = document.createElement("div");
+    dustContainer.id = "lumos-dust-container";
+    lumosGlow.appendChild(dustContainer);
+    
+    for (let i = 0; i < 35; i++) {
+      const p = document.createElement("div");
+      p.className = "lumos-dust";
+      p.style.left = Math.random() * 100 + "vw";
+      p.style.top = Math.random() * 100 + "vh";
+      p.style.setProperty("--dx", `${(Math.random() - 0.5) * 80}px`);
+      p.style.setProperty("--dy", `${-Math.random() * 100 - 40}px`);
+      p.style.animationDelay = `${Math.random() * 4}s`;
+      p.style.animationDuration = `${3 + Math.random() * 3}s`;
+      dustContainer.appendChild(p);
+    }
+    
     document.body.appendChild(lumosVignette);
     document.body.appendChild(lumosGlow);
     
@@ -2590,6 +2646,8 @@ function toggleLumosSpell(activate) {
     showSpellToast("Lumos Maxima! ⚡");
   } else {
     if (lumosVignette && lumosGlow) {
+      lumosVignette.classList.add("cooling");
+      lumosGlow.classList.add("cooling");
       lumosVignette.classList.remove("active");
       lumosGlow.classList.remove("active");
       
@@ -2598,7 +2656,7 @@ function toggleLumosSpell(activate) {
       setTimeout(() => {
         v.remove();
         g.remove();
-      }, 800);
+      }, 850);
     }
     
     window.removeEventListener("mousemove", handleLumosMove);
@@ -2723,7 +2781,12 @@ function triggerRevelioSweep() {
   document.documentElement.style.setProperty("--x", `${x}px`);
   document.documentElement.style.setProperty("--y", `${y}px`);
   document.body.appendChild(sweep);
-  setTimeout(() => sweep.remove(), 1600);
+  
+  document.body.classList.add("revelio-active");
+  setTimeout(() => {
+    sweep.remove();
+    document.body.classList.remove("revelio-active");
+  }, 1600);
 }
 
 function resetChestToEnvelope() {
@@ -2877,6 +2940,11 @@ function castSpellText(spellText) {
         chest.classList.remove("locked");
         chest.classList.add("unlocked");
         
+        // Haptic double-tap vibration for Android
+        if (window.navigator && typeof window.navigator.vibrate === 'function') {
+          window.navigator.vibrate([100, 50, 100]);
+        }
+        
         if (chestWrapper) {
           const rect = chestWrapper.getBoundingClientRect();
           window.dispatchEvent(new CustomEvent('envelopeTapped', {
@@ -2924,6 +2992,15 @@ function castSpellText(spellText) {
         window.dispatchEvent(new CustomEvent('envelopeTapped', {
           detail: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
         }));
+        
+        // Spawn gold dust radial shockwave sparks
+        if (typeof window.spawnSparkCluster === 'function') {
+          for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 6) {
+            const rx = rect.left + rect.width / 2 + Math.cos(angle) * 90;
+            const ry = rect.top + rect.height / 2 + Math.sin(angle) * 70;
+            window.spawnSparkCluster(rx, ry, 1, true);
+          }
+        }
       }, 300);
     }
     showSpellToast("Revelio! The hidden chest is revealed.");
@@ -2965,11 +3042,65 @@ function castSpellText(spellText) {
     
     const water = document.createElement("div");
     water.id = "water-level";
+    
+    // Inject dynamic waves SVG path
+    water.innerHTML = `
+      <svg id="water-waves" viewBox="0 0 100 20" preserveAspectRatio="none" style="position:absolute; top:-19px; left:0; width:100%; height:20px; fill:rgba(30, 144, 255, 0.45); pointer-events:none; z-index:181;">
+        <path id="water-wave-path" d="M 0 20 L 0 10 Q 25 10 50 10 Q 75 10 100 10 L 100 20 Z"></path>
+      </svg>
+    `;
     document.body.appendChild(water);
     
     water.className = "";
     void water.offsetWidth;
     water.classList.add("rising");
+    
+    let waveRAF;
+    let waveTime = 0;
+    let rippleX = -1;
+    let rippleForce = 0;
+    
+    const updateWaves = () => {
+      if (window.activeSpellMode !== "aguamenti") return;
+      waveTime += 0.08;
+      
+      const path = document.getElementById("water-wave-path");
+      if (path) {
+        const px = window.lastLumosX || 0;
+        const py = window.lastLumosY || 0;
+        const waterLevelRect = water.getBoundingClientRect();
+        const surfaceY = waterLevelRect.top;
+        
+        if (px && py && Math.abs(py - surfaceY) < 120) {
+          rippleX = px / window.innerWidth * 100;
+          rippleForce = Math.min(6, (120 - Math.abs(py - surfaceY)) / 120 * 5);
+        } else {
+          rippleForce *= 0.92;
+        }
+        
+        const pts = [];
+        for (let i = 0; i <= 4; i++) {
+          const xPercent = i * 25;
+          let waveHeight = 10 + Math.sin(waveTime + i * 1.5) * 2.8;
+          
+          if (rippleForce > 0.1 && rippleX >= 0) {
+            const dist = Math.abs(xPercent - rippleX);
+            if (dist < 30) {
+              const push = (30 - dist) / 30 * rippleForce * 1.8;
+              waveHeight += push;
+            }
+          }
+          pts.push(waveHeight.toFixed(1));
+        }
+        
+        const d = `M 0 20 L 0 ${pts[0]} Q 25 ${pts[1]} 50 ${pts[2]} Q 75 ${pts[3]} 100 ${pts[4]} L 100 20 Z`;
+        path.setAttribute("d", d);
+      }
+      
+      waveRAF = requestAnimationFrame(updateWaves);
+    };
+    
+    updateWaves();
     
     _aguamentiTimeout1 = setTimeout(() => {
       if (window.activeSpellMode === "aguamenti") {
@@ -2984,6 +3115,7 @@ function castSpellText(spellText) {
  
     _aguamentiTimeout2 = setTimeout(() => {
       document.body.classList.remove("aguamenti-running");
+      cancelAnimationFrame(waveRAF);
       if (water && water.parentNode) {
         water.remove();
       }
@@ -3072,14 +3204,37 @@ function castSpellText(spellText) {
     if (accioCard) {
       const c = window._bdContent || {};
       const imgSrc = c.accioImage || 'accio_card.png';
-      accioCard.innerHTML = `<img src="${imgSrc}" alt="Accio card" id="accio-card-img">`;
+      
+      // Inject gold-sheen overlay wrapper and image
+      accioCard.innerHTML = `
+        <div class="accio-gold-sheen"></div>
+        <img src="${imgSrc}" alt="Accio card" id="accio-card-img">
+      `;
+      
       accioCard.style.display = 'block';
+      accioCard.style.opacity = '0';
       accioCard.className = '';
       void accioCard.offsetWidth;
       accioCard.classList.add('accio-fly-in');
       
+      // Dynamic pointer tilt listener
+      const handleAccioTilt = (pe) => {
+        const cx = pe.touches ? pe.touches[0].clientX : pe.clientX;
+        const cy = pe.touches ? pe.touches[0].clientY : pe.clientY;
+        const rx = (cx - window.innerWidth / 2) / (window.innerWidth / 2) * 16;
+        const ry = (cy - window.innerHeight / 2) / (window.innerHeight / 2) * -16;
+        accioCard.style.transform = `translate3d(-50%, -50%, 0) rotateY(${rx}deg) rotateX(${ry}deg) scale(1.05)`;
+      };
+      
       // Summon sparkles on arrival
       setTimeout(() => {
+        accioCard.classList.remove('accio-fly-in');
+        accioCard.style.opacity = '1';
+        accioCard.style.filter = 'none';
+        
+        window.addEventListener('mousemove', handleAccioTilt, { passive: true });
+        window.addEventListener('touchmove', handleAccioTilt, { passive: true });
+        
         if (typeof window.spawnSparkCluster === 'function') {
           for (let i = 0; i < 5; i++) {
             window.spawnSparkCluster(
@@ -3093,9 +3248,16 @@ function castSpellText(spellText) {
       
       // Hold then fall
       setTimeout(() => {
-        accioCard.classList.remove('accio-fly-in');
+        window.removeEventListener('mousemove', handleAccioTilt);
+        window.removeEventListener('touchmove', handleAccioTilt);
+        
+        accioCard.style.opacity = '';
+        accioCard.style.filter = '';
+        accioCard.style.transform = '';
+        
         void accioCard.offsetWidth;
         accioCard.classList.add('accio-fall');
+        
         setTimeout(() => {
           accioCard.style.display = 'none';
           accioCard.className = '';
@@ -3121,7 +3283,6 @@ function castSpellText(spellText) {
     // Show PNG botanical border overlay
     const herBorder = document.getElementById('herbivicus-border');
     if (herBorder) {
-      herBorder.style.backgroundImage = 'url(herbivicus_border.png)';
       herBorder.style.display = 'block';
       void herBorder.offsetWidth;
       herBorder.classList.add('active');
@@ -3149,13 +3310,15 @@ function castSpellText(spellText) {
     document.body.classList.add("duro-running");
     if (typeof playCrackSound === "function") playCrackSound();
     document.body.classList.add("shake-screen");
+    if (window.navigator && typeof window.navigator.vibrate === 'function') {
+      window.navigator.vibrate(180);
+    }
     setTimeout(() => document.body.classList.remove("shake-screen"), 300);
     showSpellToast("Duro! 🪨");
     
     // Show PNG stone border overlay
     const duroBorder = document.getElementById('duro-border');
     if (duroBorder) {
-      duroBorder.style.backgroundImage = 'url(duro_border.png)';
       duroBorder.style.display = 'block';
       void duroBorder.offsetWidth;
       duroBorder.classList.add('active');
@@ -3187,7 +3350,6 @@ function castSpellText(spellText) {
     // Show fire strip at bottom
     const strip = document.getElementById('incendio-strip');
     if (strip) {
-      strip.style.backgroundImage = 'url(incendio_fire.png)';
       strip.style.display = 'block';
       void strip.offsetWidth;
       strip.classList.add('active');
@@ -3341,38 +3503,90 @@ function castSpellText(spellText) {
     const overlay = document.getElementById("amoris-overlay");
     if (overlay) {
       overlay.style.display = 'block';
+      overlay.innerHTML = '';
       const hearts = ["💕","💗","💖","💓","💞","❤️","🌸","💝"];
-      const count = (window.innerWidth < 480) ? 18 : 32;
+      const count = (window.innerWidth < 480) ? 22 : 45;
+      const heartData = [];
+      
       for (let i = 0; i < count; i++) {
         const h = document.createElement("span");
-        h.className = "amoris-heart";
+        h.className = "amoris-heart-dynamic";
         h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
-        h.style.left = (Math.random() * 95) + "vw";
-        h.style.bottom = (Math.random() * 10) + "vh";
-        const dur = (3.5 + Math.random() * 4.5).toFixed(2);
-        const delay = (Math.random() * 5).toFixed(2);
-        h.style.animationDuration = dur + "s";
-        h.style.animationDelay = delay + "s";
         overlay.appendChild(h);
+        
+        const size = 16 + Math.random() * 20;
+        h.style.fontSize = `${size}px`;
+        
+        heartData.push({
+          element: h,
+          x: Math.random() * window.innerWidth,
+          y: window.innerHeight + 50 + Math.random() * 150,
+          vx: 0,
+          vy: -1.2 - Math.random() * 2.2,
+          wobbleOffset: Math.random() * 100,
+          wobbleSpeed: 0.01 + Math.random() * 0.025,
+          scale: 0.8 + Math.random() * 0.5,
+          rot: (Math.random() - 0.5) * 20
+        });
       }
-    }
-
-    // Spawn sparkle cluster
-    if (typeof window.spawnSparkCluster === 'function') {
-      for (let i = 0; i < 6; i++) {
-        window.spawnSparkCluster(
-          window.innerWidth / 2 + (Math.random() - 0.5) * window.innerWidth * 0.6,
-          window.innerHeight * (0.3 + Math.random() * 0.5),
-          3, true
-        );
+      
+      let amorisRAF;
+      const tickAmoris = () => {
+        if (window.activeSpellMode !== "amoris") return;
+        const pointerX = window.lastLumosX || 0;
+        const pointerY = window.lastLumosY || 0;
+        
+        heartData.forEach(h => {
+          h.y += h.vy;
+          const drift = Math.sin((h.y + h.wobbleOffset) * h.wobbleSpeed) * 0.85;
+          h.x += drift + h.vx;
+          h.vx *= 0.94;
+          
+          if (pointerX && pointerY) {
+            const dx = h.x - pointerX;
+            const dy = h.y - pointerY;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 120) {
+              const force = (120 - dist) / 120 * 3.8;
+              const angle = Math.atan2(dy, dx);
+              h.x += Math.cos(angle) * force;
+              h.y += Math.sin(angle) * force * 0.5;
+            }
+          }
+          
+          if (h.y < -50) {
+            h.y = window.innerHeight + 50;
+            h.x = Math.random() * window.innerWidth;
+            h.vx = 0;
+          }
+          
+          h.element.style.transform = `translate3d(${h.x}px, ${h.y}px, 0) scale(${h.scale}) rotate(${h.rot}deg)`;
+        });
+        
+        amorisRAF = requestAnimationFrame(tickAmoris);
+      };
+      
+      tickAmoris();
+      
+      // Spawn initial sparkle clusters
+      if (typeof window.spawnSparkCluster === 'function') {
+        for (let i = 0; i < 6; i++) {
+          window.spawnSparkCluster(
+            window.innerWidth / 2 + (Math.random() - 0.5) * window.innerWidth * 0.6,
+            window.innerHeight * (0.3 + Math.random() * 0.5),
+            3, true
+          );
+        }
       }
-    }
 
-    setTimeout(() => {
-      if (window.activeSpellMode === "amoris") window.activeSpellMode = "";
-      document.body.classList.remove("amoris-running");
-      if (overlay) { overlay.innerHTML = ''; overlay.style.display = 'none'; }
-    }, 10000);
+      setTimeout(() => {
+        if (window.activeSpellMode === "amoris") window.activeSpellMode = "";
+        document.body.classList.remove("amoris-running");
+        cancelAnimationFrame(amorisRAF);
+        overlay.innerHTML = '';
+        overlay.style.display = 'none';
+      }, 10000);
+    }
   }
 
   /* ══════════════════════════════════════════
@@ -3501,25 +3715,57 @@ function activateGlaciusCanvas() {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
   
-  // Fill with icy blue-white layer
-  ctx.fillStyle = 'rgba(200, 235, 255, 0.72)';
+  // Fill with frosted pale blue-white layer
+  ctx.fillStyle = 'rgba(212, 242, 255, 0.94)';
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
   
-  // Draw ice crack lines across the surface
-  ctx.strokeStyle = 'rgba(160, 210, 240, 0.6)';
-  ctx.lineWidth = 1.5;
-  for (let i = 0; i < 18; i++) {
+  // Draw primary ice fracture crack lines
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.42)';
+  ctx.lineWidth = 1.0;
+  for (let i = 0; i < 15; i++) {
     const sx = rand(0, window.innerWidth);
     const sy = rand(0, window.innerHeight);
     ctx.beginPath();
     ctx.moveTo(sx, sy);
     let cx = sx, cy = sy;
-    for (let j = 0; j < 5; j++) {
-      cx += rand(-60, 60);
-      cy += rand(-60, 60);
+    for (let j = 0; j < 4; j++) {
+      cx += rand(-50, 50);
+      cy += rand(-50, 50);
       ctx.lineTo(cx, cy);
     }
     ctx.stroke();
+  }
+
+  // Draw 6 procedurally grown crystalline ice stars/snowflakes
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.88)';
+  for (let c = 0; c < 6; c++) {
+    const fx = rand(50, window.innerWidth - 50);
+    const fy = rand(50, window.innerHeight - 50);
+    ctx.lineWidth = 1.0;
+    
+    // Draw 8 symmetric rays
+    for (let r = 0; r < 8; r++) {
+      const angle = (r / 8) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(fx, fy);
+      let rx = fx, ry = fy;
+      for (let segment = 0; segment < 4; segment++) {
+        rx += Math.cos(angle) * rand(8, 16);
+        ry += Math.sin(angle) * rand(8, 16);
+        ctx.lineTo(rx, ry);
+        
+        // draw minor perpendicular crystal branches
+        const crossAngle = angle + Math.PI / 2;
+        const cx1 = rx + Math.cos(crossAngle) * 4;
+        const cy1 = ry + Math.sin(crossAngle) * 4;
+        const cx2 = rx - Math.cos(crossAngle) * 4;
+        const cy2 = ry - Math.sin(crossAngle) * 4;
+        ctx.moveTo(cx1, cy1);
+        ctx.lineTo(cx2, cy2);
+        ctx.moveTo(rx, ry);
+      }
+      ctx.stroke();
+    }
   }
   
   _glaciusCanvas = canvas;
