@@ -217,81 +217,206 @@ function _injectDropCapAndRender(el, text) {
   el.innerHTML = '';
 
   const paragraphs = text.split('\n').filter(p => p.trim() !== '');
-  const dropCapParaIdx = paragraphs.length > 1 ? 1 : 0;
+  const dropCapParaIdx = paragraphs.length > 2 ? 1 : 0;
+  const pElements = [];
 
   paragraphs.forEach((para, pIdx) => {
     const pEl = document.createElement('p');
+    pEl.className = 'magic-paragraph fade-phantom';
 
-    // Right-align the closing and signature lines at the end of the letter
-    if (pIdx === paragraphs.length - 1) {
+    // Highlight signature blocks
+    const isSignatureBlock = (pIdx === paragraphs.length - 1);
+    const isClosingSalutation = (pIdx === paragraphs.length - 2 && para.trim().startsWith('With') && para.length < 80);
+
+    if (isSignatureBlock || isClosingSalutation) {
       pEl.style.textAlign = 'right';
-      pEl.style.marginTop = '1.2em';
-      pEl.style.fontStyle = 'italic';
-      pEl.style.paddingRight = '5%';
-      pEl.textContent = para;
-      el.appendChild(pEl);
-      return;
-    } else if (pIdx === paragraphs.length - 2 && para.trim().startsWith('With') && para.length < 80) {
-      pEl.style.textAlign = 'right';
-      pEl.style.fontStyle = 'italic';
-      pEl.style.paddingRight = '5%';
-      pEl.textContent = para;
-      el.appendChild(pEl);
-      return;
+      pEl.style.paddingRight = '8%';
+      pEl.style.marginTop = isSignatureBlock ? '0.4em' : '1.5em';
     }
 
-    // Apply drop cap to the first body paragraph
-    if (pIdx === dropCapParaIdx) {
-      const words = para.split(/\s+/).filter(Boolean);
-      if (words[0] && words[0].length > 0) {
-        const capEl = document.createElement('span');
-        capEl.className = 'drop-cap';
-        capEl.textContent = words[0][0];
-        pEl.appendChild(capEl);
-
-        const restOfFirst = words[0].slice(1);
-        if (restOfFirst) {
-          const rSpan = document.createElement('span');
-          rSpan.textContent = restOfFirst;
-          pEl.appendChild(rSpan);
-        }
-
-        if (words.length > 1) {
-          pEl.appendChild(document.createTextNode(' '));
-        }
-
-        for (let i = 1; i < words.length; i++) {
-          pEl.appendChild(document.createTextNode(words[i] + (i < words.length - 1 ? ' ' : '')));
-        }
+    if (isSignatureBlock) {
+      const cleanName = para.trim().toLowerCase();
+      if (cleanName.includes("mcgonagall") || cleanName.includes("minerva")) {
+        pEl.innerHTML = `
+          <svg class="sig-svg" viewBox="0 0 220 50" width="165" height="38">
+            <path class="sig-path" d="M 12 36 C 22 22, 28 8, 32 15 C 38 28, 44 26, 50 36 C 56 12, 62 20, 68 34 Q 74 24, 82 28 Q 90 22, 98 32 Q 106 20, 114 28 T 130 25 T 142 30 T 154 22 L 168 36 L 175 14 L 180 38 L 186 28 Q 192 20, 198 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>`;
+      } else if (cleanName.includes("ani")) {
+        pEl.innerHTML = `
+          <svg class="sig-svg" viewBox="0 0 100 40" width="90" height="36">
+            <path class="sig-path" d="M 12 32 C 22 8, 30 22, 38 28 T 54 18 T 72 26 Q 84 20, 92 34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>`;
+      } else {
+        pEl.style.fontFamily = "'Dancing Script', cursive";
+        pEl.style.fontSize = "1.5rem";
+        pEl.style.fontWeight = "bold";
+        
+        para.split('').forEach(ch => {
+          const span = document.createElement('span');
+          span.className = 'magic-char';
+          span.textContent = ch;
+          pEl.appendChild(span);
+        });
       }
     } else {
-      pEl.textContent = para;
+      if (pIdx === dropCapParaIdx) {
+        const words = para.split(/\s+/).filter(Boolean);
+        if (words[0] && words[0].length > 0) {
+          const capEl = document.createElement('span');
+          capEl.className = 'drop-cap magic-char';
+          capEl.textContent = words[0][0];
+          pEl.appendChild(capEl);
+
+          const restOfFirst = words[0].slice(1);
+          if (restOfFirst) {
+            restOfFirst.split('').forEach(ch => {
+              const span = document.createElement('span');
+              span.className = 'magic-char';
+              span.textContent = ch;
+              pEl.appendChild(span);
+            });
+          }
+
+          if (words.length > 1) {
+            const spaceSpan = document.createElement('span');
+            spaceSpan.className = 'magic-char';
+            spaceSpan.textContent = ' ';
+            pEl.appendChild(spaceSpan);
+          }
+
+          for (let i = 1; i < words.length; i++) {
+            words[i].split('').forEach(ch => {
+              const span = document.createElement('span');
+              span.className = 'magic-char';
+              span.textContent = ch;
+              pEl.appendChild(span);
+            });
+            if (i < words.length - 1) {
+              const spaceSpan = document.createElement('span');
+              spaceSpan.className = 'magic-char';
+              spaceSpan.textContent = ' ';
+              pEl.appendChild(spaceSpan);
+            }
+          }
+        }
+      } else {
+        para.split('').forEach(ch => {
+          const span = document.createElement('span');
+          span.className = 'magic-char';
+          span.textContent = ch;
+          pEl.appendChild(span);
+        });
+      }
     }
 
     el.appendChild(pEl);
+    pElements.push(pEl);
   });
+
+  // Start sequential typewriter printing ticks
+  let currentPIdx = 0;
+  
+  function writeParagraph() {
+    if (currentPIdx >= pElements.length) {
+      // golden magical glow on document completion
+      const paper = document.getElementById("scroll-paper");
+      if (paper) {
+        paper.classList.add("magic-glow-pulse");
+        setTimeout(() => paper.classList.remove("magic-glow-pulse"), 1200);
+      }
+      return;
+    }
+
+    const pEl = pElements[currentPIdx];
+    pEl.classList.remove('fade-phantom');
+    pEl.classList.add('writing');
+
+    const chars = pEl.querySelectorAll('.magic-char');
+    const sigPath = pEl.querySelector('.sig-path');
+
+    if (sigPath) {
+      setTimeout(() => {
+        sigPath.style.animation = 'writeSignature 2.2s cubic-bezier(0.42, 0, 0.58, 1) forwards';
+        pEl.classList.remove('writing');
+        pEl.classList.add('finished');
+        currentPIdx++;
+        setTimeout(writeParagraph, 1200);
+      }, 350);
+      return;
+    }
+
+    if (chars.length === 0) {
+      pEl.classList.remove('writing');
+      pEl.classList.add('finished');
+      currentPIdx++;
+      setTimeout(writeParagraph, 350);
+      return;
+    }
+
+    let charIdx = 0;
+    const isMobile = window.innerWidth < 768;
+    const writeSpeed = isMobile ? 22 : 18;
+
+    function writeChar() {
+      if (charIdx >= chars.length) {
+        pEl.classList.remove('writing');
+        pEl.classList.add('finished');
+        currentPIdx++;
+        setTimeout(writeParagraph, 450); // stagger paragraphs
+        return;
+      }
+
+      const span = chars[charIdx];
+      span.classList.add('written');
+
+      // 5% chance to spawn gold sparkles from characters
+      if (Math.random() < 0.05 && window.spawnSparkCluster) {
+        const rect = span.getBoundingClientRect();
+        window.spawnSparkCluster(rect.left + rect.width / 2, rect.top + rect.height / 2, 1, false);
+      }
+
+      charIdx++;
+      setTimeout(writeChar, writeSpeed);
+    }
+
+    writeChar();
+  }
+
+  setTimeout(writeParagraph, 400);
 }
 
 function revealHogwartsLetter(msgEl, text, sigEl) {
   if (!msgEl) return;
   
-  // Re-trigger fade-in animation by removing and adding class/animation
   msgEl.style.animation = 'none';
-  void msgEl.offsetHeight; // trigger reflow
+  void msgEl.offsetHeight; 
   msgEl.style.animation = 'letterFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards';
 
-  // Render letter text immediately with drop cap
   _injectDropCapAndRender(msgEl, text || '');
 
-  // Hide duplicate signature element
   if (sigEl) {
     sigEl.style.display = 'none';
   }
 
-  // Reset scroll position to top
   const inner = document.getElementById('scroll-inner');
-  if (inner) {
+  const paper = document.getElementById('scroll-paper');
+  if (inner && paper) {
     inner.scrollTop = 0;
+
+    // Detect scroll to bottom trigger glow pulse
+    let glowTriggered = false;
+    inner.addEventListener("scroll", () => {
+      const reachedBottom = inner.scrollHeight - inner.scrollTop - inner.clientHeight <= 15;
+      if (reachedBottom) {
+        if (!glowTriggered) {
+          glowTriggered = true;
+          paper.classList.add("magic-glow-pulse");
+          setTimeout(() => paper.classList.remove("magic-glow-pulse"), 1000);
+        }
+      } else {
+        glowTriggered = false;
+      }
+    }, { passive: true });
   }
 }
 
@@ -314,6 +439,7 @@ function setupMusic(file, label) {
   audio.loop = true;
   audio.volume = 0.5;
   audio.preload = "auto";
+  window.bgMusic = audio;
 
   let playing = false;
   let started = false;
@@ -325,6 +451,7 @@ function setupMusic(file, label) {
     if (ctx) {
       const source = ctx.createMediaElementSource(audio);
       gainNode = ctx.createGain();
+      window.bgMusicGain = gainNode;
       source.connect(gainNode);
       gainNode.connect(ctx.destination);
       gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
@@ -2005,7 +2132,12 @@ function initEnvelope() {
         overlay.classList.remove("eyes-only-modal");
       }
 
-      setTimeout(() => revealHogwartsLetter(msgEl, msg, sigEl), 200);
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && !window._castleAwakened) {
+        window._castleAwakened = true;
+        setTimeout(() => startCastleAwakeningSequence(msgEl, msg, sigEl), 200);
+      } else {
+        setTimeout(() => revealHogwartsLetter(msgEl, msg, sigEl), 200);
+      }
     }, 450);
   }
 
@@ -2018,8 +2150,13 @@ function initEnvelope() {
     // Restore focus to envelope wrapper
     if (wrapper) wrapper.focus();
     
-    // Sequential envelope morphing is disabled to use the Revelio/Alohomora chest instead!
     firstLetterRead = true;
+
+    // Trigger peaceful Birthday Wish Ceremony if not already run
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && !window._ceremonyRun) {
+      window._ceremonyRun = true;
+      setTimeout(startWishCeremony, 500);
+    }
   }
 
   // Trap keyboard focus inside scroll overlay
@@ -2121,6 +2258,15 @@ function initializeMainApp() {
   initMagneticButtons();
   initSwipeDismiss();
   initMagicParticles({ canvasId: 'sparkle-canvas' });
+  initAmbientAtmosphere();
+
+  // Hide envelope initially and disable interactivity for the cinematic intro sequence
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const wrapper = document.getElementById("envelope-wrapper");
+    if (wrapper) wrapper.style.pointerEvents = "none";
+    const envArea = document.getElementById("envelope-area");
+    if (envArea) envArea.style.opacity = "0";
+  }
 
   // 🪄 Spell Caster Popup Overlay Listeners
   const spellBtn = document.getElementById("spell-btn");
@@ -2463,9 +2609,25 @@ async function startPreloader() {
         setTimeout(() => {
           loader.style.display = "none";
           initializeMainApp();
+          if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            startCinematicSequence();
+          } else {
+            const wrapper = document.getElementById("envelope-wrapper");
+            if (wrapper) wrapper.style.pointerEvents = "auto";
+            const envArea = document.getElementById("envelope-area");
+            if (envArea) envArea.style.opacity = "1";
+          }
         }, 800);
       } else {
         initializeMainApp();
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          startCinematicSequence();
+        } else {
+          const wrapper = document.getElementById("envelope-wrapper");
+          if (wrapper) wrapper.style.pointerEvents = "auto";
+          const envArea = document.getElementById("envelope-area");
+          if (envArea) envArea.style.opacity = "1";
+        }
       }
     }, 950);
   }
@@ -3931,3 +4093,1344 @@ window.addEventListener("popstate", (e) => {
     if (chestWrapper) chestWrapper.focus();
   }
 });
+
+/* ── Ambient Atmosphere Interactive Subsystems ── */
+function initAmbientAtmosphere() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const canvas = document.getElementById("ambient-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+
+  window.addEventListener("resize", () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }, { passive: true });
+
+  class Firefly {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.size = Math.random() * 2 + 1.2;
+      this.angle = Math.random() * Math.PI * 2;
+      this.speed = Math.random() * 0.4 + 0.2;
+      this.wobbleSpeed = Math.random() * 0.05 + 0.02;
+      this.opacity = Math.random() * 0.5 + 0.3;
+      this.fadeDir = Math.random() > 0.5 ? 0.01 : -0.01;
+    }
+    update(mouseX, mouseY, avoidRect) {
+      const dx = this.x - mouseX;
+      const dy = this.y - mouseY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        const force = (120 - dist) / 120 * 1.5;
+        this.x += (dx / dist) * force;
+        this.y += (dy / dist) * force;
+      }
+
+      if (avoidRect) {
+        const cx = avoidRect.left + avoidRect.width / 2;
+        const cy = avoidRect.top + avoidRect.height / 2;
+        if (this.x > avoidRect.left - 40 && this.x < avoidRect.right + 40 &&
+            this.y > avoidRect.top - 40 && this.y < avoidRect.bottom + 40) {
+          const ex = this.x - cx;
+          const ey = this.y - cy;
+          const edist = Math.sqrt(ex * ex + ey * ey) || 1;
+          this.x += (ex / edist) * 1.2;
+          this.y += (ey / edist) * 1.2;
+        }
+      }
+
+      this.angle += (Math.random() - 0.5) * 0.15;
+      this.x += Math.cos(this.angle) * this.speed;
+      this.y += Math.sin(this.angle) * this.speed;
+
+      if (this.x < 0) this.x = width;
+      if (this.x > width) this.x = 0;
+      if (this.y < 0) this.y = height;
+      if (this.y > height) this.y = 0;
+
+      this.opacity += this.fadeDir;
+      if (this.opacity > 0.85 || this.opacity < 0.25) {
+        this.fadeDir = -this.fadeDir;
+      }
+    }
+    draw() {
+      ctx.beginPath();
+      const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
+      grad.addColorStop(0, `rgba(180, 245, 100, ${this.opacity})`);
+      grad.addColorStop(0.3, `rgba(180, 245, 100, ${this.opacity * 0.4})`);
+      grad.addColorStop(1, 'rgba(180, 245, 100, 0)');
+      ctx.fillStyle = grad;
+      ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  class MagicalDust {
+    constructor() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.size = Math.random() * 1.2 + 0.5;
+      this.vy = Math.random() * 0.3 + 0.15;
+      this.vx = (Math.random() * 0.2 + 0.1) * -1;
+      this.opacity = Math.random() * 0.4 + 0.2;
+    }
+    update() {
+      this.y += this.vy;
+      this.x += this.vx;
+      if (this.y > height) {
+        this.y = 0;
+        this.x = Math.random() * width;
+      }
+      if (this.x < 0) {
+        this.x = width;
+        this.y = Math.random() * height;
+      }
+    }
+    draw() {
+      ctx.fillStyle = `rgba(255, 245, 210, ${this.opacity})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  class SmokeParticle {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.vx = (Math.random() - 0.5) * 0.2;
+      this.vy = -(Math.random() * 0.4 + 0.3);
+      this.size = Math.random() * 4 + 2;
+      this.maxLife = Math.random() * 120 + 80;
+      this.life = this.maxLife;
+      this.opacity = Math.random() * 0.25 + 0.1;
+    }
+    update() {
+      this.x += this.vx + Math.sin(this.y * 0.015) * 0.1;
+      this.y += this.vy;
+      this.size += 0.08;
+      this.life--;
+    }
+    draw() {
+      const alpha = (this.life / this.maxLife) * this.opacity;
+      ctx.fillStyle = `rgba(220, 220, 220, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  class ShootingStar {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.active = false;
+      this.delay = Math.random() * 1200 + 400;
+    }
+    trigger() {
+      this.active = true;
+      this.x = Math.random() * (width * 0.6) + width * 0.2;
+      this.y = Math.random() * (height * 0.3);
+      this.speed = Math.random() * 10 + 10;
+      this.angle = Math.PI * 0.2 + Math.random() * 0.1;
+      this.vx = -Math.cos(this.angle) * this.speed;
+      this.vy = Math.sin(this.angle) * this.speed;
+      this.life = Math.random() * 25 + 15;
+      this.maxLife = this.life;
+    }
+    update() {
+      if (!this.active) {
+        this.delay--;
+        if (this.delay <= 0) {
+          this.trigger();
+        }
+        return;
+      }
+      this.x += this.vx;
+      this.y += this.vy;
+      this.life--;
+      if (this.life <= 0) {
+        this.reset();
+      }
+    }
+    draw() {
+      if (!this.active) return;
+      ctx.strokeStyle = `rgba(255, 255, 235, ${this.life / this.maxLife})`;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.x - this.vx * 1.5, this.y - this.vy * 1.5);
+      ctx.stroke();
+    }
+  }
+
+  class Bird {
+    constructor(isOwl = false) {
+      this.isOwl = isOwl;
+      this.reset();
+    }
+    reset() {
+      this.x = this.isOwl ? width + 50 : -50;
+      this.y = Math.random() * (height * 0.4) + 50;
+      this.vx = this.isOwl ? -(Math.random() * 0.8 + 0.6) : (Math.random() * 0.6 + 0.4);
+      this.vy = (Math.random() - 0.5) * 0.1;
+      this.size = this.isOwl ? 8 : 4;
+      this.wingCycle = 0;
+      this.active = Math.random() > 0.4;
+      this.wingSpeed = this.isOwl ? 0.08 : 0.2;
+    }
+    update() {
+      if (!this.active) {
+        if (Math.random() < 0.002) this.active = true;
+        return;
+      }
+      this.x += this.vx;
+      this.y += this.vy + Math.sin(this.x * 0.02) * 0.1;
+      this.wingCycle += this.wingSpeed;
+
+      if ((this.isOwl && this.x < -50) || (!this.isOwl && this.x > width + 50)) {
+        this.reset();
+        this.active = false;
+      }
+    }
+    draw() {
+      if (!this.active) return;
+      ctx.strokeStyle = this.isOwl ? 'rgba(10, 15, 30, 0.42)' : 'rgba(80, 90, 100, 0.35)';
+      ctx.lineWidth = this.isOwl ? 2 : 1.2;
+      ctx.beginPath();
+
+      const wingY = Math.sin(this.wingCycle) * this.size;
+      ctx.moveTo(this.x - this.size, this.y - wingY);
+      ctx.quadraticCurveTo(this.x - this.size / 2, this.y - this.size / 2, this.x, this.y);
+      ctx.quadraticCurveTo(this.x + this.size / 2, this.y - this.size / 2, this.x + this.size, this.y - wingY);
+      ctx.stroke();
+
+      if (this.isOwl) {
+        ctx.fillStyle = 'rgba(10, 15, 30, 0.2)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  class Feather {
+    constructor() {
+      this.x = Math.random() * width;
+      this.y = -50;
+      this.size = Math.random() * 8 + 6;
+      this.vy = Math.random() * 0.2 + 0.25;
+      this.wobbleSpeed = Math.random() * 0.02 + 0.01;
+      this.wobbleRange = Math.random() * 30 + 10;
+      this.angle = Math.random() * Math.PI;
+      this.spinSpeed = (Math.random() - 0.5) * 0.015;
+      this.opacity = Math.random() * 0.22 + 0.1;
+    }
+    update() {
+      this.y += this.vy;
+      this.angle += this.spinSpeed;
+      this.xOffset = Math.sin(this.y * this.wobbleSpeed) * this.wobbleRange;
+      if (this.y > height + 50) {
+        this.y = -50;
+        this.x = Math.random() * width;
+      }
+    }
+    draw() {
+      const rx = this.x + this.xOffset;
+      ctx.save();
+      ctx.translate(rx, this.y);
+      ctx.rotate(this.angle);
+      ctx.fillStyle = `rgba(240, 240, 240, ${this.opacity})`;
+      
+      ctx.beginPath();
+      ctx.ellipse(0, 0, this.size, this.size * 0.28, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity * 1.5})`;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(-this.size, 0);
+      ctx.lineTo(this.size, 0);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+  }
+
+  const firefliesCount = 15;
+  const fireflies = Array.from({ length: firefliesCount }, () => new Firefly());
+
+  const dustCount = 20;
+  const dust = Array.from({ length: dustCount }, () => new MagicalDust());
+
+  const feathersCount = 3;
+  const feathers = Array.from({ length: feathersCount }, () => new Feather());
+
+  const smokeParticles = [];
+  const shootingStars = Array.from({ length: 2 }, () => new ShootingStar());
+
+  const isNightTime = () => {
+    const hours = new Date().getHours();
+    return hours < 6 || hours >= 18;
+  };
+  const activeBirds = Array.from({ length: 4 }, () => new Bird(isNightTime()));
+
+  // Circling owls population for the castle awakening sequence
+  const circlingOwls = [];
+  window.triggerAwakeningOwls = () => {
+    circlingOwls.length = 0;
+    for (let i = 0; i < 3; i++) {
+      circlingOwls.push({
+        angle: Math.random() * Math.PI * 2,
+        speed: 0.015 + Math.random() * 0.012,
+        radiusX: 30 + Math.random() * 25,
+        radiusY: 8 + Math.random() * 6,
+        flapSpeed: 0.12 + Math.random() * 0.08,
+        flap: Math.random() * 5
+      });
+    }
+  };
+
+  const castleWindows = document.querySelectorAll(".castle-window");
+  setInterval(() => {
+    if (document.hidden) return;
+    castleWindows.forEach(win => {
+      if (Math.random() < 0.15) {
+        win.classList.toggle("active");
+      }
+    });
+  }, 2200);
+
+  let windJitter = 0;
+  setInterval(() => {
+    if (document.hidden) return;
+    windJitter = (Math.random() - 0.5) * 8;
+    document.documentElement.style.setProperty("--wind-tilt", `${windJitter}deg`);
+  }, 80);
+
+  function loop() {
+    if (document.hidden) {
+      requestAnimationFrame(loop);
+      return;
+    }
+    ctx.clearRect(0, 0, width, height);
+
+    const env = document.getElementById("envelope-area");
+    const avoidRect = env ? env.getBoundingClientRect() : null;
+
+    const mx = window.lastMouseX || width / 2;
+    const my = window.lastMouseY || height / 2;
+
+    shootingStars.forEach(s => {
+      s.update();
+      s.draw();
+    });
+
+    activeBirds.forEach(b => {
+      b.update();
+      b.draw();
+    });
+
+    if (window.castleZoomingActive) {
+      const towerX = width * (300 / 800) + (window.lastMouseX - width/2) * -0.03;
+      const towerY = height - (height * 0.15 * 1.65) + (40 / 400 * height * 0.15 * 1.65) - 32 + (window.lastMouseY - height/2) * -0.01;
+      
+      circlingOwls.forEach(o => {
+        o.angle += o.speed;
+        o.flap += o.flapSpeed;
+        const ox = towerX + Math.cos(o.angle) * o.radiusX;
+        const oy = towerY + Math.sin(o.angle) * o.radiusY;
+        
+        ctx.fillStyle = 'rgba(8, 12, 24, 0.55)';
+        ctx.beginPath();
+        ctx.ellipse(ox, oy, 4, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.strokeStyle = 'rgba(8, 12, 24, 0.45)';
+        ctx.lineWidth = 1.0;
+        ctx.beginPath();
+        const wingY = Math.sin(o.flap) * 4;
+        ctx.moveTo(ox - 4, oy - wingY);
+        ctx.quadraticCurveTo(ox - 2, oy - 2, ox, oy);
+        ctx.quadraticCurveTo(ox + 2, oy - 2, ox + 4, oy - wingY);
+        ctx.stroke();
+      });
+    }
+
+    if (window.ceremonyConstellationActive) {
+      const towerX = width / 2 + (window.lastMouseX - width/2) * -0.01;
+      const towerY = height * 0.42 + (window.lastMouseY - height/2) * -0.01;
+      
+      const p = [
+        { x: towerX + 0, y: towerY - 50 },
+        { x: towerX + 22, y: towerY - 70 },
+        { x: towerX + 44, y: towerY - 50 },
+        { x: towerX + 32, y: towerY - 20 },
+        { x: towerX + 0, y: towerY + 15 },
+        { x: towerX - 32, y: towerY - 20 },
+        { x: towerX - 44, y: towerY - 50 },
+        { x: towerX - 22, y: towerY - 70 }
+      ];
+
+      // Draw faint connections
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.28)';
+      ctx.lineWidth = 0.8;
+      ctx.setLineDash([2, 4]);
+      ctx.beginPath();
+      ctx.moveTo(p[0].x, p[0].y);
+      for (let i = 1; i < p.length; i++) {
+        ctx.lineTo(p[i].x, p[i].y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      ctx.setLineDash([]); // reset
+
+      // Draw solid drawing path
+      if (!window.constellationProgress) window.constellationProgress = 0;
+      if (window.constellationProgress < 1.0) window.constellationProgress += 0.005;
+
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.65)';
+      ctx.lineWidth = 1.2;
+      ctx.shadowColor = '#ffd54f';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      
+      const totalLen = p.length;
+      const currentLimit = window.constellationProgress * totalLen;
+      ctx.moveTo(p[0].x, p[0].y);
+      for (let i = 1; i <= totalLen; i++) {
+        const pt = p[i % totalLen];
+        const prev = p[i - 1];
+        if (i <= currentLimit) {
+          ctx.lineTo(pt.x, pt.y);
+        } else {
+          const rem = currentLimit - (i - 1);
+          if (rem > 0) {
+            const lx = prev.x + (pt.x - prev.x) * rem;
+            const ly = prev.y + (pt.y - prev.y) * rem;
+            ctx.lineTo(lx, ly);
+          }
+          break;
+        }
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0; // reset
+
+      // Draw stars at vertices
+      p.forEach((pt, idx) => {
+        const starTimeLimit = window.constellationProgress * totalLen;
+        if (idx <= starTimeLimit) {
+          const pulse = 1.0 + Math.sin(Date.now() * 0.005 + idx) * 0.2;
+          ctx.fillStyle = '#fff';
+          ctx.shadowColor = '#ffd54f';
+          ctx.shadowBlur = 10 * pulse;
+          
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 2.5 * pulse, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.shadowBlur = 0;
+        }
+      });
+    }
+
+    if (Math.random() < 0.08) {
+      const castleX = width * (95 / 800);
+      const castleY = height - (height * 0.15) + (170 / 400 * (height * 0.15));
+      smokeParticles.push(new SmokeParticle(castleX, castleY));
+    }
+    if (Math.random() < 0.08) {
+      const castleX = width * (300 / 800);
+      const castleY = height - (height * 0.15) + (40 / 400 * (height * 0.15));
+      smokeParticles.push(new SmokeParticle(castleX, castleY));
+    }
+
+    for (let i = smokeParticles.length - 1; i >= 0; i--) {
+      const p = smokeParticles[i];
+      p.update();
+      p.draw();
+      if (p.life <= 0 || p.y < 0) {
+        smokeParticles.splice(i, 1);
+      }
+    }
+
+    dust.forEach(d => {
+      d.update();
+      d.draw();
+    });
+
+    feathers.forEach(f => {
+      f.update();
+      f.draw();
+    });
+
+    fireflies.forEach(f => {
+      f.update(mx, my, avoidRect);
+      f.draw();
+    });
+
+    requestAnimationFrame(loop);
+  }
+
+  window.lastMouseX = width / 2;
+  window.lastMouseY = height / 2;
+  window.addEventListener("mousemove", (e) => {
+    window.lastMouseX = e.clientX;
+    window.lastMouseY = e.clientY;
+  }, { passive: true });
+
+  window.addEventListener("touchmove", (e) => {
+    if (e.touches.length > 0) {
+      window.lastMouseX = e.touches[0].clientX;
+      window.lastMouseY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  requestAnimationFrame(loop);
+}
+
+/* ── Cinematic Introduction Sequence ── */
+let _cinematicActive = false;
+let _windOscillatorNode = null;
+let _windGainNode = null;
+let _windAudioCtx = null;
+
+function playOwlHoot() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+  
+  try {
+    const ctx = new AudioContext();
+    const playNode = (delay, dur, freqStart, freqEnd) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freqStart, ctx.currentTime + delay);
+      osc.frequency.exponentialRampToValueAtTime(freqEnd, ctx.currentTime + delay + dur * 0.45);
+      osc.frequency.exponentialRampToValueAtTime(freqStart * 0.88, ctx.currentTime + delay + dur);
+      
+      gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + delay + dur * 0.25);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + dur);
+      
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(550, ctx.currentTime);
+      
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + dur);
+    };
+    
+    // Far hollow hoot rhythm
+    playNode(0, 0.48, 330, 350);
+    playNode(0.6, 0.38, 310, 330);
+    playNode(0.95, 0.52, 320, 340);
+  } catch (e) {
+    console.log("AudioContext blocked or unsupported:", e);
+  }
+}
+
+function startWindAmbient() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+
+  try {
+    const ctx = new AudioContext();
+    _windAudioCtx = ctx;
+
+    const bufferSize = ctx.sampleRate * 5;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    noise.loop = true;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.Q.value = 2.5;
+
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = 0.07; // Slow cyclic wind rise and fall
+
+    const oscGain = ctx.createGain();
+    oscGain.gain.value = 200;
+
+    filter.frequency.value = 420;
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 2.5); // Soft fade-in
+
+    _windGainNode = gain;
+    _windOscillatorNode = osc;
+
+    osc.connect(oscGain);
+    oscGain.connect(filter.frequency);
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    noise.start();
+  } catch (e) {
+    console.log("Wind synth failed:", e);
+  }
+}
+
+function stopWindAmbient() {
+  if (_windGainNode && _windAudioCtx) {
+    try {
+      _windGainNode.gain.exponentialRampToValueAtTime(0.0001, _windAudioCtx.currentTime + 2.0);
+    } catch (e) {}
+  }
+}
+
+function startCinematicSequence() {
+  _cinematicActive = true;
+  
+  const overlay = document.getElementById("cinematic-overlay");
+  const canvas = document.getElementById("cinematic-canvas");
+  const skipBtn = document.getElementById("skip-cinematic-btn");
+  
+  if (!overlay || !canvas) return;
+  
+  overlay.style.display = "block";
+  overlay.style.opacity = "1";
+  
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  
+  let w = canvas.width = window.innerWidth;
+  let h = canvas.height = window.innerHeight;
+  
+  window.addEventListener("resize", () => {
+    if (!_cinematicActive) return;
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }, { passive: true });
+
+  // Start soundscapes
+  startWindAmbient();
+  setTimeout(() => {
+    if (_cinematicActive) playOwlHoot();
+  }, 2500);
+
+  // Setup feather particles emitted by the owl
+  const owlFeathers = [];
+
+  class MiniFeather {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.vx = (Math.random() - 0.5) * 0.4 - 0.2;
+      this.vy = Math.random() * 0.3 + 0.2;
+      this.size = Math.random() * 4 + 3;
+      this.alpha = Math.random() * 0.3 + 0.2;
+      this.angle = Math.random() * Math.PI;
+    }
+    update() {
+      this.x += this.vx + Math.sin(this.y * 0.02) * 0.3;
+      this.y += this.vy;
+      this.angle += 0.01;
+    }
+    draw() {
+      ctx.fillStyle = `rgba(220, 220, 220, ${this.alpha})`;
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, this.size, this.size * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // Cinematic timeline clock ticks
+  let tick = 0;
+
+  // Owl tracking details
+  let owlX = -100;
+  let owlY = h * 0.2;
+  let owlScale = 1;
+  let owlFlap = 0;
+
+  // Falling envelope details
+  let envX = 0;
+  let envY = -200;
+  let envAngle = 0;
+  let envReleased = false;
+  let envLanded = false;
+  let envVy = 0;
+  
+  const targetX = w / 2;
+  const targetY = h / 2 + 30;
+  const envW = Math.min(260, w * 0.8);
+  const envH = envW * (170 / 260);
+
+  // Dust puff particles on landing
+  const landingDust = [];
+
+  function drawOwlSilhouette(x, y, scale, wingFlap, isRight) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(isRight ? scale : -scale, scale);
+    
+    ctx.fillStyle = 'rgba(8, 12, 24, 0.95)';
+    // Head & Ears
+    ctx.beginPath();
+    ctx.arc(12, -6, 9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(15, -15);
+    ctx.lineTo(17, -8);
+    ctx.lineTo(11, -8);
+    ctx.fill();
+
+    // Body
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 20, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Flapping Wings
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    const wingY = Math.sin(wingFlap) * 30;
+    ctx.quadraticCurveTo(-10, -25, -28, wingY);
+    ctx.quadraticCurveTo(-12, -4, 0, 0);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawEnvelopeSilhouette(x, y, width, height, angle) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+
+    // Card shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillRect(-width / 2 + 5, -height / 2 + 5, width, height);
+
+    // Parchment base
+    ctx.fillStyle = '#ebdeb7';
+    ctx.strokeStyle = '#cbbb93';
+    ctx.lineWidth = 2;
+    ctx.fillRect(-width / 2, -height / 2, width, height);
+    ctx.strokeRect(-width / 2, -height / 2, width, height);
+
+    // Flaps folding lines
+    ctx.beginPath();
+    ctx.moveTo(-width / 2, -height / 2);
+    ctx.lineTo(0, 0);
+    ctx.lineTo(width / 2, -height / 2);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(-width / 2, height / 2);
+    ctx.lineTo(-width / 6, 0);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(width / 2, height / 2);
+    ctx.lineTo(width / 6, 0);
+    ctx.stroke();
+
+    // Wax seal circle
+    ctx.fillStyle = '#a61c1c';
+    ctx.beginPath();
+    ctx.arc(0, -2, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function tickCinematic() {
+    if (!_cinematicActive) return;
+
+    ctx.clearRect(0, 0, w, h);
+    tick++;
+
+    // Draw dark night sky background
+    ctx.fillStyle = '#060812';
+    ctx.fillRect(0, 0, w, h);
+
+    // Draw the moon in the top right
+    const moonRadius = 45;
+    const moonX = w * 0.75;
+    const moonY = h * 0.22;
+    
+    ctx.beginPath();
+    const moonGlow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, moonRadius * 4);
+    moonGlow.addColorStop(0, 'rgba(255, 255, 240, 0.22)');
+    moonGlow.addColorStop(0.3, 'rgba(255, 255, 240, 0.06)');
+    moonGlow.addColorStop(1, 'rgba(255, 255, 240, 0)');
+    ctx.fillStyle = moonGlow;
+    ctx.arc(moonX, moonY, moonRadius * 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(255, 255, 245, 0.88)';
+    ctx.arc(moonX, moonY, moonRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Distant castle silhouette (faintly visible)
+    ctx.fillStyle = 'rgba(10, 15, 30, 0.35)';
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    ctx.lineTo(0, h - 80);
+    ctx.lineTo(w * 0.1, h - 80);
+    ctx.lineTo(w * 0.13, h - 140);
+    ctx.lineTo(w * 0.16, h - 80);
+    ctx.lineTo(w * 0.35, h - 80);
+    ctx.lineTo(w * 0.38, h - 220);
+    ctx.lineTo(w * 0.4, h - 80);
+    ctx.lineTo(w * 0.65, h - 80);
+    ctx.lineTo(w * 0.68, h - 170);
+    ctx.lineTo(w * 0.72, h - 80);
+    ctx.lineTo(w, h - 80);
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fill();
+
+    // ── Transition Timeline Stages ──
+
+    // Stage 1 & 2: Owl slowly flies across the moon
+    if (tick < 500) {
+      owlScale = 0.4;
+      owlFlap += 0.12;
+      owlX = moonX + 220 - (tick * 0.7);
+      owlY = moonY - 30 + Math.sin(tick * 0.04) * 15;
+      drawOwlSilhouette(owlX, owlY, owlScale, owlFlap, false);
+
+      // Spawn drifting feathers
+      if (Math.random() < 0.08) {
+        owlFeathers.push(new MiniFeather(owlX, owlY));
+      }
+    }
+    // Stage 3: Owl approaches viewer, scaling up and sweeping close
+    else if (tick >= 500 && tick < 780) {
+      const prog = (tick - 500) / 280; // 0 to 1
+      owlScale = 0.4 + prog * 1.6;
+      owlFlap += 0.18;
+      
+      // Sweep in a circular arc towards the center
+      const sweepAngle = Math.PI * 1.5 - prog * Math.PI;
+      owlX = w / 2 + Math.cos(sweepAngle) * (w * 0.35 * (1 - prog * 0.5));
+      owlY = h / 2 - 100 + Math.sin(sweepAngle) * (h * 0.22);
+      
+      drawOwlSilhouette(owlX, owlY, owlScale, owlFlap, true);
+
+      if (Math.random() < 0.12) {
+        owlFeathers.push(new MiniFeather(owlX, owlY));
+      }
+    }
+    // Stage 4: Owl releases envelope, flies away
+    else if (tick >= 780 && !envLanded) {
+      if (!envReleased) {
+        envReleased = true;
+        envX = owlX;
+        envY = owlY;
+        envAngle = 0.2;
+      }
+
+      // Owl flies off into the top left distance
+      const owlProg = (tick - 780);
+      owlFlap += 0.2;
+      owlX -= 3.2;
+      owlY -= 0.6;
+      owlScale = Math.max(0.3, 2.0 - owlProg * 0.02);
+      drawOwlSilhouette(owlX, owlY, owlScale, owlFlap, false);
+
+      // Envelope falls with gravity physics
+      envVy += 0.18;
+      envY += envVy;
+      
+      // Horizontal drift LERP to center landing coords
+      envX += (targetX - envX) * 0.06;
+      envAngle += Math.sin(tick * 0.06) * 0.015;
+
+      // Detect Landing collision
+      if (envY >= targetY) {
+        envY = targetY;
+        envLanded = true;
+        
+        // Spawn radial dust landing puff
+        for (let i = 0; i < 30; i++) {
+          const dustAng = Math.random() * Math.PI * 2;
+          const dustSp = Math.random() * 3 + 1.5;
+          landingDust.push({
+            x: envX,
+            y: envY + 20,
+            vx: Math.cos(dustAng) * dustSp,
+            vy: Math.sin(dustAng) * dustSp * 0.4 - 0.5,
+            size: Math.random() * 3 + 1.5,
+            alpha: Math.random() * 0.55 + 0.3
+          });
+        }
+
+        // Play unseal snapping feedback crack sound
+        playCrackSound();
+
+        // Initiate fade-out exit sequence
+        setTimeout(() => {
+          endCinematic();
+        }, 1600);
+      }
+
+      drawEnvelopeSilhouette(envX, envY, envW, envH, envAngle);
+    }
+    // Stage 5: Envelope landed, showing seal glow pulse
+    else if (envLanded) {
+      drawEnvelopeSilhouette(envX, envY, envW, envH, envAngle);
+
+      // Pulse a gold ring centered on the wax seal
+      const pulseProg = (tick % 60) / 60; // 0 to 1
+      ctx.strokeStyle = `rgba(212, 175, 55, ${1 - pulseProg})`;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(envX, envY, 15 + pulseProg * 45, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Update & draw feathers
+    for (let i = owlFeathers.length - 1; i >= 0; i--) {
+      const f = owlFeathers[i];
+      f.update();
+      f.draw();
+      if (f.y > h + 20) {
+        owlFeathers.splice(i, 1);
+      }
+    }
+
+    // Update & draw landing dust
+    landingDust.forEach(d => {
+      d.x += d.vx;
+      d.y += d.vy;
+      d.vy += 0.08; // fall back down
+      d.alpha -= 0.015;
+      if (d.alpha > 0) {
+        ctx.fillStyle = `rgba(212, 185, 140, ${d.alpha})`;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+
+    requestAnimationFrame(tickCinematic);
+  }
+
+  // Enable click/touch-to-skip gesture anywhere on overlay
+  overlay.addEventListener("click", () => {
+    endCinematic();
+  }, { once: true });
+
+  skipBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    endCinematic();
+  }, { once: true });
+
+  // Run tick loop
+  requestAnimationFrame(tickCinematic);
+}
+
+function endCinematic() {
+  if (!_cinematicActive) return;
+  _cinematicActive = false;
+
+  stopWindAmbient();
+
+  const overlay = document.getElementById("cinematic-overlay");
+  const envArea = document.getElementById("envelope-area");
+  const wrapper = document.getElementById("envelope-wrapper");
+
+  if (overlay) {
+    overlay.style.opacity = "0";
+    setTimeout(() => {
+      overlay.style.display = "none";
+      overlay.remove();
+    }, 1800);
+  }
+
+  if (envArea) {
+    envArea.style.opacity = "1";
+    envArea.classList.add("envelope-pulse-highlight");
+  }
+  if (wrapper) {
+    wrapper.style.pointerEvents = "auto";
+  }
+}
+
+/* ── Castle Awakening Cinematic Sequence ── */
+let _choirOscillators = [];
+let _choirGainNode = null;
+let _choirAudioCtx = null;
+
+function playCastleBell() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+
+  try {
+    const ctx = new AudioContext();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 650;
+
+    const freqs = [105, 212, 324.5, 480, 680];
+    freqs.forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = i === 0 ? 'sine' : 'triangle';
+      osc.frequency.value = f;
+      
+      // Detuned physical vibration decay
+      osc.frequency.linearRampToValueAtTime(f * 0.985, ctx.currentTime + 5.5);
+
+      const oscGain = ctx.createGain();
+      oscGain.gain.value = i === 0 ? 0.08 : 0.035;
+
+      osc.connect(oscGain);
+      oscGain.connect(filter);
+      osc.start();
+      osc.stop(ctx.currentTime + 6.0);
+    });
+
+    const mainGain = ctx.createGain();
+    mainGain.gain.setValueAtTime(0, ctx.currentTime);
+    mainGain.gain.linearRampToValueAtTime(0.14, ctx.currentTime + 0.05);
+    mainGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 5.8);
+
+    filter.connect(mainGain);
+    mainGain.connect(ctx.destination);
+  } catch (e) {
+    console.log("Bell synth failed:", e);
+  }
+}
+
+function startChoirDrone() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+
+  try {
+    const ctx = new AudioContext();
+    _choirAudioCtx = ctx;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 280;
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 3.0); // Soft swelling fade-in
+
+    _choirGainNode = gain;
+    _choirOscillators = [];
+
+    // Detuned perfect fifth chord drone (A3 + E4 + A4)
+    const chords = [220, 221.4, 330, 440];
+    chords.forEach(f => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      osc.connect(filter);
+      osc.start();
+      _choirOscillators.push(osc);
+    });
+
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+  } catch (e) {
+    console.log("Choir synth failed:", e);
+  }
+}
+
+function stopChoirDrone() {
+  if (_choirGainNode && _choirAudioCtx) {
+    try {
+      _choirGainNode.gain.exponentialRampToValueAtTime(0.0001, _choirAudioCtx.currentTime + 2.5);
+      setTimeout(() => {
+        _choirOscillators.forEach(osc => {
+          try { osc.stop(); } catch(e) {}
+        });
+        _choirOscillators = [];
+      }, 2600);
+    } catch (e) {}
+  }
+}
+
+function startCastleAwakeningSequence(msgEl, msg, sigEl) {
+  const paper = document.getElementById("scroll-paper");
+  const closeBtn = document.getElementById("scroll-close");
+  const castleWrapper = document.getElementById("ambient-castle-wrapper");
+  const flames = document.querySelectorAll(".candle-flame");
+  const windows = [".cw1", ".cw2", ".cw3", ".cw4", ".cw5", ".cw6"];
+
+  if (!paper) {
+    // Fail-safe fallbacks
+    revealHogwartsLetter(msgEl, msg, sigEl);
+    return;
+  }
+
+  // 1. Temporarily dim scroll sheet and hide close button
+  paper.classList.add("cinematic-dim");
+  if (closeBtn) closeBtn.style.display = "none";
+
+  // 2. Trigger slow camera zoom towards distant castle silhouette
+  if (castleWrapper) castleWrapper.classList.add("zoomed-in");
+
+  // 3. Fade down background soundtrack volume
+  if (window.bgMusic) {
+    window.bgMusic.volume = 0.05;
+  }
+
+  // 4. Play cathedral bell and start soft choir drone pads
+  playCastleBell();
+  startChoirDrone();
+
+  // 5. Ignite Great Hall candles sequentially
+  flames.forEach((flame, idx) => {
+    setTimeout(() => {
+      flame.style.opacity = "1";
+    }, 1500 + idx * 1200);
+  });
+
+  // 6. Turn on castle window lights one by one
+  windows.forEach((winCls, idx) => {
+    setTimeout(() => {
+      const winEl = document.querySelector(winCls);
+      if (winEl) winEl.classList.add("active");
+    }, 2000 + idx * 1400);
+  });
+
+  // 7. Spawn circling owls around castle tower on ambient canvas
+  window.castleZoomingActive = true;
+  if (typeof window.triggerAwakeningOwls === "function") {
+    window.triggerAwakeningOwls();
+  }
+
+  // 8. Restore normal interface reading state after 12 seconds
+  setTimeout(() => {
+    if (castleWrapper) castleWrapper.classList.remove("zoomed-in");
+    if (paper) paper.classList.remove("cinematic-dim");
+    if (closeBtn) closeBtn.style.display = "block";
+    
+    stopChoirDrone();
+    if (window.bgMusic) {
+      window.bgMusic.volume = 0.5; // restore original volume
+    }
+
+    window.castleZoomingActive = false;
+
+    // Proceed to text letter rendering typewriter sequence
+    revealHogwartsLetter(msgEl, msg, sigEl);
+  }, 12500);
+}
+
+/* ── Birthday Wish Ceremony ── */
+function playWishChime() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+
+  try {
+    const ctx = new AudioContext();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'peaking';
+    filter.frequency.value = 1200;
+    filter.Q.value = 1.5;
+    filter.gain.value = 6;
+
+    // Peaceful crystal glass harp arpeggio (C5 -> E5 -> G5 -> C6)
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      const startTime = ctx.currentTime + idx * 0.22;
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.08, startTime + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 2.5);
+
+      osc.connect(gain);
+      gain.connect(filter);
+      osc.start(startTime);
+      osc.stop(startTime + 2.6);
+    });
+
+    filter.connect(ctx.destination);
+  } catch (e) {
+    console.log("Chime synth failed:", e);
+  }
+}
+
+function startWishCeremony() {
+  const overlayText = document.getElementById("ceremony-text-container");
+  const textContent = document.getElementById("ceremony-text-content");
+  const moonBeam = document.getElementById("moon-beam");
+  const candles = document.querySelectorAll(".ambient-candle");
+
+  if (!overlayText || !textContent) return;
+
+  // 1. Enter ceremony mode (fades out landing UI, slows fog/clouds, brightens moon)
+  document.body.classList.add("ceremony-active");
+  overlayText.classList.remove("hidden");
+  overlayText.style.opacity = "1";
+
+  // 2. Slow fade out background music soundtrack
+  if (window.bgMusic) {
+    let vol = window.bgMusic.volume;
+    const fade = setInterval(() => {
+      vol -= 0.05;
+      if (vol <= 0.02) {
+        window.bgMusic.volume = 0;
+        window.bgMusic.pause();
+        clearInterval(fade);
+      } else {
+        window.bgMusic.volume = vol;
+      }
+    }, 60);
+  }
+
+  // 3. Move floating candles slowly into a glowing circle above the castle
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight * 0.42;
+  const R = Math.min(window.innerWidth, window.innerHeight) * 0.18;
+
+  candles.forEach((candle, idx) => {
+    const angle = (idx / candles.length) * Math.PI * 2;
+    const tx = cx + Math.cos(angle) * R - 2;
+    const ty = cy + Math.sin(angle) * R - 12;
+
+    candle.style.transition = "left 6.5s cubic-bezier(0.25, 1, 0.5, 1), top 6.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 3s ease";
+    candle.style.left = `${tx}px`;
+    candle.style.top = `${ty}px`;
+    candle.style.animation = "none";
+  });
+
+  // 4. Peaceful Text Prompts Sequence
+  const prompts = [
+    { text: "Before you leave...", delay: 2000, duration: 4000 },
+    { text: "Close your eyes...", delay: 7500, duration: 4000 },
+    { text: "Make one wish.", delay: 13000, duration: -1 } // stays visible until tapped
+  ];
+
+  prompts.forEach(p => {
+    setTimeout(() => {
+      textContent.textContent = p.text;
+      textContent.classList.add("visible");
+
+      if (p.duration > 0) {
+        setTimeout(() => {
+          textContent.classList.remove("visible");
+        }, p.duration);
+      } else {
+        // Unlock click-to-wish interaction once the final prompt settles
+        setTimeout(() => {
+          overlayText.classList.add("active");
+        }, 1200);
+      }
+    }, p.delay);
+  });
+
+  // 5. Handle Click/Touch to Wish
+  function handleWishTap(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Disable multiple taps
+    overlayText.classList.remove("active");
+    overlayText.removeEventListener("click", handleWishTap);
+    overlayText.removeEventListener("touchend", handleWishTap);
+
+    // Fade out text prompt
+    textContent.classList.remove("visible");
+
+    // Synthesize peaceful crystal arpeggio
+    playWishChime();
+
+    // Fade in vertical moon beam of light
+    if (moonBeam) moonBeam.classList.add("active");
+
+    // Brighten candle flames
+    document.body.classList.add("ceremony-tapped");
+
+    // Animate golden star constellation above castle
+    window.constellationProgress = 0;
+    window.ceremonyConstellationActive = true;
+
+    // Spawn peaceful slowly rising golden particles from bottom of viewport
+    if (window.spawnSparkCluster) {
+      for (let i = 0; i < 90; i++) {
+        setTimeout(() => {
+          const rx = Math.random() * window.innerWidth;
+          const ry = window.innerHeight - 30 - Math.random() * 50;
+          window.spawnSparkCluster(rx, ry, 1, false);
+        }, i * 35);
+      }
+    }
+
+    // 6. Resolution & Return to normal card layout after 8 seconds
+    setTimeout(() => {
+      if (moonBeam) moonBeam.classList.remove("active");
+      window.ceremonyConstellationActive = false;
+
+      // Smoothly fade out ceremony overlay
+      overlayText.style.opacity = "0";
+
+      setTimeout(() => {
+        overlayText.classList.add("hidden");
+        document.body.classList.remove("ceremony-active", "ceremony-tapped");
+
+        // Restore floating candles to original layout
+        candles.forEach(candle => {
+          candle.style.left = "";
+          candle.style.top = "";
+          candle.style.animation = "";
+          candle.style.transition = "";
+        });
+
+        // Fade soundtrack background music back in
+        if (window.bgMusic) {
+          window.bgMusic.play().then(() => {
+            let vol = 0;
+            const fadeIn = setInterval(() => {
+              vol += 0.05;
+              if (vol >= 0.5) {
+                window.bgMusic.volume = 0.5;
+                clearInterval(fadeIn);
+              } else {
+                window.bgMusic.volume = vol;
+              }
+            }, 60);
+          }).catch(() => {});
+        }
+      }, 2000);
+
+    }, 8500);
+  }
+
+  overlayText.addEventListener("click", handleWishTap);
+  overlayText.addEventListener("touchend", handleWishTap);
+}
+
+
