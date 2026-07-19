@@ -1,0 +1,13 @@
+/* ── Reset & Core Defaults ── */
+*, *::before, *::after {
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html { 
+  overscroll-behavior: none; 
+  height: 100%; 
+}

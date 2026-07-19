@@ -1,0 +1,2196 @@
+   🏰 CENTER GLASSMORPHIC HOUSE SELECTOR OVERLAY
+   ============================================================ */
+
+#house-selector-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 9, 7, 0.96); /* Fully opaque deep glass dark background to avoid laggy blurs */
+  display: none; /* Initially display none to avoid preloader layering conflict */
+  align-items: center;
+  justify-content: center;
+  z-index: 50000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.6s;
+  overflow-y: auto; /* Scrollable backup for short screen dimensions */
+  padding: 24px 12px;
+}
+
+#house-selector-overlay.visible {
+  display: flex;
+}
+
+#theme-switcher-panel {
+  background: rgba(18, 14, 10, 0.75);
+  border: 2px solid #D3A625;
+  border-radius: 24px;
+  padding: clamp(24px, 5vw, 40px);
+  width: min(680px, 94vw); /* Increased width to make space for larger badge icons */
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85), 
+              inset 0 0 24px rgba(211, 166, 37, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 4vh, 32px);
+  text-align: center;
+  animation: panelReveal 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  margin: auto; /* Center cleanly when content causes overflow scrolling */
+}
+
+@keyframes panelReveal {
+  from {
+    transform: scale(0.9) translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+#selector-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.6rem, 5vw, 2.3rem);
+  color: #D3A625;
+  text-shadow: 0 0 12px rgba(211, 166, 37, 0.5), 0 2px 4px rgba(0,0,0,0.8);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.house-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 3vw, 24px);
+  width: 100%;
+}
+
+.house-badge {
+  background: rgba(15, 12, 10, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: clamp(16px, 3vh, 24px) 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(255, 255, 255, 0.02);
+  aspect-ratio: 1 / 1.15;
+  width: 100%;
+}
+
+.badge-shimmer-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.badge-img {
+  width: clamp(90px, 20vw, 130px);
+  height: clamp(100px, 22vw, 140px);
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.7));
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.badge-name {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.65rem, 2vw, 0.8rem);
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+/* Sweep border animation on hover */
+.house-badge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255,255,255,0.15) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.house-badge:hover::before {
+  opacity: 1;
+  animation: badgeShimmer 0.8s ease-in-out forwards;
+}
+
+@keyframes badgeShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.house-badge:hover, 
+.house-badge:focus-visible {
+  outline: none;
+  background: rgba(25, 20, 15, 0.65);
+}
+
+.house-badge:hover .badge-name, 
+.house-badge:focus-visible .badge-name {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.house-badge:hover .badge-img, 
+.house-badge:focus-visible .badge-img {
+  transform: translateY(-4px) scale(1.06);
+}
+
+/* Click Active Pop Animation */
+.house-badge.pop-active {
+  animation: badgePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes badgePop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Spin animation for chosen badges */
+@keyframes emojiSpin {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.3); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.badge-img.spinning {
+  animation: emojiSpin 0.45s ease-out forwards;
+}
+
+/* Active Theme States */
+.house-badge[data-house="gryffindor"].active {
+  border-color: #D3A625;
+  box-shadow: 0 0 16px rgba(211,166,37,0.75), inset 0 0 10px rgba(116,0,1,0.5);
+  background: rgba(116,0,1,0.35);
+}
+
+.house-badge[data-house="slytherin"].active {
+  border-color: #AAAAAA;
+  box-shadow: 0 0 16px rgba(170,170,170,0.65), inset 0 0 10px rgba(26,71,42,0.5);
+  background: rgba(26,71,42,0.35);
+}
+
+.house-badge[data-house="ravenclaw"].active {
+  border-color: #946B2D;
+  box-shadow: 0 0 16px rgba(148,107,45,0.75), inset 0 0 10px rgba(14,26,64,0.5);
+  background: rgba(14,26,64,0.35);
+}
+
+.house-badge[data-house="hufflepuff"].active {
+  border-color: #ECB939;
+  box-shadow: 0 0 16px rgba(236,185,57,0.85), inset 0 0 10px rgba(236,185,57,0.4);
+  background: rgba(236,185,57,0.22);
+}
+
+
+/* ============================================================
+   💡 LUMOS SPELL FLASHLIGHT EFFECT
+   ============================================================ */
+#lumos-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 140; /* Just below particles canvas (150) and letter scroll modal (200) */
+  background: rgba(4, 3, 2, 0.9);
+  mix-blend-mode: multiply;
+  transition: opacity 0.85s cubic-bezier(0.25, 1, 0.5, 1);
+  opacity: 0;
+}
+
+#lumos-vignette.active {
+  opacity: 1;
+  mask-image: radial-gradient(circle 120px at var(--x, 50vw) var(--y, 50vh), transparent 45%, black 100%);
+  -webkit-mask-image: radial-gradient(circle 120px at var(--x, 50vw) var(--y, 50vh), transparent 45%, black 100%);
+}
+
+#lumos-vignette.cooling {
+  mask-image: radial-gradient(circle 20px at var(--x, 50vw) var(--y, 50vh), transparent 45%, black 100%);
+  -webkit-mask-image: radial-gradient(circle 20px at var(--x, 50vw) var(--y, 50vh), transparent 45%, black 100%);
+}
+
+#lumos-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 145; /* Just below particle canvas */
+  background: radial-gradient(circle 120px at var(--x, 50vw) var(--y, 50vh), rgba(255, 252, 220, 0.3) 0%, rgba(255, 218, 120, 0.08) 60%, transparent 100%);
+  mix-blend-mode: screen;
+  transition: opacity 0.85s cubic-bezier(0.25, 1, 0.5, 1), background-image 0.85s ease;
+  opacity: 0;
+}
+
+#lumos-glow.active {
+  opacity: 1;
+}
+
+#lumos-glow.cooling {
+  background: radial-gradient(circle 45px at var(--x, 50vw) var(--y, 50vh), rgba(255, 69, 0, 0.38) 0%, rgba(139, 0, 0, 0.12) 50%, transparent 100%);
+}
+
+/* Floating dust particles within the spotlight */
+#lumos-dust-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mask-image: radial-gradient(circle 140px at var(--x, 50vw) var(--y, 50vh), black 100%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle 140px at var(--x, 50vw) var(--y, 50vh), black 100%, transparent 100%);
+}
+.lumos-dust {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 235, 160, 0.55);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(0.5px);
+  animation: floatDust 4s infinite linear;
+}
+@keyframes floatDust {
+  0% { transform: translate3d(0, 0, 0) scale(0.8); opacity: 0; }
+  12% { opacity: 0.65; }
+  85% { opacity: 0.65; }
+  100% { transform: translate3d(var(--dx, 20px), var(--dy, -40px), 0) scale(1.3); opacity: 0; }
+}
+
+/* Revelio Depth-Warp animation */
+body.revelio-active #main-content {
+  animation: revelioWarp 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes revelioWarp {
+  0% { transform: scale(1); filter: blur(0px); }
+  20% { transform: scale(1.04); filter: blur(1.5px); }
+  55% { transform: scale(0.985); filter: blur(0.5px); }
+  100% { transform: scale(1); filter: blur(0px); }
+}
+
+
+/* ============================================================
+   🍷 PRIVATE "EYES ONLY" ENVELOPE THEME OVERRIDES
+   ============================================================ */
+#envelope.eyes-only {
+  background-color: #6b0d0d;
+}
+
+#envelope.eyes-only #env-back {
+  background: linear-gradient(160deg, #6b0d0d 0%, #520606 100%);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.5),
+    0 2px 8px  rgba(0,0,0,0.4),
+    inset 0 0 0 1px rgba(212, 175, 55, 0.35);
+}
+
+#envelope.eyes-only #env-flap-bottom {
+  background: linear-gradient(170deg, #5c0808 0%, #400404 100%);
+}
+
+#envelope.eyes-only #env-flap-left {
+  background: linear-gradient(100deg, #570707 0%, #4a0505 60%, #6b0d0d 100%);
+}
+
+#envelope.eyes-only #env-flap-right {
+  background: linear-gradient(260deg, #570707 0%, #4a0505 60%, #6b0d0d 100%);
+}
+
+#envelope.eyes-only #env-flap-top {
+  background: linear-gradient(180deg, #6b0d0d 0%, #570707 100%);
+}
+
+#envelope.eyes-only #env-flap-top-inner {
+  background: linear-gradient(180deg, #7a1212 0%, #5c0808 100%);
+}
+
+#envelope.eyes-only #env-seal {
+  background: radial-gradient(circle, #cc1414 0%, #800000 100%);
+  box-shadow: 
+    0 4px 12px rgba(0,0,0,0.6), 
+    inset 0 2px 4px rgba(255,255,255,0.25),
+    0 0 12px rgba(212,175,55,0.45);
+}
+
+#envelope.eyes-only #env-seal-letter {
+  color: #ffd700;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+}
+
+#envelope.eyes-only .env-address-to {
+  color: #ffeb80;
+}
+
+#envelope.eyes-only .env-address-name {
+  color: #fff8d6;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+#envelope.eyes-only .env-address-line2 {
+  color: #ffc4c4;
+}
+
+#envelope.eyes-only #env-letter {
+  background: linear-gradient(160deg, #fff2f2 0%, #ffe3e3 100%);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(212, 175, 55, 0.35);
+}
+
+#envelope.eyes-only .letter-line {
+  background: rgba(180, 50, 50, 0.25);
+}
+
+/* 🌹 Rosy Tint for Private Message Scroll Overlay */
+#scroll-overlay.eyes-only-modal #scroll-paper-bg {
+  background: radial-gradient(circle, #fff9f5 60%, #fae6de 100%) !important;
+  box-shadow: 
+    inset 0 0 40px rgba(180, 50, 50, 0.1),
+    0 24px 70px rgba(0, 0, 0, 0.7) !important;
+  border: 2px solid rgba(212, 175, 55, 0.45) !important;
+}
+
+#scroll-overlay.eyes-only-modal #scroll-close {
+  background: radial-gradient(circle, #cc1414 0%, #800000 100%) !important;
+  color: #ffd700 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+#scroll-overlay.eyes-only-modal .hogwarts-school-name {
+  color: #8a1313 !important;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+}
+
+#scroll-overlay.eyes-only-modal .hogwarts-divider {
+  color: #d4af37 !important;
+}
+
+
+/* 🔮 Spell Cast Popup Modal */
+#spell-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60000;
+  display: none;
+  align-items: flex-end;   /* Bottom sheet: anchored to bottom */
+  justify-content: center;
+  padding: 0;
+}
+
+#spell-modal.open {
+  display: flex;
+}
+
+#spell-modal-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 2, 1, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+#spell-modal-card {
+  position: relative;
+  z-index: 10;
+  background: radial-gradient(160% 100% at 50% 100%, #fcf4e0 70%, #eedeb3 100%);
+  border: 1px solid rgba(62, 39, 20, 0.16);
+  outline: 4px solid rgba(62, 39, 20, 0.04);
+  outline-offset: -5px;
+  border-bottom: none;
+  box-shadow:
+    0 -8px 45px rgba(0,0,0,0.55),
+    inset 0 0 25px rgba(255,255,255,0.45);
+  border-radius: 28px 28px 0 0;  /* Bottom sheet rounded top */
+  padding: 0.6rem 1.6rem 2.4rem;
+  padding-bottom: calc(2.4rem + env(safe-area-inset-bottom, 0px));
+  width: 100%;
+  max-width: 100vw;
+  text-align: center;
+  color: #3e2714;
+  transform: translateY(100%);  /* starts off-screen below */
+  transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  max-height: 92svh;
+  overflow-y: auto;
+}
+
+#spell-modal.open #spell-modal-card {
+  transform: translateY(0);
+}
+
+/* ── Bottom Sheet drag handle ── */
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(140, 112, 80, 0.35);
+  border-radius: 2px;
+  margin: 8px auto 14px;
+  flex-shrink: 0;
+}
+
+#spell-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  color: #8c7050;
+  font-size: 1.4rem;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  min-height: 50px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+#spell-modal-close:hover {
+  color: #740001;
+  transform: scale(1.15) rotate(90deg);
+}
+
+#spell-modal-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: clamp(1.15rem, 5vw, 1.5rem);
+  letter-spacing: 0.06em;
+  margin-bottom: 0.15rem;
+  margin-top: 0;
+  color: #520000;
+}
+
+.spell-modal-subtitle {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: clamp(0.78rem, 3.5vw, 0.92rem);
+  color: #6b4e33;
+  margin-bottom: 1.2rem;
+  margin-top: 0;
+}
+
+.spell-input-group {
+  display: flex;
+  background: #fdfaf0;
+  border: 2px solid #cbb88a;
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 1.2rem;
+  align-items: center;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.spell-input-group:focus-within {
+  border-color: var(--house-accent);
+  box-shadow: 0 0 0 3px var(--house-accent);
+}
+
+#spell-input-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Lora', serif;
+  font-size: clamp(1rem, 4.5vw, 1.2rem);
+  padding: 10px 14px;
+  color: #3e2714;
+  user-select: text;
+  -webkit-user-select: text;
+  /* Android keyboard push-up fix */
+  -webkit-tap-highlight-color: transparent;
+}
+
+#spell-input-field::placeholder {
+  color: #bfaea0;
+  font-style: italic;
+}
+
+#spell-cast-action {
+  background: radial-gradient(circle, #740001 0%, #520000 100%);
+  border: 1.5px solid #d4af37;
+  border-radius: 8px;
+  color: #ffd700;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.95rem; /* Larger button */
+  padding: 10px 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+#spell-cast-action:hover {
+  background: radial-gradient(circle, #8a0002 0%, #630000 100%);
+}
+
+#spell-cast-action:active {
+  transform: scale(0.96);
+}
+
+/* ✦ Categorized Scrollable Spell Helper Grid for Quick Tapping ✦ */
+.spell-help-container {
+  margin-top: 1.4rem;
+  border-top: 1px dashed rgba(140, 112, 80, 0.35);
+  padding-top: 1.2rem;
+  text-align: left;
+}
+
+.spell-help-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #740001;
+  text-align: center;
+  margin: 0 0 1rem 0;
+  letter-spacing: 0.05em;
+}
+
+.spell-help-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-height: 38svh;   /* more room on tall Android screens */
+  overflow-y: auto;
+  padding-right: 4px;
+  /* smooth native scroll on Android Chrome */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.spell-help-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.spell-help-grid::-webkit-scrollbar-thumb {
+  background: rgba(140, 112, 80, 0.35);
+  border-radius: 2px;
+}
+
+.spell-help-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: 1px solid rgba(212, 196, 154, 0.2);
+  padding-bottom: 0.6rem;
+}
+
+.spell-help-col:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.spell-cat {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #520000;
+  letter-spacing: 0.04em;
+}
+
+.spell-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.spell-tag {
+  position: relative;
+  background: #fdfaf0;
+  border: 1px solid rgba(203, 184, 138, 0.6);
+  border-radius: 20px;  /* pill shape — more modern on Android */
+  color: #5c3e21;
+  font-family: 'Lora', serif;
+  font-size: clamp(0.72rem, 3vw, 0.82rem);
+  padding: 6px 13px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;  /* suppress Android blue flash */
+  touch-action: manipulation;               /* no double-tap delay on Android */
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+}
+
+/* Expand touch target to 44px on mobile viewports for accessibility */
+.spell-tag::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+.spell-tag:hover {
+  background: var(--house-primary);
+  color: var(--house-accent);
+  border-color: var(--house-accent);
+  transform: translateY(-1.5px);
+}
+
+.spell-tag:active {
+  transform: translateY(0);
+}
+
+.spell-tag.elemental {
+  background: #edf8fd;
+  border-color: rgba(135, 206, 250, 0.75);
+  color: #0b519e;
+}
+
+.spell-tag.elemental:hover,
+.spell-tag.elemental:active {
+  background: #0b519e;
+  color: #fff;
+  border-color: #0b519e;
+}
+
+/* Amoris — pink love spell */
+.spell-tag.love {
+  background: #fff0f5;
+  border-color: rgba(255, 105, 135, 0.55);
+  color: #c0305a;
+}
+
+.spell-tag.love:hover,
+.spell-tag.love:active {
+  background: #c0305a;
+  color: #fff;
+  border-color: #c0305a;
+}
+
+/* Stellaris — deep celestial spell */
+.spell-tag.star {
+  background: #f2eeff;
+  border-color: rgba(120, 80, 220, 0.5);
+  color: #5b2db0;
+}
+
+.spell-tag.star:hover,
+.spell-tag.star:active {
+  background: #5b2db0;
+  color: #e8d9ff;
+  border-color: #5b2db0;
+}
+
+/* Mobile responsive spell modal overrides */
+@media (max-width: 768px) {
+  #spell-btn {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10, 8, 6, 0.92) !important;
+  }
+  #spell-modal-bg {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+  /* Input group full row on mobile */
+  .spell-input-group {
+    flex-direction: row;
+  }
+  #spell-cast-action {
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #spell-btn-text {
+    display: none !important;
+  }
+  
+  #spell-btn {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+  }
+  
+  .spell-icon {
+    font-size: 1.25rem;
+    margin: 0;
+    line-height: 1;
+  }
+}
+
+/* ============================================================
+   🔮 PREMIUM SPELL VISUALS & ANIMATIONS
+   ============================================================ */
+
+/* Wingardium Leviosa bobbing class - renamed or removed */
+
+/* Glacius frosted glass vignette overlay */
+body.frosted::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  border: 18px solid rgba(173, 216, 230, 0.35);
+  box-shadow: inset 0 0 110px rgba(135, 206, 250, 0.7);
+  pointer-events: none;
+  z-index: 9999;
+  animation: frostFadeIn 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes frostFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Revelio Sweep gold ring radar */
+#revelio-sweep {
+  position: fixed;
+  left: var(--x, 50vw);
+  top: var(--y, 50vh);
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  margin-top: -10px;
+  border-radius: 50%;
+  background: transparent;
+  border: 5px solid rgba(212, 175, 55, 0.85);
+  box-shadow: 0 0 45px rgba(212, 175, 55, 0.85), inset 0 0 45px rgba(212, 175, 55, 0.85);
+  pointer-events: none;
+  z-index: 9998;
+  animation: revelioWave 1.5s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+}
+@keyframes revelioWave {
+  0% { transform: scale(1); opacity: 1; border-width: 15px; }
+  100% { transform: scale(120); opacity: 0; border-width: 1px; }
+}
+
+
+
+/* Patronus Element Flight style */
+.patronus-element {
+  position: fixed;
+  top: 30vh;
+  left: -200px;
+  width: 180px;
+  height: 180px;
+  opacity: 0.88;
+  pointer-events: none;
+  z-index: 190;
+  filter: drop-shadow(0 0 16px rgba(224, 232, 255, 0.95)) drop-shadow(0 0 35px rgba(100, 180, 255, 0.8));
+  animation: patronusFlight 5.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes patronusFlight {
+  0% { left: -200px; transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-40px) scaleY(0.95); }
+  100% { left: 110vw; transform: translateY(10px) scaleY(1); }
+}
+
+/* ============================================================
+   🏺 3D REVELIO TREASURE CHEST SCENE
+   ============================================================ */
+
+#treasure-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 4, 2, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  perspective: 1500px;
+}
+#treasure-overlay:not(.hidden) {
+  opacity: 1;
+  pointer-events: auto;
+}
+#treasure-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 90%;
+  width: 380px;
+  transform-style: preserve-3d;
+}
+#treasure-close {
+  position: absolute;
+  top: -10px;
+  right: 15px;
+  background: rgba(36, 23, 10, 0.95);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  color: #F5E6C8;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.15rem;
+  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  z-index: 310;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#treasure-close:hover {
+  background: #740001;
+  border-color: #FFD700;
+  transform: scale(1.1) rotate(90deg);
+}
+
+/* Envelopes & hints transition swaps */
+#envelope-wrapper, #envelope-hint {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+#envelope-wrapper.hidden, #envelope-hint.hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: scale(0.9) translateY(20px);
+  display: none !important;
+}
+
+#treasure-chest-wrapper {
+  position: relative;
+  width: clamp(210px, 55vw, 290px);
+  height: clamp(145px, 38vw, 200px);
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  animation: env-float 6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  perspective: 1000px;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  transform-style: preserve-3d;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+#treasure-chest-wrapper.hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+}
+#treasure-chest-wrapper.shake {
+  animation: chestShake 0.45s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes chestShake {
+  10%, 90% { transform: translate3d(-3px, 0, 0) rotate(-1.5deg); }
+  20%, 80% { transform: translate3d(4px, 0, 0) rotate(2.5deg); }
+  30%, 50%, 70% { transform: translate3d(-5px, 0, 0) rotate(-3deg); }
+  40%, 60% { transform: translate3d(5px, 0, 0) rotate(3deg); }
+}
+
+#treasure-chest {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.chest-lid {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 38%;
+  background: linear-gradient(to bottom, #855325, #613C19);
+  border: 3px solid #331D08;
+  border-bottom: 5px solid #241405;
+  border-radius: 35px 35px 0 0;
+  transform-origin: bottom center;
+  transform-style: preserve-3d;
+  transition: transform 1.3s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 10;
+}
+.chest-handle {
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 12px;
+  border: 3px solid #DAA520;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+}
+.chest-metal-band-left, .chest-metal-band-right {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 15px;
+  background: linear-gradient(to right, #B8860B, #FFD700, #B8860B);
+  border-left: 1px solid #331D08;
+  border-right: 1px solid #331D08;
+}
+.chest-metal-band-left { left: 30px; }
+.chest-metal-band-right { right: 30px; }
+
+.chest-body {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%;
+  height: 62%;
+  background: linear-gradient(to bottom, #613C19, #40250D);
+  border: 3px solid #241405;
+  border-radius: 0 0 6px 6px;
+  transform-style: preserve-3d;
+  z-index: 5;
+}
+.chest-lock-plate {
+  position: absolute;
+  top: -8px; left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 34px;
+  background: linear-gradient(135deg, #DAA520, #B8860B);
+  border: 2px solid #241405;
+  border-radius: 4px;
+  z-index: 12;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+.chest-lock-plate::after {
+  content: '';
+  position: absolute;
+  bottom: 5px; left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 12px;
+  background: #110A03;
+  border-radius: 4px 4px 0 0;
+}
+
+#chest-padlock {
+  position: absolute;
+  top: 25%; left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 40px;
+  transform-style: preserve-3d;
+  z-index: 20;
+  transition: transform 0.9s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.8s ease;
+}
+.padlock-shackle {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  border: 4px solid #808080;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+}
+.padlock-body {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%;
+  height: 24px;
+  background: linear-gradient(to bottom, #C59B27, #80610D);
+  border: 1px solid #241405;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+/* Unlocked rotations */
+#treasure-chest.unlocked .chest-lid {
+  transform: rotateX(-115deg);
+}
+#treasure-chest.unlocked ~ #chest-padlock {
+  transform: translate(-50%, 180px) rotate(60deg) scale(0.7);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Secret Scroll within the chest overlay */
+#treasure-scroll {
+  width: min(390px, 84vw);
+  position: absolute;
+  top: 75px;
+  display: flex;
+  justify-content: center;
+  z-index: 25;
+  transition: transform 1.3s cubic-bezier(0.19, 1, 0.22, 1), opacity 1.1s ease;
+}
+#treasure-scroll.hidden-scroll {
+  transform: scale(0.3) translateY(240px);
+  opacity: 0;
+  pointer-events: none;
+}
+#treasure-scroll.show-scroll {
+  transform: scale(1) translateY(-40px);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scroll-paper-mini {
+  background-color: #F6E9CF;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent          26px,
+    rgba(139,101,55,0.06) 27px
+  );
+  border: 1px solid rgba(139, 101, 55, 0.45);
+  border-radius: 4px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.85), inset 0 0 35px rgba(180, 140, 80, 0.15);
+  padding: 2.2rem 2.0rem;
+  text-align: center;
+  max-height: 380px;
+  overflow-y: auto;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  color: #2E1B0A;
+  line-height: 1.8;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+.scroll-paper-mini::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-paper-mini::-webkit-scrollbar-thumb {
+  background: rgba(139, 101, 55, 0.3);
+  border-radius: 3px;
+}
+.scroll-header-mini {
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+  font-weight: bold;
+  color: #740001;
+  margin-bottom: 0.5rem;
+}
+.scroll-divider-mini {
+  font-size: 0.95rem;
+  color: #DAA520;
+  margin-bottom: 1.2rem;
+}
+.scroll-paper-mini p {
+  margin-bottom: 1.1rem;
+  font-size: 1.05rem;
+}
+
+/* ============================================================
+   🛡️ TOUCH DEACTIVATION BLOCKER & SPELL DIMMING
+   ============================================================ */
+
+#spell-touch-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: transparent;
+  pointer-events: auto !important;
+  cursor: wait;
+}
+
+/* Patronus dimming light overlay */
+body.patronus-active::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, rgba(128, 222, 234, 0.15) 0%, rgba(5, 20, 30, 0.65) 100%);
+  pointer-events: none;
+  z-index: 175;
+  animation: patronusDimPulse 0.3s infinite alternate ease-in-out;
+}
+@keyframes patronusDimPulse {
+  0% { opacity: 0.85; }
+  100% { opacity: 0.95; }
+}
+
+/* 3 Patronus Animals Flying paths */
+.patronus-element.stag {
+  top: 24vh;
+  animation: patronusFlightStag 6.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+.patronus-element.otter {
+  top: 48vh;
+  animation: patronusFlightOtter 6.5s cubic-bezier(0.25, 1, 0.5, 1) 1.2s forwards;
+}
+.patronus-element.owl {
+  top: 10vh;
+  animation: patronusFlightOwl 6.5s cubic-bezier(0.25, 1, 0.5, 1) 2.4s forwards;
+}
+
+@keyframes patronusFlightStag {
+  0% { left: -200px; transform: translateY(0) scale(0.9); }
+  50% { transform: translateY(-30px) scale(0.95); }
+  100% { left: 110vw; transform: translateY(10px) scale(1); }
+}
+@keyframes patronusFlightOtter {
+  0% { left: -200px; transform: translateY(0) scale(0.7) rotate(-5deg); }
+  50% { transform: translateY(20px) scale(0.75) rotate(5deg); }
+  100% { left: 110vw; transform: translateY(-10px) scale(0.8) rotate(0); }
+}
+@keyframes patronusFlightOwl {
+  0% { left: -200px; transform: translateY(0) scale(0.8) rotate(15deg); }
+  50% { transform: translateY(-50px) scale(0.85) rotate(-10deg); }
+  100% { left: 110vw; transform: translateY(20px) scale(0.9) rotate(0); }
+}
+
+/* Glacius freezing style overrides */
+body.frozen-lock #envelope-wrapper,
+body.frozen-lock #treasure-chest-wrapper,
+body.frozen-lock button:not(#spell-touch-blocker),
+body.frozen-lock h1,
+body.frozen-lock h2,
+body.frozen-lock h3,
+body.frozen-lock p,
+body.frozen-lock .badge-img,
+body.frozen-lock #scroll-paper {
+  filter: saturate(0.15) contrast(1.15) brightness(1.2) drop-shadow(0 0 14px rgba(135, 206, 250, 0.9)) !important;
+  color: #E0F7FA !important;
+  border-color: #B2EBF2 !important;
+  text-shadow: 0 0 10px rgba(173, 216, 230, 0.85) !important;
+  transition: filter 1.2s ease, color 1.2s ease, border-color 1.2s ease, transform 1.2s ease !important;
+  transform: scale(0.97) !important; /* icy contraction */
+}
+
+/* Confundo confusion rotation */
+body.confundo-running #envelope-wrapper,
+body.confundo-running #treasure-chest-wrapper,
+body.confundo-running #scroll-paper,
+body.confundo-running h1,
+body.confundo-running h2 {
+  animation: confundoSpin 2.5s ease-in-out infinite alternate;
+}
+@keyframes confundoSpin {
+  0% { transform: rotate(-3deg) scale(0.98); filter: blur(0.5px); }
+  50% { transform: rotate(3deg) scale(1.02); filter: blur(1.5px); }
+  100% { transform: rotate(-2deg) scale(0.97); filter: blur(0px); }
+}
+
+/* Accio element flight */
+body.accio-flying-in #envelope-wrapper,
+body.accio-flying-in #treasure-chest-wrapper,
+body.accio-flying-in #scroll-paper {
+  animation: accioShake 0.4s ease infinite;
+}
+@keyframes accioShake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(0px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(2px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(2px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+/* Depulso element push */
+body.depulso-flying #envelope-wrapper,
+body.depulso-flying #treasure-chest-wrapper,
+body.depulso-flying #scroll-paper {
+  animation: depulsoPush 1.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+@keyframes depulsoPush {
+  0% { transform: scale(1) translate3d(0, 0, 0); opacity: 1; }
+  30% { transform: scale(0.85) translate3d(0, 40px, 0); opacity: 0.9; }
+  100% { transform: scale(1.6) translate3d(0, -600px, 0); opacity: 0; }
+}
+
+/* ============================================================
+   🌟 UPGRADED SPELL SYSTEM: PATRONUS, INCENDIO & AGUAMENTI
+   ============================================================ */
+
+.patronus-element {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 16px rgba(0, 191, 255, 0.95)) drop-shadow(0 0 35px rgba(30, 144, 255, 0.85)) brightness(1.2);
+}
+
+.patronus-element.stag {
+  background-image: url('images/patronus_stag.png');
+}
+.patronus-element.otter {
+  background-image: url('images/patronus_otter.png');
+}
+.patronus-element.owl {
+  background-image: url('images/patronus_owl.png');
+}
+.patronus-element.wolf {
+  background-image: url('images/patronus_wolf.png');
+  top: 35vh;
+  animation: patronusFlightWolf 6.5s cubic-bezier(0.25, 1, 0.5, 1) 3.6s forwards;
+}
+.patronus-element.fox {
+  background-image: url('images/patronus_fox.png');
+  top: 18vh;
+  animation: patronusFlightFox 6.5s cubic-bezier(0.25, 1, 0.5, 1) 4.8s forwards;
+}
+.patronus-element.cat {
+  background-image: url('images/patronus_cat.png');
+  top: 55vh;
+  animation: patronusFlightCat 6.5s cubic-bezier(0.25, 1, 0.5, 1) 6.0s forwards;
+}
+
+@keyframes patronusFlightWolf {
+  0% { left: -200px; transform: translateY(0) scale(0.85); }
+  50% { transform: translateY(-10px) scale(0.9); }
+  100% { left: 110vw; transform: translateY(20px) scale(0.85); }
+}
+@keyframes patronusFlightFox {
+  0% { left: -200px; transform: translateY(0) scale(0.75) rotate(5deg); }
+  50% { transform: translateY(-30px) scale(0.8) rotate(-5deg); }
+  100% { left: 110vw; transform: translateY(10px) scale(0.75) rotate(0); }
+}
+@keyframes patronusFlightCat {
+  0% { left: -200px; transform: translateY(0) scale(0.7) rotate(-10deg); }
+  50% { transform: translateY(30px) scale(0.75) rotate(10deg); }
+  100% { left: 110vw; transform: translateY(-10px) scale(0.7) rotate(0); }
+}
+
+/* Wingardium Leviosa float upward animation */
+body.levitation-running #envelope-wrapper,
+body.levitation-running #treasure-chest-wrapper,
+body.levitation-running button:not(#spell-touch-blocker),
+body.levitation-running h1,
+body.levitation-running h2,
+body.levitation-running h3,
+body.levitation-running p,
+body.levitation-running .badge-img,
+body.levitation-running #scroll-paper {
+  pointer-events: none !important;
+}
+
+body.levitation-running h1 {
+  animation: levitateH1 7.2s cubic-bezier(0.55, 0, 0.55, 0.2) forwards !important;
+}
+body.levitation-running h2,
+body.levitation-running h3 {
+  animation: levitateH23 7.0s cubic-bezier(0.55, 0, 0.55, 0.2) 0.3s forwards !important;
+}
+body.levitation-running #envelope-wrapper,
+body.levitation-running #treasure-chest-wrapper {
+  animation: levitateChest 7.5s cubic-bezier(0.55, 0, 0.55, 0.2) 0.6s forwards !important;
+}
+body.levitation-running p {
+  animation: levitateP 6.8s cubic-bezier(0.55, 0, 0.55, 0.2) 1.0s forwards !important;
+}
+body.levitation-running button:not(#spell-touch-blocker) {
+  animation: levitateBtn 6.5s cubic-bezier(0.55, 0, 0.55, 0.2) 1.3s forwards !important;
+}
+body.levitation-running .badge-img {
+  animation: levitateBadge 7.3s cubic-bezier(0.55, 0, 0.55, 0.2) 0.5s forwards !important;
+}
+body.levitation-running #scroll-paper {
+  animation: levitateScroll 7.8s cubic-bezier(0.55, 0, 0.55, 0.2) forwards !important;
+}
+
+@keyframes levitateH1 {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(6deg); }
+}
+@keyframes levitateH23 {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(-5deg); }
+}
+@keyframes levitateChest {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(10deg); }
+}
+@keyframes levitateP {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(-4deg); }
+}
+@keyframes levitateBtn {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(7deg); }
+}
+@keyframes levitateBadge {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(-9deg); }
+}
+@keyframes levitateScroll {
+  0% { transform: translateY(0) rotate(0); }
+  100% { transform: translateY(-130vh) rotate(5deg); }
+}
+
+/* Wingardium Leviosa dimming light overlay */
+body.levitation-running::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 30, 0.4); /* 40% dim cool dark blue */
+  pointer-events: none;
+  z-index: 175;
+  animation: dimFadeIn 0.6s ease forwards;
+}
+
+/* Incendio dimming light overlay - Optimized box-shadow animation using opacity to run at 60fps on Android */
+body.incendio-running::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  box-shadow: inset 0 0 100px rgba(255, 69, 0, 0.65);
+  background: radial-gradient(circle, rgba(255, 69, 0, 0.15) 0%, rgba(20, 5, 0, 0.68) 100%);
+  pointer-events: none;
+  z-index: 175;
+  animation: fireDimPulse 0.25s infinite alternate ease-in-out;
+  will-change: opacity;
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes fireDimPulse {
+  0% { opacity: 0.72; }
+  100% { opacity: 0.98; }
+}
+
+body.incendio-running {
+  box-shadow: inset 0 0 70px rgba(255, 69, 0, 0.4) !important;
+}
+
+/* Incendio burning visual overrides */
+body.incendio-running #envelope-wrapper,
+body.incendio-running #treasure-chest-wrapper,
+body.incendio-running #scroll-paper,
+body.incendio-running .badge-img {
+  filter: sepia(0.6) saturate(2.5) brightness(0.7) contrast(1.4) drop-shadow(0 0 20px #FF4500) !important;
+  border-color: #FF3000 !important;
+  box-shadow: 0 0 15px rgba(255, 69, 0, 0.8), inset 0 0 15px rgba(255, 69, 0, 0.6) !important;
+  animation: firePulse 0.15s infinite alternate !important;
+  transition: border-color 1s ease, transform 1s ease, box-shadow 1s ease !important;
+}
+body.incendio-running button:not(#spell-touch-blocker),
+body.incendio-running h1,
+body.incendio-running h2,
+body.incendio-running h3,
+body.incendio-running p {
+  color: #FF4500 !important;
+  text-shadow: 0 0 8px #FF8C00, 0 0 16px #FF4500 !important;
+  animation: fireTextPulse 0.15s infinite alternate !important;
+  transition: color 1s ease, text-shadow 1s ease !important;
+}
+
+@keyframes firePulse {
+  0% { box-shadow: 0 0 10px rgba(255, 69, 0, 0.6), inset 0 0 10px rgba(255, 69, 0, 0.4); }
+  100% { box-shadow: 0 0 20px rgba(255, 69, 0, 0.95), inset 0 0 20px rgba(255, 69, 0, 0.7); }
+}
+@keyframes fireTextPulse {
+  0% { text-shadow: 0 0 6px #FF8C00, 0 0 12px #FF4500; }
+  100% { text-shadow: 0 0 12px #FFD700, 0 0 24px #FF3000; }
+}
+
+/* Aguamenti dimming light overlay */
+body.aguamenti-running::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 8, 20, 0.5); /* 50% dim blue-black */
+  pointer-events: none;
+  z-index: 175;
+  animation: dimFadeIn 0.6s ease forwards;
+}
+
+/* Aguamenti element freezing overrides */
+body.aguamenti-running #envelope-wrapper,
+body.aguamenti-running #treasure-chest-wrapper,
+body.aguamenti-running #scroll-paper,
+body.aguamenti-running .badge-img {
+  filter: saturate(0.15) contrast(1.15) brightness(1.2) drop-shadow(0 0 14px rgba(135, 206, 250, 0.9)) !important;
+  border-color: #B2EBF2 !important;
+  transition: border-color 1.2s ease, transform 1.2s ease !important;
+  transform: scale(0.97) !important;
+}
+body.aguamenti-running button:not(#spell-touch-blocker),
+body.aguamenti-running h1,
+body.aguamenti-running h2,
+body.aguamenti-running h3,
+body.aguamenti-running p {
+  color: #E0F7FA !important;
+  text-shadow: 0 0 8px rgba(173, 216, 230, 0.85) !important;
+  transition: color 1.2s ease, text-shadow 1.2s ease !important;
+}
+
+/* Water Level overlay style */
+#water-level {
+  position: fixed;
+  left: 0; right: 0; bottom: -100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(10, 80, 180, 0.65), rgba(30, 144, 255, 0.45), rgba(0, 191, 255, 0.15));
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+  z-index: 180;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+#water-level.rising {
+  transform: translateY(-70vh); /* rise to cover 70% of viewport */
+  transition: transform 8s linear;
+}
+#water-level.falling {
+  transform: translateY(110vh); /* fall down off-screen */
+  transition: transform 2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+
+/* First definition of ice-overlay removed to resolve duplication. Placed lower in the file. */
+
+/* Glacius freezing visuals overrides */
+body.frozen-lock #envelope-wrapper,
+body.frozen-lock #treasure-chest-wrapper,
+body.frozen-lock #scroll-paper,
+body.frozen-lock .badge-img {
+  filter: saturate(0.2) brightness(0.9) contrast(1.1) drop-shadow(0 0 14px rgba(100, 180, 255, 0.6)) !important;
+  border-color: #B2EBF2 !important;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.45), inset 0 0 15px rgba(135, 206, 250, 0.3) !important;
+  transform: scale(0.96) !important;
+  transition: border-color 1.2s ease, box-shadow 1.2s ease, transform 1.2s ease !important;
+}
+
+body.frozen-lock h1,
+body.frozen-lock h2,
+body.frozen-lock h3 {
+  color: #e0f4ff !important;
+  text-shadow: 0 0 8px rgba(0, 191, 255, 0.8), 0 0 15px rgba(30, 144, 255, 0.5) !important;
+  transition: color 1.2s ease, text-shadow 1.2s ease !important;
+}
+
+body.frozen-lock p,
+body.frozen-lock #scroll-paper p,
+body.frozen-lock #scroll-message p,
+body.frozen-lock button:not(#spell-touch-blocker) {
+  color: #163e52 !important; /* dark frosty blue/teal for readability */
+  text-shadow: 0 0 4px rgba(135, 206, 250, 0.4) !important;
+  transition: color 1.2s ease, text-shadow 1.2s ease !important;
+}
+
+/* ==========================================================================
+   🪄 Four New Magic Spells (Confundo, Specialis Revelio, Accio, Depulso)
+   ========================================================================== */
+
+/* 1. Confundo (Confusion Charm) */
+body.confundo-running h1,
+body.confundo-running h2,
+body.confundo-running h3,
+body.confundo-running p,
+body.confundo-running button:not(#spell-touch-blocker),
+body.confundo-running #envelope-wrapper,
+body.confundo-running #treasure-chest-wrapper,
+body.confundo-running #scroll-paper,
+body.confundo-running .badge-img {
+  animation: confundoWobble 1.8s ease-in-out infinite alternate !important;
+  transform-origin: center !important;
+}
+
+@keyframes confundoWobble {
+  0% { transform: rotate(-4deg); }
+  50% { transform: rotate(3deg) scale(1.02); }
+  100% { transform: rotate(-3deg) scale(0.98); }
+}
+
+/* 2. Specialis Revelio (Scrutiny Spell) */
+#revelio-scan-line {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, transparent, #ffd700, #da70d6, #ffd700, transparent);
+  box-shadow: 0 0 20px 4px rgba(255, 215, 0, 0.8), 0 0 40px 8px rgba(218, 112, 214, 0.6);
+  z-index: 200;
+  pointer-events: none;
+  top: -10px;
+  will-change: transform;
+  animation: scanningSweep 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes scanningSweep {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(115vh); }
+}
+
+.revelio-pulse {
+  animation: elementPulse 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards !important;
+}
+
+@keyframes elementPulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px rgba(255, 215, 0, 0));
+  }
+  50% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 10px rgba(218, 112, 214, 0.8)) !important;
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px rgba(255, 215, 0, 0));
+  }
+}
+
+/* 3. Depulso (Banishing Charm) */
+body.depulso-running #envelope-wrapper,
+body.depulso-running #treasure-chest-wrapper,
+body.depulso-running button:not(#spell-touch-blocker),
+body.depulso-running h1,
+body.depulso-running h2,
+body.depulso-running h3,
+body.depulso-running p,
+body.depulso-running .badge-img,
+body.depulso-running #scroll-paper {
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.2s ease !important;
+}
+
+/* Quadrant-based translations for Depulso */
+body.depulso-running h1,
+body.depulso-running h2,
+body.depulso-running h3 {
+  transform: translate(-120vw, -120vh) rotate(-25deg) !important;
+}
+body.depulso-running .badge-img {
+  transform: translate(0, -120vh) rotate(15deg) !important;
+}
+body.depulso-running #envelope-wrapper {
+  transform: translate(-150vw, 10vh) rotate(-35deg) !important;
+}
+body.depulso-running #treasure-chest-wrapper {
+  transform: translate(150vw, -10vh) rotate(35deg) !important;
+}
+body.depulso-running #scroll-paper {
+  transform: translate(-120vw, 120vh) rotate(-15deg) !important;
+}
+body.depulso-running p {
+  transform: translate(0, 120vh) rotate(5deg) !important;
+}
+body.depulso-running button:not(#spell-touch-blocker) {
+  transform: translate(120vw, 120vh) rotate(45deg) !important;
+}
+
+/* 4. Accio (Summoning Charm) */
+body.accio-running #envelope-wrapper,
+body.accio-running #treasure-chest-wrapper,
+body.accio-running button:not(#spell-touch-blocker),
+body.accio-running h1,
+body.accio-running h2,
+body.accio-running h3,
+body.accio-running p,
+body.accio-running .badge-img,
+body.accio-running #scroll-paper {
+  transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease !important;
+}
+
+/* ==========================================================================
+   🪄 Android Optimized Spells Styling (Ventus, Duro, Fulgur, Pyra, etc.)
+   ========================================================================== */
+
+/* Duplicate sparkle-canvas definition removed. */
+
+/* 1. Ventus (Wind) */
+body.ventus-running #envelope-wrapper,
+body.ventus-running #treasure-chest-wrapper,
+body.ventus-running #scroll-paper,
+body.ventus-running h1,
+body.ventus-running h2 {
+  animation: ventusSway 3s ease-in-out infinite alternate !important;
+}
+@keyframes ventusSway {
+  0% { transform: rotate(-1deg) translateY(0); }
+  100% { transform: rotate(1.5deg) translateY(-5px); }
+}
+
+/* 2. Duro (Earth/Stone) */
+body.duro-running #envelope-wrapper,
+body.duro-running #treasure-chest-wrapper,
+body.duro-running #scroll-paper {
+  border-color: #5d4037 !important;
+  background: #d7ccc8 !important;
+  box-shadow: 0 10px 30px rgba(93, 64, 55, 0.4) !important;
+}
+body.duro-running h1,
+body.duro-running h2,
+body.duro-running p {
+  color: #4e342e !important;
+  text-shadow: 0 2px 2px rgba(0,0,0,0.15) !important;
+}
+
+/* Removed spells (caligo, solis, obscuro, cryo, polaris, fulgur) CSS cleaned up — these spells are no longer active */
+
+body.prisma-running h1,
+body.prisma-running h2 {
+  animation: prismaShift 5s linear infinite !important;
+}
+body.prisma-running * {
+  cursor: crosshair;
+}
+@keyframes prismaShift {
+  0%   { color: #ff5252; text-shadow: 0 0 12px #ff5252; }
+  16%  { color: #ff9800; text-shadow: 0 0 12px #ff9800; }
+  33%  { color: #ffeb3b; text-shadow: 0 0 12px #ffeb3b; }
+  50%  { color: #69f0ae; text-shadow: 0 0 12px #69f0ae; }
+  66%  { color: #40c4ff; text-shadow: 0 0 12px #40c4ff; }
+  83%  { color: #e040fb; text-shadow: 0 0 12px #e040fb; }
+  100% { color: #ff5252; text-shadow: 0 0 12px #ff5252; }
+}
+/* Prisma rainbow bands sweep across the background */
+body.prisma-running::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255,82,82,0.07) 0%,
+    rgba(255,152,0,0.07) 14%,
+    rgba(255,235,59,0.07) 28%,
+    rgba(105,240,174,0.07) 43%,
+    rgba(64,196,255,0.07) 57%,
+    rgba(224,64,251,0.07) 71%,
+    rgba(255,82,82,0.07) 85%,
+    rgba(255,152,0,0.07) 100%
+  );
+  background-size: 200% 200%;
+  animation: prismaBands 3s linear infinite;
+}
+@keyframes prismaBands {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 200%; }
+}
+
+/* 12. Chronos — Full vintage black & white noise overlay */
+#chronos-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 155;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  background: rgba(0, 0, 0, 0.05);
+}
+#chronos-overlay.active {
+  opacity: 0.25;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.7) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 80% 40%, rgba(0,0,0,0.8) 1.2px, transparent 1.2px),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.6) 1.8px, transparent 1.8px),
+    linear-gradient(rgba(0,0,0,0.15) 50%, transparent 50%);
+  background-size: 300px 300px, 250px 250px, 350px 350px, 100% 4px;
+  animation: chronosNoise 0.25s steps(4) infinite;
+}
+@keyframes chronosNoise {
+  0% { background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px; }
+  25% { background-position: 50px 100px, -30px 40px, 80px -120px, 0px 1px; }
+  50% { background-position: -80px 40px, 120px -80px, -40px 60px, 0px -1px; }
+  75% { background-position: 110px -50px, -60px 120px, 50px 80px, 0px 2px; }
+  100% { background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px; }
+}
+body.chronos-running {
+  filter: grayscale(100%) contrast(1.1) brightness(0.95);
+  transition: filter 0.8s ease;
+}
+body.chronos-running h1,
+body.chronos-running h2,
+body.chronos-running h3,
+body.chronos-running p,
+body.chronos-running span,
+body.chronos-running div,
+body.chronos-running button {
+  font-family: 'IM Fell English', serif !important;
+  letter-spacing: 0.03em;
+}
+/* For light parchment scrolls, force dark ink */
+body.chronos-running #scroll-paper,
+body.chronos-running #scroll-paper h1,
+body.chronos-running #scroll-paper h2,
+body.chronos-running #scroll-paper h3,
+body.chronos-running #scroll-paper p,
+body.chronos-running #scroll-paper span,
+body.chronos-running .scroll-paper-mini,
+body.chronos-running .scroll-paper-mini h1,
+body.chronos-running .scroll-paper-mini h2,
+body.chronos-running .scroll-paper-mini h3,
+body.chronos-running .scroll-paper-mini p,
+body.chronos-running .scroll-paper-mini span {
+  color: #1a1a1a !important;
+  text-shadow: none !important;
+}
+/* For dark background areas, explicitly style light text to maintain high contrast */
+body.chronos-running #main-content,
+body.chronos-running #main-content p,
+body.chronos-running #main-content h1,
+body.chronos-running #main-content h2,
+body.chronos-running #main-content span,
+body.chronos-running #house-selector-overlay,
+body.chronos-running #house-selector-overlay h1,
+body.chronos-running #house-selector-overlay h2,
+body.chronos-running #house-selector-overlay h3,
+body.chronos-running #house-selector-overlay span {
+  color: #e8e8e8 !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
+}
+body.chronos-running #scroll-paper {
+  border: 3px double #111 !important;
+  background: #fcfbf8 !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 50px rgba(0,0,0,0.15) !important;
+}
+body.chronos-running #hero-friend-name {
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.3) !important;
+}
+body.chronos-running #sparkle-canvas {
+  filter: brightness(0.85);
+}
+
+
+/* ══════════════════════════════════════════════
+   💕 AMORIS — Floating Hearts Spell
+   ══════════════════════════════════════════════ */
+
+@keyframes heart-float {
+  0%   { transform: translateY(0) scale(0.8) rotate(-8deg); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 0.7; }
+  100% { transform: translateY(-90vh) scale(1.3) rotate(12deg); opacity: 0; }
+}
+
+.amoris-heart {
+  position: absolute;
+  font-size: clamp(1.2rem, 4vw, 2.2rem);
+  pointer-events: none;
+  animation: heart-float linear forwards;
+  will-change: transform, opacity;
+}
+
+body.amoris-running {
+  --sparkle-tint: rgba(255, 150, 180, 0.45);
+}
+
+/* ══════════════════════════════════════════════
+   ✨ STELLARIS — Starry Night Spell
+   ══════════════════════════════════════════════ */
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.7); }
+  50%       { opacity: 1;   transform: scale(1.2); }
+}
+
+@keyframes shooting-star {
+  0%   { transform: translate(0, 0) rotate(-30deg) scaleX(0); opacity: 0; }
+  5%   { opacity: 1; transform: translate(0, 0) rotate(-30deg) scaleX(1); }
+  100% { transform: translate(200px, 120px) rotate(-30deg) scaleX(0.5); opacity: 0; }
+}
+
+.stellaris-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  pointer-events: none;
+  animation: star-twinkle ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.stellaris-shooter {
+  position: absolute;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.9), transparent);
+  pointer-events: none;
+  animation: shooting-star ease-in forwards;
+  will-change: transform, opacity;
+}
+
+body.stellaris-running {
+  --sparkle-tint: rgba(140, 100, 255, 0.4);
+}
+
+body.stellaris-running #main-content,
+body.stellaris-running #envelope-wrapper {
+  filter: brightness(0.82) saturate(0.7) hue-rotate(220deg);
+  transition: filter 1.2s ease;
+}
+
+/* ── Fumos Mist Canvas (styled in JS, just ensure z-index stacking) ── */
+#fumos-canvas {
+  z-index: 160;
+}
+
+/* ── Glacius Ice Canvas ── */
+#glacius-canvas {
+  z-index: 161;
+}
+
+/* ── Herbivicus Botanical Border ── */
+#herbivicus-border {
+  position: fixed;
+  inset: 0;
+  z-index: 158;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  will-change: opacity;
+  box-shadow: inset 0 0 35px rgba(34, 139, 34, 0.4), inset 0 0 100px rgba(0, 100, 0, 0.2);
+  border: 12px solid transparent;
+  border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0,30 Q15,5 30,30 T60,30' fill='none' stroke='%231B5E20' stroke-width='2'/%3E%3Cpath d='M15,18 Q8,8 2,15 C5,25 22,25 22,18 Z' fill='%234CAF50'/%3E%3Cpath d='M45,42 Q38,32 32,39 C35,49 52,49 52,42 Z' fill='%2381C784'/%3E%3C/svg%3E") 20 repeat;
+}
+#herbivicus-border.active {
+  opacity: 1;
+}
+/* Subtle glow on text during herbivicus */
+body.herbivicus-running h1,
+body.herbivicus-running h2 {
+  text-shadow: 0 0 16px rgba(100, 200, 100, 0.7),
+               0 2px 4px rgba(0,0,0,0.8) !important;
+  transition: text-shadow 0.5s ease;
+}
+body.herbivicus-running #scroll-paper {
+  border-color: #66bb6a !important;
+  box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), inset 0 0 30px rgba(160, 230, 130, 0.08) !important;
+}
+/* Leaf/plant decorations on text during Herbivicus */
+body.herbivicus-running h1::after,
+body.herbivicus-running h2::after {
+  content: '';
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background-image: url('herbivicus_leaf.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-left: 8px;
+  vertical-align: middle;
+  opacity: 0.85;
+}
+body.herbivicus-running p::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-image: url('herbivicus_leaf.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-right: 6px;
+  vertical-align: middle;
+  opacity: 0.8;
+}
+body.herbivicus-running #scroll-paper::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 45px;
+  height: 45px;
+  background-image: url('herbivicus_leaf.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 5;
+  opacity: 0.9;
+  transform: rotate(-30deg);
+}
+body.herbivicus-running #scroll-paper::after {
+  content: '';
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 45px;
+  height: 45px;
+  background-image: url('herbivicus_leaf.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 5;
+  opacity: 0.9;
+  transform: rotate(150deg);
+}
+
+/* ── Duro Stone Border ── */
+#duro-border {
+  position: fixed;
+  inset: 0;
+  z-index: 157;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  will-change: opacity;
+  transform: translate3d(0,0,0);
+}
+#duro-border.active {
+  opacity: 0.9;
+}
+body.duro-running h1,
+body.duro-running h2 {
+  text-shadow: 2px 2px 0 rgba(80,60,40,0.7),
+               0 0 12px rgba(141,110,99,0.5) !important;
+  color: #bcaaa4 !important;
+}
+body.duro-running #scroll-paper {
+  border-color: #8d6e63 !important;
+  box-shadow: 0 0 18px rgba(141,110,99,0.5), inset 0 0 0 2px rgba(141,110,99,0.15) !important;
+}
+
+/* ── Incendio Fire Strip ── */
+#incendio-strip {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: clamp(80px, 18vh, 160px);
+  z-index: 156;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80' viewBox='0 0 120 80'%3E%3Cpath d='M0 80 L0 50 Q15 20 30 55 T60 40 T90 55 T120 45 L120 80 Z' fill='%23FF3D00' opacity='0.85'/%3E%3Cpath d='M0 80 L0 60 Q20 35 40 65 T80 50 T120 60 L120 80 Z' fill='%23FF8A00' opacity='0.75'/%3E%3Cpath d='M0 80 L0 68 Q25 48 50 72 T100 58 L120 70 L120 80 Z' fill='%23FFD700' opacity='0.65'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom center;
+  background-size: 180px 100%;
+  opacity: 0;
+  transform: translateY(30px) translate3d(0,0,0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+#incendio-strip.active {
+  opacity: 1;
+  transform: translateY(0) translate3d(0,0,0);
+  animation: fireFlicker 0.15s infinite alternate ease-in-out;
+}
+@keyframes fireFlicker {
+  0%   { filter: brightness(0.92) saturate(1.0) scaleY(0.98); }
+  100% { filter: brightness(1.18) saturate(1.25) scaleY(1.05); }
+}
+body.incendio-running #main-content {
+  padding-bottom: calc(9rem + var(--sab));
+}
+
+/* ── Accio Card Summon Animation ── */
+#accio-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 170;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1) translate3d(0,0,0);
+  opacity: 0;
+  display: none;
+  width: clamp(180px, 45vw, 280px);
+  height: auto;
+  will-change: transform, opacity, filter;
+  transition: opacity 0.3s ease;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+.accio-gold-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(255,215,0,0) 30%,
+    rgba(255,215,0,0.22) 45%,
+    rgba(255,255,255,0.45) 50%,
+    rgba(255,215,0,0.22) 55%,
+    rgba(255,215,0,0) 70%
+  );
+  background-size: 200% 200%;
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+  z-index: 5;
+  animation: goldSheen 4.5s infinite linear;
+}
+@keyframes goldSheen {
+  0% { background-position: -200% -200%; }
+  100% { background-position: 200% 200%; }
+}
+#accio-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow:
+    0 0 40px rgba(255, 220, 100, 0.8),
+    0 0 80px rgba(255, 200, 50, 0.4),
+    0 20px 60px rgba(0,0,0,0.6);
+}
+#accio-card.accio-fly-in {
+  animation: accioFlyIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+#accio-card.accio-fall {
+  animation: accioFall 0.9s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+@keyframes accioFlyIn {
+  0% {
+    transform: translate(-50%, -50%) scale(0.01) translateZ(0);
+    filter: brightness(4) blur(18px);
+    opacity: 0.2;
+  }
+  60% {
+    filter: brightness(1.3) blur(2px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) translateZ(0);
+    filter: brightness(1) blur(0px);
+    opacity: 1;
+  }
+}
+@keyframes accioFall {
+  0% {
+    transform: translate(-50%, -50%) scale(1) translateZ(0);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  40% {
+    transform: translate(-50%, 80vh) scale(0.7) rotate(20deg) translateZ(0);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, 200vh) scale(0.3) rotate(45deg) translateZ(0);
+    opacity: 0;
+    filter: brightness(0.5) blur(6px);
+  }
+}
+
+/* ── Ventus Cyclone Text Effect ── */
+body.ventus-running #hero-friend-name,
+body.ventus-running h2,
+body.ventus-running #tagline {
+  animation: ventusSwirl 2s ease-in-out infinite !important;
+}
+@keyframes ventusSwirl {
+  0%   { transform: translateX(0) skewX(0deg); filter: blur(0); }
+  25%  { transform: translateX(-6px) skewX(-4deg); filter: blur(0.5px); }
+  50%  { transform: translateX(8px) skewX(3deg); filter: blur(0); }
+  75%  { transform: translateX(-4px) skewX(-2deg); }
+  100% { transform: translateX(0) skewX(0deg); filter: blur(0); }
+}
+body.ventus-running #video-bg {
+  animation: ventusShake 0.3s ease-in-out infinite;
+}
+@keyframes ventusShake {
+  0%  { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+  100%{ transform: translateX(0); }
+}
+body.ventus-running #sparkle-canvas {
+  animation: ventusWhoosh 1.5s ease-in-out infinite alternate;
+}
+@keyframes ventusWhoosh {
+  0%   { transform: scaleX(1); }
+  100% { transform: scaleX(1.04) translateX(6px); }
+}
+
+/* ── Fumos running body state ── */
+body.fumos-running #scroll-paper {
+  border-color: rgba(180, 200, 220, 0.5) !important;
+}
+
+/* ── Glacius Ice Freeze Effect ── */
+body.frozen-lock #scroll-paper {
+  border-color: #80deea !important;
+  box-shadow: 0 0 20px rgba(128, 222, 234, 0.5), inset 0 0 30px rgba(200, 240, 255, 0.1) !important;
+}
+body.frozen-lock h1 {
+  text-shadow: 0 0 12px rgba(128, 222, 234, 0.7), 2px 2px 0 rgba(100, 200, 230, 0.3) !important;
+  color: #b2ebf2 !important;
+}
+#ice-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 185; /* Must be above ice particles from sparkle canvas (150) but below Glacius scratch canvas (161) - reviewed */
+  opacity: 0;
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      rgba(200, 230, 255, 0.03) 0px,
+      rgba(200, 230, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(180, 220, 255, 0.02) 0px,
+      rgba(180, 220, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    radial-gradient(circle, rgba(255,255,255,0) 25%, rgba(200,240,255,0.18) 60%, rgba(100,180,240,0.45) 100%);
+  box-shadow: inset 0 0 100px rgba(70,130,180,0.5);
+  backdrop-filter: blur(2.5px) saturate(0.3) contrast(1.1);
+  -webkit-backdrop-filter: blur(2.5px) saturate(0.3) contrast(1.1);
+  transition: opacity 0.8s ease;
+  will-change: opacity;
+  transform: translate3d(0, 0, 0);
+}
+#ice-overlay.frozen {
+  opacity: 1;
+}
+
+/* ── Prisma Flying Box ── */
+#prisma-box {
+  position: fixed;
+  width: 90px;
+  height: 90px;
+  bottom: -120px;
+  right: -120px;
+  z-index: 156;
+  pointer-events: none;
+  border: 3px solid transparent;
+  border-image: linear-gradient(135deg, #ff5252, #ff9800, #ffeb3b, #69f0ae, #40c4ff, #e040fb) 1;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.25), inset 0 0 15px rgba(255, 255, 255, 0.15);
+  display: none;
+  transform: rotate(0deg);
+}
+body.prisma-running #prisma-box {
+  display: block;
+  animation: prismaBoxMove 8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+@keyframes prismaBoxMove {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.6);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    scale: 1;
+  }
+  90% {
+    opacity: 1;
+    scale: 1;
+  }
+  100% {
+    transform: translate(-125vw, -125vh) rotate(720deg) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* Amoris Dynamic Heart Styling */
+.amoris-heart-dynamic {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  will-change: transform;
+  font-size: 20px;
+  filter: drop-shadow(0 4px 8px rgba(255, 105, 180, 0.45));
+}

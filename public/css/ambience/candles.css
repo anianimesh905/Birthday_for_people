@@ -1,0 +1,15 @@
+/* Floating candles */
+#ambient-candles-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.ambient-candle {
+  position: absolute;
+  width: 8px;
+  height: 25px;
+  background: rgba(255, 255, 245, 0.88);
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgba(255,255,240,0.5);
+}

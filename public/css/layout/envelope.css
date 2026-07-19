@@ -1,0 +1,376 @@
+   🦉 HOGWARTS OWL POST ENVELOPE (3D CONSTRUCTION)
+   ============================================================ */
+
+#envelope-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#envelope-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transform: translate3d(calc(var(--mx) * 0.08px), calc(var(--my) * 0.08px), 0);
+  transition: transform 0.1s ease-out;
+}
+
+#envelope-wrapper {
+  position: relative;
+  cursor: pointer;
+  padding: 14px;
+  -webkit-user-select: none;
+  user-select: none;
+  animation: env-float 6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  perspective: 600px;
+  will-change: transform;
+  transform: translate3d(0, 0, 0); /* GPU acceleration for Android Chrome */
+}
+
+#envelope-wrapper:active #envelope {
+  transform: scale(0.96);
+}
+
+@keyframes env-float {
+  0%   { transform: translateY(0px)   rotate(-1.5deg); }
+  25%  { transform: translateY(-8px)  rotate(-0.3deg); }
+  50%  { transform: translateY(-15px) rotate(1.8deg);  }
+  75%  { transform: translateY(-6px)  rotate(0.5deg);  }
+  100% { transform: translateY(0px)   rotate(-1.5deg); }
+}
+
+/* Outer envelope container */
+#envelope {
+  position: relative;
+  width:  clamp(200px, 52vw, 280px);
+  height: clamp(138px, 36vw, 193px);
+  background-color: #E8D5A3; /* aged-parchment envelope base */
+  transition: transform 0.2s ease;
+  overflow: hidden; /* contain owls and vignette */
+}
+
+/* Soft shadows */
+#env-shadow {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85%;
+  height: 20px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.45) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: shadow-pulse 6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+@keyframes shadow-pulse {
+  0%  , 100% { transform: translateX(-50%) scaleX(0.85); opacity: 0.45; }
+  50%        { transform: translateX(-50%) scaleX(0.7);  opacity: 0.28; }
+}
+
+/* Back flap join panel */
+#env-back {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #E8D5A3 0%, #dcd0aa 100%);
+  border-radius: 3px 3px 4px 4px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.4),
+    0 2px 8px  rgba(0,0,0,0.3),
+    inset 0 0 0 1px rgba(139,101,55,0.22);
+}
+
+/* Envelope peeking letter */
+#env-letter {
+  position: absolute;
+  bottom: 12%;
+  left: 12%;
+  right: 12%;
+  height: 65%;
+  background: linear-gradient(160deg, #fdf8eb 0%, #f7ecc5 100%);
+  border-radius: 2px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(210,170,80,0.3);
+  transform: translateY(100%);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  z-index: 1;
+}
+
+#env-letter-content {
+  padding: 18% 14% 10%;
+}
+.letter-line {
+  height: 2px;
+  background: rgba(160,120,60,0.3);
+  border-radius: 2px;
+  margin-bottom: 10%;
+}
+.l1 { width: 80%; }
+.l2 { width: 65%; }
+.l3 { width: 72%; }
+.l4 { width: 50%; }
+.letter-heart {
+  color: var(--house-accent, #c82010);
+  font-size: clamp(1rem, 4vw, 1.4rem);
+  text-align: right;
+  margin-top: 8%;
+}
+
+#envelope.open #env-letter {
+  transform: translateY(-28%);
+}
+
+/* 3D Envelope flaps details */
+#env-flap-bottom {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 55%;
+  clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+  background: linear-gradient(170deg, #dfd0ab 0%, #ccbe97 100%);
+  z-index: 2;
+}
+
+#env-flap-left {
+  position: absolute;
+  top: 0; left: 0;
+  width: 52%; height: 100%;
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+  background: linear-gradient(100deg, #d4c49a 0%, #ccbe97 60%, #E8D5A3 100%);
+  z-index: 3;
+}
+
+#env-flap-right {
+  position: absolute;
+  top: 0; right: 0;
+  width: 52%; height: 100%;
+  clip-path: polygon(100% 0%, 0% 50%, 100% 100%);
+  background: linear-gradient(260deg, #d4c49a 0%, #ccbe97 60%, #E8D5A3 100%);
+  z-index: 3;
+}
+
+#env-flap-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55%;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  background: linear-gradient(180deg, #E8D5A3 0%, #d4c49a 100%);
+  transform-origin: top center;
+  transform: rotateX(0deg);
+  transition: transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
+  z-index: 5;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+#env-flap-top-inner {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  background: linear-gradient(180deg, #ebdcb5 0%, #dfd0ab 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease 0.2s;
+}
+
+#env-flap-crease {
+  position: absolute;
+  bottom: 0;
+  left: 22%; right: 22%;
+  height: 1.5px;
+  background: rgba(140,100,40,0.3);
+  border-radius: 2px;
+}
+
+#envelope.open #env-flap-top {
+  transform: rotateX(-180deg);
+}
+#envelope.open #env-flap-top-inner {
+  opacity: 1;
+}
+
+/* ⚡ Watermark crest */
+.env-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 160px;
+  opacity: 0.04;
+  color: #5a3e2b;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  line-height: 1;
+}
+
+/* Cursive To: Address block */
+.env-address {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.env-address-to {
+  font-family: 'Dancing Script', cursive;
+  font-size: 0.85rem;
+  color: #3d2b1f;
+  opacity: 0.75;
+}
+
+.env-address-name {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2a1a0e;
+  line-height: 1.2;
+}
+
+.env-address-line2 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 0.95rem;
+  color: #3d2b1f;
+  opacity: 0.85;
+}
+
+/* Wax Seal on Envelope */
+#env-seal {
+  position: absolute;
+  top: calc(55% - 29px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--house-primary, #740001);
+  border: 2px solid var(--house-accent, #D3A625);
+  box-shadow:
+    inset 0 0 0 3px rgba(0,0,0,0.2),
+    0 4px 12px rgba(0,0,0,0.5),
+    0 2px 4px rgba(0,0,0,0.3),
+    var(--house-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              opacity 0.5s ease,
+              box-shadow 0.4s ease,
+              border-color 0.4s ease,
+              background-color 0.4s ease;
+}
+
+#env-seal::before {
+  content: '';
+  position: absolute;
+  width: 72px;
+  height: 68px;
+  background: var(--house-primary, #740001);
+  opacity: 0.55;
+  border-radius: 48% 52% 60% 40% / 45% 55% 45% 55%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -46%);
+  z-index: -1;
+  filter: blur(2px);
+  transition: background-color 0.4s ease;
+}
+
+#env-seal-letter {
+  font-family: 'Cinzel', 'Palatino Linotype', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--house-accent, #D3A625);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  user-select: none;
+  position: relative;
+  z-index: 1;
+  transition: color 0.4s ease;
+}
+
+#envelope.open #env-seal {
+  transform: translateX(-50%) scale(0) rotate(25deg);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.55, 0, 1, 0.45), opacity 0.4s ease;
+}
+
+/* Aura glowing effect behind the envelope */
+#env-glow {
+  position: absolute;
+  inset: -30px;
+  border-radius: 16px;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 55%,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 75%
+  );
+  pointer-events: none;
+  animation: env-aura 4s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes env-aura {
+  0%,100% { opacity: 0.7; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.05); }
+}
+
+/* 🦉 Flying Owl Silhouettes */
+.env-owl {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 3;
+  will-change: left, opacity, transform;
+  transform: translate3d(0, 0, 0);
+}
+
+.owl-svg {
+  fill: #5a3e2b;
+  display: block;
+}
+
+.owl-1 { width: 22px; top: 18%; animation: owlDrift 10s linear infinite; }
+.owl-2 { width: 16px; top: 55%; animation: owlDrift 13s linear infinite 3s; }
+.owl-3 { width: 19px; top: 30%; animation: owlDrift  8s linear infinite 1.5s; }
+.owl-4 { width: 14px; top: 72%; animation: owlDrift 14s linear infinite 6s; }
+
+@keyframes owlDrift {
+  0%   { left: -30px;  opacity: 0;   }
+  5%   { opacity: 0.5; }
+  90%  { opacity: 0.5; }
+  100% { left: calc(100% + 40px); opacity: 0; }
+}
+
+.owl-delivering {
+  animation-duration: 0.8s !important;
+  opacity: 0.85 !important;
+}
+
+/* Envelope opening instructions text label */
+#envelope-hint {
+  font-family: 'Jost', sans-serif;
+  font-weight: 200;
+  font-size: clamp(0.6rem, 2.4vw, 0.7rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+  margin-top: clamp(0.7rem, 2.2vh, 1.2rem);
+  animation: pulse-hint 3.4s ease-in-out infinite;
+}
+
+@keyframes pulse-hint {
+  0%,100% { opacity: 0.4; }
+  50%      { opacity: 0.95; }
+}
+
+
+/* ============================================================

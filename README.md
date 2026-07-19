@@ -1,96 +1,85 @@
-# 🌅 Golden Summer Sunset — Birthday Website
+# Hogwarts Birthday Letter — Developer Edition
 
-A cinematic, clock-aware birthday website for your friend's special day.
+Welcome to the **Hogwarts Birthday Letter** project—a highly optimized, cinematic, clock-aware, and living interactive scrapbook themed after the wizarding world of Harry Potter. 
+
+This repository has been fully refactored from a monolithic codebase into a clean, modern, zero-dependency **ES6 modular architecture**. It features advanced Web Audio API synthesis, procedural HTML5 canvas particle engines, 3D CSS rendering layers, PWA capabilities, and fully adaptive soundscapes.
 
 ---
 
-## 📁 File Structure
+## ⚡ Quick Start
 
+1. **Clone the repository** to your local machine.
+2. **Launch a local server**. Because this project uses native ES6 modules, the browser requires standard CORS headers. You cannot run it by opening `index.html` directly via `file://`.
+   ```bash
+   # Run with Python (built-in)
+   python -m http.server 8000
+   
+   # Or run with Node.js (via serve)
+   npx serve .
+   ```
+3. **Open the browser** and navigate to `http://localhost:8000`.
+
+---
+
+## 📂 Documentation Directory
+
+To make it easy to extend, inspect, and contribute to this project, the developer documentation is divided into specialized manuals:
+
+- 🏗️ **[ARCHITECTURE.md](file:///c:/Users/anian/Downloads/IMP_2/New_birthday/ARCHITECTURE.md)**: Details the folder structure, module allocations, initialization sequence, and execution loops.
+- 🪄 **[FEATURES.md](file:///c:/Users/anian/Downloads/IMP_2/New_birthday/FEATURES.md)**: Explains the story timeline, animation pipeline, Web Audio synthesizers, environment controls, and accessibility implementations.
+- 🎨 **[ASSETS.md](file:///c:/Users/anian/Downloads/IMP_2/New_birthday/ASSETS.md)**: Lists media locations, formats, sizes, and requirements for sound/video streams.
+- 🤝 **[CONTRIBUTING.md](file:///c:/Users/anian/Downloads/IMP_2/New_birthday/CONTRIBUTING.md)**: Code guidelines and developer tutorials for adding new scenes, custom soundtracks, and magical creatures.
+- 📜 **[CHANGELOG.md](file:///c:/Users/anian/Downloads/IMP_2/New_birthday/CHANGELOG.md)**: Traces history of updates, refactor targets, and optimizations from initial layout drafts to production releases.
+
+---
+
+## ✏️ Customizing the Birthday Content
+
+All recipient parameters are isolated inside the global **`content.js`** file at the root. A non-technical user can edit this file safely without editing any application code.
+
+### Configuration Fields
+```javascript
+const BIRTHDAY_CONTENT = {
+  // SALUTATION DETAILS
+  friendName: "Ayushi Mishra",
+  friendAddressLine: "The Bedroom",
+  birthdayDate: "2 June",
+  senderName: "Ani",
+  tagline: "An owl arrived at midnight — this letter is for you…",
+
+  // THEME PARAMETERS
+  defaultHouse: "Slytherin", // "Gryffindor" | "Slytherin" | "Ravenclaw" | "Hufflepuff"
+  senderHouse: "Slytherin",
+
+  // MEDIA ASSET STREAM PATHS
+  gryffindorVideo: "videos/gryffindor.mp4",
+  slytherinVideo: "videos/slytherin.mp4",
+  ravenclawVideo: "videos/ravenclaw.mp4",
+  hufflepuffVideo: "videos/hufflepuff.mp4",
+  musicFile: "birthday.mp3",
+  musicLabel: "Wingardium Leviosa", // Song button label
+
+  // SCENE MESSAGES
+  slytherinMessage: `Dear Ayushi...`,
+  gryffindorMessage: `Dear Ayushi...`,
+  ravenclawMessage: `Dear Ayushi...`,
+  hufflepuffMessage: `Dear Ayushi...`,
+  eyesOnlyMessage: `Confidential message...`
+};
 ```
-birthday-site/
-├── index.html          ← Main website (don't need to edit)
-├── style.css           ← All styles and animations (don't need to edit)
-├── script.js           ← All interactivity (don't need to edit)
-├── content.js          ← ✏️ EDIT THIS — name, message, sender, etc.
-├── birthday-song.mp3   ← 🎵 ADD YOUR MUSIC FILE HERE (optional)
-├── vercel.json         ← Vercel deployment config
-└── README.md           ← This file
-```
 
 ---
 
-## ✏️ How to Personalise
+## 🚀 Deployment
 
-1. Open **`content.js`** in any text editor (Notepad, TextEdit, VS Code, etc.)
-2. Change the text between the `" "` quotes
-3. Save the file
+The project is structured to deploy static files instantly to any provider (Vercel, Netlify, GitHub Pages) without a build step.
 
-**That's it!** No coding required.
-
----
-
-## 🎵 Adding Background Music
-
-1. Find a birthday song or any .mp3 you like
-2. Rename the file to `birthday-song.mp3`
-3. Place it in the same folder as `index.html`
-4. In `content.js`, make sure `musicFile: "birthday-song.mp3"` is set
-
-> **Tip:** Royalty-free music sources: [pixabay.com/music](https://pixabay.com/music/), [freemusicarchive.org](https://freemusicarchive.org/)
-
----
-
-## 🚀 Deploy to Vercel (get a shareable link)
-
-### Option A — Vercel Web UI (easiest, no terminal)
-
-1. Go to [vercel.com](https://vercel.com) and create a free account
-2. Click **"Add New Project"**
-3. Choose **"Upload"** (drag & drop the entire `birthday-site` folder)
-4. Click **Deploy** — you'll get a live link in ~30 seconds! 🎉
-
-### Option B — Vercel CLI (terminal)
-
+### Vercel CLI
 ```bash
-# Install Vercel CLI (only once)
+# Install Vercel CLI globally
 npm install -g vercel
 
-# Go into the project folder
-cd birthday-site
-
-# Deploy
+# Deploy in production mode
 vercel --prod
 ```
-
-Follow the prompts. You'll get a URL like:
-`https://birthday-site-abc123.vercel.app`
-
-Share that link with your friend! 🎂
-
----
-
-## 🌅 Features
-
-- **Clock-aware sky** — automatically detects the viewer's local time
-  - Morning: bright blue sky with soft clouds
-  - Afternoon: warm golden hour hues
-  - Evening/Night: deep sunset oranges → purples → starry night with moon
-- **Live sky gradient** shifts smoothly and cinematically in real time
-- **Sun/Moon** that moves across the sky based on the hour
-- **3 layered animated ocean waves** with parallax depth
-- **Drifting clouds** at different speeds and heights
-- **Message in a Bottle** — tap to reveal the birthday scroll with smooth animation
-- **Animated seagulls** flying across periodically
-- **Sparkle cursor trail** on desktop
-- **Film grain texture** for a cinematic feel
-- **Background music** player (optional)
-- **Mobile-first** and fully responsive
-
----
-
-## 🛠 Technical Notes
-
-- Pure HTML + CSS + Vanilla JS — no frameworks, no npm, no build step
-- All animations are CSS-only (60fps smooth)
-- Fonts: Cormorant Garamond + Jost (Google Fonts)
-- Works offline after first load (except Google Fonts)
+When using Vercel, paths inside `vercel.json` are pre-configured to handle cache control headers for media streams.

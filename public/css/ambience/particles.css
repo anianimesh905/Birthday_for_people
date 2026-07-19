@@ -1,0 +1,16 @@
+   🎨 DYNAMIC SPARKLE CANVAS
+   ============================================================ */
+
+#sparkle-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 150; /* stack between content and letter scroll */
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+
+/* ============================================================

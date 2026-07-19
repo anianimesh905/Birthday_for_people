@@ -1,0 +1,10 @@
+/* Moon glow styling */
+#ambient-moon-glow {
+  position: absolute;
+  top: 5%;
+  right: 8%;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  z-index: 1;
+}

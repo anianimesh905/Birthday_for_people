@@ -1,0 +1,33 @@
+   ♿ ACCESSIBILITY FOCUS INDICATORS
+   ============================================================ */
+
+#envelope-wrapper:focus-visible {
+  outline: 3px solid var(--house-accent);
+  outline-offset: 8px;
+  border-radius: 8px;
+}
+#scroll-close:focus-visible {
+  outline: 3px solid var(--house-accent);
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+#music-btn:focus-visible {
+  outline: 3px solid var(--house-accent);
+  outline-offset: 4px;
+}
+
+/* Screen Reader Only — visually hidden but accessible to assistive tech */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ============================================================

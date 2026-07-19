@@ -1,0 +1,28 @@
+/* ============================================================
+   ⚡ HOGWARTS MASTER STYLESHEET ⚡
+   ============================================================ */
+
+/* ── 1. Base Layer ── */
+@import url('base/reset.css');
+@import url('base/variables.css');
+@import url('base/typography.css');
+@import url('base/animations.css');
+@import url('base/utilities.css');
+
+/* ── 2. Layout Layer ── */
+@import url('layout/app.css');
+@import url('layout/envelope.css');
+@import url('layout/parchment.css');
+@import url('layout/modal.css');
+@import url('layout/castle.css');
+@import url('layout/landing.css');
+@import url('layout/responsive.css');
+
+/* ── 3. Ambience Layer ── */
+@import url('ambience/fog.css');
+@import url('ambience/moon.css');
+@import url('ambience/candles.css');
+@import url('ambience/clouds.css');
+@import url('ambience/creatures.css');
+@import url('ambience/particles.css');
+@import url('ambience/weather.css');
