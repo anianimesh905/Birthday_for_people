@@ -45,6 +45,21 @@ function handleResize() {
 
 function handleVisibilityChange() {
   state.system.isVisible = !document.hidden;
+  const isHidden = document.hidden;
+  
+  const videos = document.querySelectorAll('video');
+  videos.forEach(v => {
+    if (isHidden) {
+      if (v.play && !v.paused) v.pause();
+    } else {
+      const isLetterOpen = document.body && document.body.classList.contains('letter-open');
+      const isLowPower = state.system && state.system.isLowPowerDevice;
+      const shouldPlay = !(isLetterOpen && isLowPower);
+      if (shouldPlay && v.play && v.paused) {
+        v.play().catch(() => {});
+      }
+    }
+  });
 }
 
 function handleFocus() {
@@ -104,6 +119,38 @@ export function initCentralEvents() {
     motionQuery.addListener((e) => {
       state.system.reducedMotion = e.matches;
     });
+  }
+
+  // MutationObserver to pause videos when the letter is open on low-power devices
+  if (typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          const isLetterOpen = document.body && document.body.classList.contains('letter-open');
+          const isLowPower = state.system && state.system.isLowPowerDevice;
+          if (isLetterOpen && isLowPower) {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(v => {
+              if (v.play && !v.paused) v.pause();
+            });
+          } else if (!isLetterOpen && !document.hidden && state.system.isVisible) {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(v => {
+              if (v.play && v.paused) {
+                v.play().catch(() => {});
+              }
+            });
+          }
+        }
+      });
+    });
+    if (document.body) {
+      observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      });
+    }
   }
 
   startPointerLerpLoop();

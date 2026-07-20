@@ -27,6 +27,11 @@ export function initParallax() {
       return;
     }
     
+    if (state.system.reducedMotion || state.system.isLowPowerDevice) {
+      requestAnimationFrame(updateParallax);
+      return;
+    }
+    
     // Read smoothed central pointer coordinates instead of registering a duplicate mousemove listener
     const cx = state.system.width / 2;
     const cy = state.system.height / 2;

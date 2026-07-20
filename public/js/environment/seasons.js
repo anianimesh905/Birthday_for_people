@@ -5,6 +5,9 @@ export function getSeason() {
          (month >= 8 && month <= 10) ? 'autumn' : 'winter';
 }
 
+const leafImg = new Image();
+leafImg.src = 'public/assets/particles/leaf.png';
+
 export class Petal {
   constructor() {
     this.x = 0;
@@ -93,10 +96,12 @@ export class Leaf {
     if (this.x > width + 20) this.x = -20;
   }
   draw(ctx) {
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.ellipse(this.x, this.y, this.size, this.size * 0.4, this.angle, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    ctx.globalAlpha = 0.72;
+    ctx.drawImage(leafImg, -this.size, -this.size, this.size * 2, this.size * 2);
+    ctx.restore();
   }
 }
 

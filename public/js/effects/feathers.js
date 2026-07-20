@@ -1,3 +1,6 @@
+const featherImg = new Image();
+featherImg.src = 'public/assets/creatures/feather.png';
+
 export class Feather {
   constructor() {
     this.x = 0;
@@ -38,19 +41,13 @@ export class Feather {
     ctx.save();
     ctx.translate(rx, this.y);
     ctx.rotate(this.angle);
-    ctx.fillStyle = `rgba(240, 240, 240, ${this.opacity})`;
+    ctx.globalAlpha = this.opacity;
     
-    ctx.beginPath();
-    ctx.ellipse(0, 0, this.size, this.size * 0.28, 0, 0, Math.PI * 2);
-    ctx.fill();
+    // Draw the image centered
+    const w = this.size * 2.8;
+    const h = w * 0.32; // aspect ratio approximation
+    ctx.drawImage(featherImg, -w / 2, -h / 2, w, h);
     
-    ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity * 1.5})`;
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(-this.size, 0);
-    ctx.lineTo(this.size, 0);
-    ctx.stroke();
-
     ctx.restore();
   }
 }

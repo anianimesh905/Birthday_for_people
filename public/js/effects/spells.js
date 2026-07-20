@@ -165,7 +165,7 @@ export function triggerPatronusFlight() {
     { type: 'otter', delay: 1200, top: 0.48, amp: -20 },
     { type: 'owl', delay: 2400, top: 0.10, amp: 50 },
     { type: 'wolf', delay: 3600, top: 0.35, amp: -10 },
-    { type: 'fox', delay: 4800, top: 0.18, amp: 30 },
+    { type: 'phoenix', delay: 4800, top: 0.18, amp: 30 },
     { type: 'cat', delay: 6000, top: 0.55, amp: -30 }
   ];
 

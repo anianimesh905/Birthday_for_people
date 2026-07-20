@@ -46,33 +46,42 @@ export function initAmbientAtmosphere() {
 
   const season = getSeason();
   const ambientParticles = [];
+  const lowPower = state.system.isLowPowerDevice;
+
   if (season === 'spring') {
-    for (let i = 0; i < 35; i++) ambientParticles.push(new Petal());
+    const count = lowPower ? 10 : 35;
+    for (let i = 0; i < count; i++) ambientParticles.push(new Petal());
   } else if (season === 'summer') {
-    for (let i = 0; i < 18; i++) ambientParticles.push(new Firefly());
-    for (let i = 0; i < 20; i++) ambientParticles.push(new MagicalDust());
+    const fireflyCount = lowPower ? 6 : 18;
+    const dustCount = lowPower ? 6 : 20;
+    for (let i = 0; i < fireflyCount; i++) ambientParticles.push(new Firefly());
+    for (let i = 0; i < dustCount; i++) ambientParticles.push(new MagicalDust());
   } else if (season === 'autumn') {
-    for (let i = 0; i < 30; i++) ambientParticles.push(new Leaf());
+    const count = lowPower ? 10 : 30;
+    for (let i = 0; i < count; i++) ambientParticles.push(new Leaf());
   } else {
-    for (let i = 0; i < 50; i++) ambientParticles.push(new Snowflake());
+    const count = lowPower ? 15 : 50;
+    for (let i = 0; i < count; i++) ambientParticles.push(new Snowflake());
   }
 
-  const feathersCount = 3;
+  const feathersCount = lowPower ? 1 : 3;
   const feathers = Array.from({ length: feathersCount }, () => new Feather());
 
   const smokeParticles = [];
-  const shootingStars = Array.from({ length: 2 }, () => new ShootingStar());
+  const shootingStars = Array.from({ length: lowPower ? 0 : 2 }, () => new ShootingStar());
 
   const hour = new Date().getHours();
-  let birdsCount = 2;
-  if (hour >= 5 && hour < 8) birdsCount = 5;
-  else if (hour >= 17 && hour < 20) birdsCount = 3;
-  else if (hour >= 20 || hour < 5) birdsCount = 1;
+  let birdsCount = 0;
+  if (!lowPower) {
+    if (hour >= 5 && hour < 8) birdsCount = 5;
+    else if (hour >= 17 && hour < 20) birdsCount = 3;
+    else if (hour >= 20 || hour < 5) birdsCount = 1;
+  }
 
   const activeBirds = Array.from({ length: birdsCount }, () => new Bird(hour >= 20 || hour < 5));
 
   const curiousOwl = new CuriousOwl();
-  const butterflies = Array.from({ length: 3 }, () => new GlowingButterfly(season));
+  const butterflies = Array.from({ length: lowPower ? 1 : 3 }, () => new GlowingButterfly(season));
   const whiteStag = new WhiteStag();
 
   updateTimeOfDayOverlay();
@@ -82,7 +91,7 @@ export function initAmbientAtmosphere() {
 
   const castleWindows = document.querySelectorAll(".castle-window");
   setInterval(() => {
-    if (document.hidden) return;
+    if (document.hidden || !state.system.isVisible) return;
     castleWindows.forEach(win => {
       if (Math.random() < 0.15) {
         win.classList.toggle("active");
@@ -93,15 +102,28 @@ export function initAmbientAtmosphere() {
   let currentWindTilt = 0;
   let targetWindTilt = 0;
   setInterval(() => {
-    if (document.hidden) return;
+    if (document.hidden || !state.system.isVisible) return;
     targetWindTilt = (Math.random() - 0.5) * 5.2;
   }, 1600);
 
-  function loop() {
-    if (document.hidden) {
+  let lastFrameTime = 0;
+  const fpsInterval = 1000 / 30; // 30 FPS target for low power
+
+  function loop(now) {
+    if (document.hidden || (state.system && !state.system.isVisible)) {
       requestAnimationFrame(loop);
       return;
     }
+
+    if (state.system && state.system.isLowPowerDevice) {
+      const elapsed = now - lastFrameTime;
+      if (elapsed < fpsInterval) {
+        requestAnimationFrame(loop);
+        return;
+      }
+      lastFrameTime = now - (elapsed % fpsInterval);
+    }
+
     currentWindTilt += (targetWindTilt - currentWindTilt) * 0.045;
     document.documentElement.style.setProperty("--wind-tilt", `${currentWindTilt.toFixed(2)}deg`);
     ctx.clearRect(0, 0, width, height);

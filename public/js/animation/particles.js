@@ -2,8 +2,8 @@ import { rand } from '../core/helpers.js';
 import { state } from '../core/state.js';
 
 const leafImg = new Image();
-leafImg.onerror = () => console.warn('herbivicus_leaf.png missing');
-leafImg.src = 'public/assets/images/herbivicus_leaf.png';
+leafImg.onerror = () => console.warn('leaf.png missing');
+leafImg.src = 'public/assets/particles/leaf.png';
 
 const pebbleImg = new Image();
 pebbleImg.onerror = () => console.warn('duro_pebble.png missing');
@@ -510,6 +510,11 @@ function drawLargeRainbowOverlay() {
 }
 
 function loop(now) {
+  if (document.hidden || (state.system && !state.system.isVisible)) {
+    isLoopRunning = false;
+    rafId = null;
+    return;
+  }
   const dt = Math.min((now - lastTime) / 1000, 0.1);
   lastTime = now;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -568,12 +573,19 @@ export function initMagicParticles(opts = {}) {
     ctx.scale(dpr, dpr);
     
     isMobile = window.innerWidth < 768;
-    state.spells.maxParticlesLimit = isMobile ? 60 : 120;
+    if (state.system && state.system.isLowPowerDevice) {
+      state.spells.maxParticlesLimit = isMobile ? 25 : 45;
+    } else {
+      state.spells.maxParticlesLimit = isMobile ? 60 : 120;
+    }
   }
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas, { passive: true });
 
   SPAWN_INTERVAL = isMobile ? 180 : 100;
+  if (state.system && state.system.isLowPowerDevice) {
+    SPAWN_INTERVAL = isMobile ? 320 : 200;
+  }
   palette = { ...PALETTES.gryffindor };
 
   window.addEventListener('houseChanged', (e) => {

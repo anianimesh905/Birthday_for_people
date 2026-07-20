@@ -2,6 +2,9 @@ import { DEFAULT_SIZES, PRELOADED_ASSETS } from '../core/constants.js';
 import { playCrackSound, transitionWindToAmbient, playOwlHoot } from '../audio/ambience.js';
 import { startWindAmbient } from '../audio/wind.js';
 
+const owlImg = new Image();
+owlImg.src = 'public/assets/creatures/owl.png';
+
 let _cinematicActive = false;
 
 export async function startPreloader() {
@@ -99,7 +102,7 @@ export async function startPreloader() {
   const activeVideoUrl = c[activeVideoId] || `assets/video/${activeHouse}.mp4`;
 
   const assets = [
-    { id: 'musicFile',       url: c.musicFile       || 'assets/audio/birthday.mp3' }
+    { id: 'musicFile',       url: c.musicFile       || 'public/assets/audio/music/birthday.mp3' }
   ].filter(asset => asset.url);
 
   assets.forEach(asset => {
@@ -368,27 +371,11 @@ export function startCinematicSequence() {
     ctx.translate(x, y);
     ctx.scale(isRight ? scale : -scale, scale);
     
-    ctx.fillStyle = 'rgba(8, 12, 24, 0.95)';
-    ctx.beginPath();
-    ctx.arc(12, -6, 9, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(15, -15);
-    ctx.lineTo(17, -8);
-    ctx.lineTo(11, -8);
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 20, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    const wingY = Math.sin(wingFlap) * 30;
-    ctx.quadraticCurveTo(-10, -25, -28, wingY);
-    ctx.quadraticCurveTo(-12, -4, 0, 0);
-    ctx.fill();
-
+    // Draw the high-res owl image centered
+    const w = 48;
+    const h = 48;
+    ctx.drawImage(owlImg, -w / 2, -h / 2, w, h);
+    
     ctx.restore();
   }
 

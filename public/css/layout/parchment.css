@@ -57,7 +57,8 @@
       transparent          26px,
       rgba(139,101,55,0.07) 27px
     ),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='parch'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23parch)' opacity='0.09'/%3E%3C/svg%3E");
+    url('../../assets/textures/parchments.png');
+  background-size: auto, cover;
   
   border        : 1px solid rgba(139, 101, 55, 0.35);
   box-shadow    : 0 2px 18px rgba(80, 50, 10, 0.25),
@@ -147,7 +148,8 @@
   left: 0; right: 0;
   height: 38px;
   background-color: #F5E6C8;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='parch'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23parch)' opacity='0.09'/%3E%3C/svg%3E");
+  background-image: url('../../assets/textures/parchments.png');
+  background-size: cover;
   filter: url(#deckle-edge);
   z-index: 3;
   transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.15);
@@ -188,21 +190,14 @@
   font-size       : clamp(0.7rem, 1.6vw, 0.92rem);
   font-weight     : 600;
   letter-spacing  : 0.12em;
-  color           : var(--house-accent, #740001);
-  text-shadow     : 0 1px 3px rgba(0,0,0,0.15);
+  background      : url('../../assets/textures/gold-foil.png') repeat !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color           : transparent !important;
+  text-shadow     : none !important;
   margin          : 0 0 0.25rem;
   line-height     : 1.4;
-  transition      : color 0.4s ease;
-}
-
-.theme-slytherin .hogwarts-school-name {
-  color: #1A472A !important; /* Slytherin dark green */
-  text-shadow: none;
-}
-
-.theme-ravenclaw .hogwarts-school-name {
-  color: #0E1A40 !important; /* Ravenclaw dark blue */
-  text-shadow: none;
 }
 
 .hogwarts-headmistress {
@@ -214,12 +209,14 @@
 }
 
 .hogwarts-divider {
-  font-size     : 0.78rem;
-  letter-spacing: 0.18em;
-  color         : var(--house-accent, #D3A625);
-  margin        : 0.1rem 0 0.45rem;
-  line-height   : 1;
-  user-select   : none;
+  height: 18px;
+  background: url('../../assets/ui/divider.png') no-repeat center/contain;
+  margin: 0.4rem auto 0.7rem;
+  width: 80%;
+  max-width: 260px;
+  user-select: none;
+  font-size: 0;
+  color: transparent;
 }
 
 .hogwarts-motto-sub {
@@ -343,10 +340,6 @@
   text-shadow: none;
 }
 
-.theme-gryffindor .hogwarts-school-name {
-  color: #740001 !important; /* Gryffindor dark red */
-  text-shadow: none;
-}
 
 /* Word Reveal Stagger Animation */
 @keyframes wordFadeUp {
@@ -632,6 +625,32 @@ body.ceremony-tapped .candle-flame {
   z-index: 1; /* Above bg-video (0) and video-overlay, below content */
   opacity: 0.82;
   transition: background 8s ease-in-out;
+}
+
+/* Decorative corner graphics for parchment letter modal */
+.scroll-corner {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  background: url('../../assets/ui/corner-decoration.png') no-repeat center/contain;
+  pointer-events: none;
+  opacity: 0.38; /* subtle styling to blend with parchment page texture */
+  z-index: 10;
+}
+.scroll-corner.top-left {
+  top: 14px; left: 14px;
+}
+.scroll-corner.top-right {
+  top: 14px; right: 14px;
+  transform: rotate(90deg);
+}
+.scroll-corner.bottom-left {
+  bottom: 14px; left: 14px;
+  transform: rotate(-90deg);
+}
+.scroll-corner.bottom-right {
+  bottom: 14px; right: 14px;
+  transform: rotate(180deg);
 }
 
 /* Accessibility: Support prefers-reduced-motion */

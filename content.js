@@ -48,16 +48,16 @@ const BIRTHDAY_CONTENT = {
   // Place all video files inside a /videos/ subfolder in the same folder as index.html.
   // If a video can't load, the site automatically uses the fallback colour instead.
 
-  gryffindorVideo: "videos/gryffindor.mp4",
+  gryffindorVideo: "public/assets/video/gryffindor.mp4",
   // ^ Background video for Gryffindor theme (warm, fiery, golden candlelight).
 
-  slytherinVideo: "videos/slytherin.mp4",
+  slytherinVideo: "public/assets/video/slytherin.mp4",
   // ^ Background video for Slytherin theme (dark, cool, mysterious underwater/mist).
 
-  ravenclawVideo: "videos/ravenclaw.mp4",
+  ravenclawVideo: "public/assets/video/ravenclaw.mp4",
   // ^ Background video for Ravenclaw theme (celestial, deep space, starry night).
 
-  hufflepuffVideo: "videos/hufflepuff.mp4",
+  hufflepuffVideo: "public/assets/video/hufflepuff.mp4",
   // ^ Background video for Hufflepuff theme (warm, earthy, autumnal nature).
 
   // ════════════════════════════════════════════
@@ -142,7 +142,7 @@ Ani 🌻`,
   // 🎵 MUSIC
   // ════════════════════════════════════════════
 
-  musicFile: "public/assets/audio/birthday.mp3",
+  musicFile: "public/assets/audio/music/birthday.mp3",
   // ^ The background music file. Place it in the same folder as index.html.
   //   Supports .mp3 and .ogg formats. Set to "" to hide the music button.
 

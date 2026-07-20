@@ -188,5 +188,70 @@
   }
 }
 
-
 /* ============================================================
+   ⚡ LOW POWER & REDUCED MOTION ACCESSIBILITY & PERFORMANCE
+   ============================================================ */
+html.low-power body,
+body.low-power {
+  /* Reduce glow intensity and shadow blur radius */
+  --house-glow: 0 0 4px var(--house-accent) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Reduce fog density and stop animation */
+html.low-power #volumetric-fog-1,
+html.low-power #volumetric-fog-2,
+body.low-power #volumetric-fog-1,
+body.low-power #volumetric-fog-2 {
+  opacity: 0.08 !important;
+  animation: none !important;
+}
+
+/* Stop film grain overlay animation to save GPU decoding */
+html.low-power #noise-overlay,
+body.low-power #noise-overlay {
+  animation: none !important;
+  display: none !important;
+}
+
+/* Disable cloud drift animation */
+html.low-power .cloud-inner,
+body.low-power .cloud-inner {
+  animation: none !important;
+  transform: translateX(10vw) !important; /* static placement */
+}
+
+/* Disable candle bob and flame flicker animations */
+html.low-power .ambient-candle,
+html.low-power .candle-flame,
+body.low-power .ambient-candle,
+body.low-power .candle-flame {
+  animation: none !important;
+  filter: none !important;
+}
+
+/* Disable ambient moon pulsing */
+html.low-power #ambient-moon-glow,
+body.low-power #ambient-moon-glow {
+  animation: none !important;
+  opacity: 0.6 !important;
+  transform: scale(1) !important;
+}
+
+/* Disable spell-related active pulse animations on low power */
+html.low-power .eq-visualizer .bar,
+body.low-power .eq-visualizer .bar {
+  animation: none !important;
+  height: 4px !important;
+}
+
+/* Pause animations for reduced motion users */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

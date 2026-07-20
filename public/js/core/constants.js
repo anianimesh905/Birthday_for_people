@@ -1,9 +1,9 @@
 export const DEFAULT_SIZES = {
-  "gryffindor.mp4": 2716980,
-  "slytherin.mp4"  : 4421700,
-  "ravenclaw.mp4"  : 2403039,
-  "hufflepuff.mp4" : 7582169,
-  "birthday.mp3"   : 4824920
+  "gryffindor.mp4": 6958797,
+  "slytherin.mp4"  : 9503396,
+  "ravenclaw.mp4"  : 7175733,
+  "hufflepuff.mp4" : 37611035,
+  "birthday.mp3"   : 575529
 };
 
 export const HOUSES = {

@@ -72,6 +72,10 @@ body {
   height: 100dvh;
   width: 100%;
   background-color: var(--house-primary);
+  background-image: url('../../assets/textures/wood-table.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: var(--house-text);
   user-select: none;
   -webkit-user-select: none;
