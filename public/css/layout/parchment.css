@@ -396,14 +396,22 @@
               border-color 0.4s ease;
 }
 
-#scroll-close:hover,
+#scroll-close:hover {
+  transform  : scale(1.10) rotate(8deg);
+  box-shadow : 
+    var(--house-glow),
+    0 5px 16px rgba(0, 0, 0, 0.50),
+    inset 0 1px 3px rgba(255, 255, 255, 0.15);
+}
+
 #scroll-close:focus-visible {
   transform  : scale(1.10) rotate(8deg);
   box-shadow : 
     var(--house-glow),
     0 5px 16px rgba(0, 0, 0, 0.50),
     inset 0 1px 3px rgba(255, 255, 255, 0.15);
-  outline    : none;
+  outline: 3px solid var(--house-accent);
+  outline-offset: 3px;
 }
 
 #scroll-close:active {

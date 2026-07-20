@@ -2,6 +2,7 @@ import { adjustAudioToState } from '../audio/adaptiveMusic.js';
 import { playWishChime } from '../audio/ceremony.js';
 import { state } from '../core/state.js';
 import { spawnSparkCluster } from '../animation/particles.js';
+import { triggerAmbientUpdate } from '../environment/ambienceManager.js';
 
 export function startWishCeremony() {
   const overlayText = document.getElementById("ceremony-text-container");
@@ -61,12 +62,15 @@ export function startWishCeremony() {
   });
 
   function handleWishTap(e) {
-    e.preventDefault();
-    e.stopPropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
     overlayText.classList.remove("active");
     overlayText.removeEventListener("click", handleWishTap);
     overlayText.removeEventListener("touchend", handleWishTap);
+    overlayText.removeEventListener("keydown", handleWishKey);
 
     textContent.classList.remove("visible");
 
@@ -78,6 +82,7 @@ export function startWishCeremony() {
 
     state.environment.constellationProgress = 0;
     state.environment.ceremonyConstellationActive = true;
+    triggerAmbientUpdate();
 
     for (let i = 0; i < 90; i++) {
       setTimeout(() => {
@@ -116,6 +121,13 @@ export function startWishCeremony() {
     }, 8500);
   }
 
+  function handleWishKey(e) {
+    if (e.key === "Enter" || e.key === " ") {
+      handleWishTap(e);
+    }
+  }
+
   overlayText.addEventListener("click", handleWishTap);
   overlayText.addEventListener("touchend", handleWishTap);
+  overlayText.addEventListener("keydown", handleWishKey);
 }

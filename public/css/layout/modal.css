@@ -68,7 +68,7 @@
 
 .house-badge {
   background: rgba(15, 12, 10, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: clamp(16px, 3vh, 24px) 12px;
   cursor: pointer;
@@ -181,28 +181,47 @@
 }
 
 /* Active Theme States */
+.house-badge.active::after {
+  content: "✓";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  background: var(--house-accent, #cb8d23);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 20px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+  z-index: 10;
+  display: block;
+}
+
 .house-badge[data-house="gryffindor"].active {
-  border-color: #D3A625;
-  box-shadow: 0 0 16px rgba(211,166,37,0.75), inset 0 0 10px rgba(116,0,1,0.5);
-  background: rgba(116,0,1,0.35);
+  border: 2px solid #D3A625;
+  box-shadow: 0 0 20px rgba(211,166,37,0.85), inset 0 0 12px rgba(116,0,1,0.6);
+  background: rgba(116,0,1,0.45);
 }
 
 .house-badge[data-house="slytherin"].active {
-  border-color: #AAAAAA;
-  box-shadow: 0 0 16px rgba(170,170,170,0.65), inset 0 0 10px rgba(26,71,42,0.5);
-  background: rgba(26,71,42,0.35);
+  border: 2px solid #AAAAAA;
+  box-shadow: 0 0 20px rgba(170,170,170,0.75), inset 0 0 12px rgba(26,71,42,0.6);
+  background: rgba(26,71,42,0.45);
 }
 
 .house-badge[data-house="ravenclaw"].active {
-  border-color: #946B2D;
-  box-shadow: 0 0 16px rgba(148,107,45,0.75), inset 0 0 10px rgba(14,26,64,0.5);
-  background: rgba(14,26,64,0.35);
+  border: 2px solid #946B2D;
+  box-shadow: 0 0 20px rgba(148,107,45,0.85), inset 0 0 12px rgba(14,26,64,0.6);
+  background: rgba(14,26,64,0.45);
 }
 
 .house-badge[data-house="hufflepuff"].active {
-  border-color: #ECB939;
-  box-shadow: 0 0 16px rgba(236,185,57,0.85), inset 0 0 10px rgba(236,185,57,0.4);
-  background: rgba(236,185,57,0.22);
+  border: 2px solid #ECB939;
+  box-shadow: 0 0 20px rgba(236,185,57,0.95), inset 0 0 12px rgba(236,185,57,0.5);
+  background: rgba(236,185,57,0.3);
 }
 
 
@@ -628,6 +647,19 @@ body.revelio-active #main-content {
   -webkit-tap-highlight-color: transparent;  /* suppress Android blue flash */
   touch-action: manipulation;               /* no double-tap delay on Android */
   transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+  
+  /* Button resets */
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.spell-tag:focus-visible {
+  outline: 2px solid var(--house-accent, #740001);
+  outline-offset: 2px;
 }
 
 /* Expand touch target to 44px on mobile viewports for accessibility */
@@ -698,11 +730,7 @@ body.revelio-active #main-content {
 
 /* Mobile responsive spell modal overrides */
 @media (max-width: 768px) {
-  #spell-btn {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(10, 8, 6, 0.92) !important;
-  }
+
   #spell-modal-bg {
     backdrop-filter: blur(4px) !important;
     -webkit-backdrop-filter: blur(4px) !important;

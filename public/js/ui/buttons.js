@@ -97,6 +97,7 @@ export function setupMusic(file, label) {
         playing = true;
         if (btnText) btnText.textContent = "Now Playing";
         btn.classList.add("playing");
+        btn.setAttribute("aria-label", "Pause background music (Now Playing)");
         fadeInVolume();
       })
       .catch(() => {
@@ -112,6 +113,7 @@ export function setupMusic(file, label) {
       playing = false;
       if (btnText) btnText.textContent = cleanLabel;
       btn.classList.remove("playing");
+      btn.setAttribute("aria-label", "Play background music");
       if (fadeInterval) {
         clearInterval(fadeInterval);
         fadeInterval = null;
@@ -123,6 +125,7 @@ export function setupMusic(file, label) {
           started = true;
           if (btnText) btnText.textContent = "Now Playing";
           btn.classList.add("playing");
+          btn.setAttribute("aria-label", "Pause background music (Now Playing)");
           fadeInVolume();
         })
         .catch(() => {});

@@ -24,7 +24,7 @@ export function playCrackSound() {
     filter.Q.setValueAtTime(4, ctx.currentTime);
     
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.7, ctx.currentTime);
+    gain.gain.setValueAtTime(0.25, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
     
     noiseNode.connect(filter);
@@ -147,11 +147,11 @@ export function playAmbientOwlHoot(ctx, dest) {
 }
 
 export function playOwlHoot() {
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContext) return;
-  
   try {
-    const ctx = new AudioContext();
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    
     const playNode = (delay, dur, freqStart, freqEnd) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();

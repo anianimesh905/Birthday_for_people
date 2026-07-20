@@ -135,6 +135,17 @@ export function initHouseSelector(siteContent) {
     }, 200);
   }
 
+  const closeHouseSelector = () => {
+    overlay.classList.add('hidden');
+    overlay.style.opacity = '0';
+    overlay.style.visibility = 'hidden';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+    }, 600);
+    const switcherBtn = document.getElementById('house-switch-btn');
+    if (switcherBtn) switcherBtn.focus();
+  };
+
   badges.forEach(badge => {
     const house = badge.getAttribute('data-house');
     
@@ -147,12 +158,7 @@ export function initHouseSelector(siteContent) {
       sessionStorage.setItem('selectedHouse', house);
       selectHouse(house, { siteContent, silent: false });
       
-      overlay.classList.add('hidden');
-      overlay.style.opacity = '0';
-      overlay.style.visibility = 'hidden';
-      setTimeout(() => {
-        overlay.style.display = 'none';
-      }, 600);
+      closeHouseSelector();
       
       startMusic();
     };
@@ -177,4 +183,13 @@ export function initHouseSelector(siteContent) {
     
     switcherBtn.addEventListener('click', handleSwitch);
   }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const savedHouse = sessionStorage.getItem('selectedHouse');
+      if (savedHouse && !overlay.classList.contains('hidden') && overlay.style.display !== 'none') {
+        closeHouseSelector();
+      }
+    }
+  });
 }

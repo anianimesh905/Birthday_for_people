@@ -20,6 +20,7 @@
 }
 
 #stars-overlay {
+  display: none !important;
   background: url('../../assets/overlays/stars.png') repeat center/cover;
   mix-blend-mode: screen;
   opacity: 0.12;
@@ -39,6 +40,7 @@
 }
 
 #magic-dust-overlay {
+  display: none !important;
   background: url('../../assets/overlays/magic-dust.png') repeat center/cover;
   mix-blend-mode: screen;
   opacity: 0.10;
@@ -77,16 +79,16 @@
   height: clamp(140px, 22vw, 320px);
   background: url('../../assets/ui/moon.png') no-repeat center/contain;
   mix-blend-mode: screen;
-  opacity: 0.65;
+  opacity: 0.50;
   filter: drop-shadow(0 0 20px rgba(255, 255, 235, 0.45));
   will-change: opacity, transform;
-  animation: moonPulse 60s infinite alternate ease-in-out;
+  animation: moonPulse 180s infinite alternate ease-in-out;
   z-index: 1;
 }
 
 @keyframes moonPulse {
-  0% { opacity: 0.55; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1.12); }
+  0% { opacity: 0.45; transform: scale(0.98); }
+  100% { opacity: 0.55; transform: scale(1.02); }
 }
 
 #volumetric-fog-1, #volumetric-fog-2 {
@@ -101,27 +103,28 @@
 #volumetric-fog-1 {
   background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 80%), url('../../assets/overlays/fog.png') repeat;
   background-size: auto, 512px 512px;
-  animation: fogSlow1 50s infinite alternate ease-in-out;
+  animation: fogSlow1 180s infinite alternate ease-in-out;
 }
 
 #volumetric-fog-2 {
   background: radial-gradient(circle, rgba(212, 230, 255, 0.03) 0%, transparent 75%), url('../../assets/overlays/fog.png') repeat;
   background-size: auto, 700px 700px;
-  animation: fogSlow2 70s infinite alternate ease-in-out;
+  animation: fogSlow2 220s infinite alternate ease-in-out;
 }
 
 @keyframes fogSlow1 {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-  100% { transform: translate(120px, 60px) scale(1.15); opacity: 0.7; }
+  0% { transform: translate(0, 0) scale(1); opacity: 0.04; }
+  100% { transform: translate(60px, 30px) scale(1.08); opacity: 0.08; }
 }
 
 @keyframes fogSlow2 {
-  0% { transform: translate(0, 0) scale(1.1); opacity: 0.25; }
-  100% { transform: translate(-100px, -40px) scale(0.9); opacity: 0.6; }
+  0% { transform: translate(0, 0) scale(1.05); opacity: 0.03; }
+  100% { transform: translate(-50px, -20px) scale(0.95); opacity: 0.06; }
 }
 
 /* Background Clouds */
 .bg-cloud {
+  display: none !important;
   position: absolute;
   pointer-events: none;
   color: rgba(255, 255, 255, 0.065);
@@ -221,33 +224,13 @@
 }
 
 .ambient-candle {
-  position: absolute;
-  left: var(--c-x);
-  top: var(--c-y);
-  width: 4px;
-  height: 25px;
-  background: linear-gradient(to right, rgba(238, 238, 238, 0.45), rgba(207, 216, 220, 0.35));
-  border-radius: 1px;
-  animation: candleBob var(--c-dur) ease-in-out infinite alternate;
-  animation-delay: var(--c-delay);
-  will-change: transform;
+  display: none !important;
+  animation: none !important;
 }
 
 .candle-flame {
-  position: absolute;
-  top: -6px;
-  left: 50%;
-  width: 4px;
-  height: 7px;
-  background: radial-gradient(circle at bottom, #ffeb3b 20%, #ff5722 80%);
-  border-radius: 50% 50% 20% 20%;
-  transform: translateX(-50%) rotate(var(--wind-tilt, 0deg));
-  transform-origin: bottom center;
-  animation: flameFlicker 0.12s infinite alternate ease-in-out;
-  filter: drop-shadow(0 0 2px #ffd54f);
-  will-change: transform, opacity;
-  opacity: 0; /* Default unlit; ignites dynamically during castle awakening */
-  transition: opacity 1.8s ease-in-out;
+  display: none !important;
+  animation: none !important;
 }
 
 @keyframes candleBob {

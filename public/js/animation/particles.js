@@ -536,7 +536,6 @@ function loop(now) {
   if (!isMobile || state.spells.isLumosActive || (state.spells.activeMode && state.spells.activeMode !== 'none')) {
     tickSpawner(now);
   }
-  
   let activeCount = 0;
   for (let i = 0; i < particles.length; i++) {
     if (particles[i].active) {
@@ -546,7 +545,7 @@ function loop(now) {
     }
   }
 
-  if (activeCount === 0 && (isMobile || !document.hasFocus()) && !state.spells.isLumosActive) {
+  if (activeCount === 0 && !state.spells.isLumosActive && !state.spells.activeMode) {
     isLoopRunning = false;
     rafId = null;
     return;

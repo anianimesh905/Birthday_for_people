@@ -36,6 +36,8 @@ function handlePointerMove(e) {
       _lastTrailY = y;
     }
   }
+
+  startPointerLerpLoop();
 }
 
 function handleResize() {
@@ -78,19 +80,30 @@ function handleNetworkOffline() {
   state.system.isOnline = false;
 }
 
-// Single continuous LERP execution loop for pointer position smoothing
-function startPointerLerpLoop() {
+// Dynamic LERP execution loop for pointer position smoothing
+export function startPointerLerpLoop() {
   if (_lerpRunning) return;
   _lerpRunning = true;
   
   function update() {
-    if (document.hidden) {
-      requestAnimationFrame(update);
+    if (document.hidden || !state.system.isVisible) {
+      _lerpRunning = false;
       return;
     }
     const ease = 0.16; // Standard delay LERP parameter
-    state.pointer.x += (state.pointer.targetX - state.pointer.x) * ease;
-    state.pointer.y += (state.pointer.targetY - state.pointer.y) * ease;
+    const dx = state.pointer.targetX - state.pointer.x;
+    const dy = state.pointer.targetY - state.pointer.y;
+    
+    // Stop the loop once coordinates are close enough to the target
+    if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+      state.pointer.x = state.pointer.targetX;
+      state.pointer.y = state.pointer.targetY;
+      _lerpRunning = false;
+      return;
+    }
+    
+    state.pointer.x += dx * ease;
+    state.pointer.y += dy * ease;
     requestAnimationFrame(update);
   }
   requestAnimationFrame(update);

@@ -1,15 +1,14 @@
 import { state } from '../core/state.js';
+import { getAudioCtx } from './audioEngine.js';
 
 let _windAudioCtx = null;
 let _windGainNode = null;
 let _windOscillatorNode = null;
 
 export function startWindAmbient() {
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContext) return;
-
   try {
-    const ctx = new AudioContext();
+    const ctx = getAudioCtx();
+    if (!ctx) return;
     _windAudioCtx = ctx;
 
     const bufferSize = ctx.sampleRate * 5;

@@ -1,17 +1,16 @@
 import { revealHogwartsLetter } from './narrative.js';
 import { state } from '../core/state.js';
-import { triggerAwakeningOwls } from '../environment/ambienceManager.js';
+import { triggerAwakeningOwls, triggerAmbientUpdate } from '../environment/ambienceManager.js';
+import { getAudioCtx } from '../audio/audioEngine.js';
 
 let _choirOscillators = [];
 let _choirGainNode = null;
 let _choirAudioCtx = null;
 
 export function playCastleBell() {
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContext) return;
-
   try {
-    const ctx = new AudioContext();
+    const ctx = getAudioCtx();
+    if (!ctx) return;
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.value = 650;
@@ -46,11 +45,9 @@ export function playCastleBell() {
 }
 
 export function startChoirDrone() {
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContext) return;
-
   try {
-    const ctx = new AudioContext();
+    const ctx = getAudioCtx();
+    if (!ctx) return;
     _choirAudioCtx = ctx;
 
     const filter = ctx.createBiquadFilter();
@@ -134,6 +131,7 @@ export function startCastleAwakeningSequence(msgEl, msg, sigEl) {
 
   state.castle.zoomingActive = true;
   triggerAwakeningOwls();
+  triggerAmbientUpdate();
 
   setTimeout(() => {
     if (castleWrapper) castleWrapper.classList.remove("zoomed-in");

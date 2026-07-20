@@ -67,6 +67,31 @@
     width: 185px; 
     height: 128px; 
   }
+  .hogwarts-school-name {
+    font-size: 0.72rem !important;
+    line-height: 1.35 !important;
+    letter-spacing: 0.05em !important;
+  }
+  .hogwarts-headmistress {
+    font-size: 0.78rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+  .hogwarts-motto-sub {
+    font-size: 0.75rem !important;
+  }
+  #scroll-title {
+    font-size: 1.15rem !important;
+    margin-bottom: 0.8rem !important;
+  }
+  #scroll-message p {
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 0.7em !important;
+  }
+  #scroll-signature {
+    font-size: 0.9rem !important;
+    margin-top: 1em !important;
+  }
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
@@ -133,7 +158,7 @@
   #scroll-flap-top, #scroll-flap-bottom {
     filter: url(#deckle-edge) !important; /* Restore deckled edges on scroll flaps */
   }
-  #music-btn, #house-switch-btn, #house-toast, #scroll-close {
+  #house-toast, #scroll-close {
     backdrop-filter: blur(5px) !important;
     -webkit-backdrop-filter: blur(5px) !important;
     background: rgba(10, 8, 6, 0.82) !important; /* Translucent premium glassmorphism buttons */

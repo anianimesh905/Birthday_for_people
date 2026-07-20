@@ -12,6 +12,14 @@ import { updateMoonPhase } from './moon.js';
 import { SmokeParticle } from '../effects/smoke.js';
 import { state } from '../core/state.js';
 
+let _triggerAmbientUpdateFn = null;
+
+export function triggerAmbientUpdate() {
+  if (_triggerAmbientUpdateFn) {
+    _triggerAmbientUpdateFn();
+  }
+}
+
 const circlingOwls = [];
 
 export function triggerAwakeningOwls() {
@@ -44,60 +52,23 @@ export function initAmbientAtmosphere() {
     height = canvas.height = window.innerHeight;
   }, { passive: true });
 
-  const season = getSeason();
-  const ambientParticles = [];
-  const lowPower = state.system.isLowPowerDevice;
-
-  if (season === 'spring') {
-    const count = lowPower ? 10 : 35;
-    for (let i = 0; i < count; i++) ambientParticles.push(new Petal());
-  } else if (season === 'summer') {
-    const fireflyCount = lowPower ? 6 : 18;
-    const dustCount = lowPower ? 6 : 20;
-    for (let i = 0; i < fireflyCount; i++) ambientParticles.push(new Firefly());
-    for (let i = 0; i < dustCount; i++) ambientParticles.push(new MagicalDust());
-  } else if (season === 'autumn') {
-    const count = lowPower ? 10 : 30;
-    for (let i = 0; i < count; i++) ambientParticles.push(new Leaf());
-  } else {
-    const count = lowPower ? 15 : 50;
-    for (let i = 0; i < count; i++) ambientParticles.push(new Snowflake());
-  }
-
-  const feathersCount = lowPower ? 1 : 3;
-  const feathers = Array.from({ length: feathersCount }, () => new Feather());
-
   const smokeParticles = [];
-  const shootingStars = Array.from({ length: lowPower ? 0 : 2 }, () => new ShootingStar());
 
-  const hour = new Date().getHours();
-  let birdsCount = 0;
-  if (!lowPower) {
-    if (hour >= 5 && hour < 8) birdsCount = 5;
-    else if (hour >= 17 && hour < 20) birdsCount = 3;
-    else if (hour >= 20 || hour < 5) birdsCount = 1;
+  let _ambientLoopRunning = false;
+
+  function triggerAmbientUpdateFn() {
+    if (!_ambientLoopRunning) {
+      _ambientLoopRunning = true;
+      requestAnimationFrame(loop);
+    }
   }
 
-  const activeBirds = Array.from({ length: birdsCount }, () => new Bird(hour >= 20 || hour < 5));
-
-  const curiousOwl = new CuriousOwl();
-  const butterflies = Array.from({ length: lowPower ? 1 : 3 }, () => new GlowingButterfly(season));
-  const whiteStag = new WhiteStag();
+  _triggerAmbientUpdateFn = triggerAmbientUpdateFn;
 
   updateTimeOfDayOverlay();
   setInterval(updateTimeOfDayOverlay, 900000);
 
   updateMoonPhase();
-
-  const castleWindows = document.querySelectorAll(".castle-window");
-  setInterval(() => {
-    if (document.hidden || !state.system.isVisible) return;
-    castleWindows.forEach(win => {
-      if (Math.random() < 0.15) {
-        win.classList.toggle("active");
-      }
-    });
-  }, 2200);
 
   let currentWindTilt = 0;
   let targetWindTilt = 0;
@@ -111,7 +82,7 @@ export function initAmbientAtmosphere() {
 
   function loop(now) {
     if (document.hidden || (state.system && !state.system.isVisible)) {
-      requestAnimationFrame(loop);
+      _ambientLoopRunning = false;
       return;
     }
 
@@ -128,23 +99,13 @@ export function initAmbientAtmosphere() {
     document.documentElement.style.setProperty("--wind-tilt", `${currentWindTilt.toFixed(2)}deg`);
     ctx.clearRect(0, 0, width, height);
 
-    const env = document.getElementById("envelope-area");
-    const avoidRect = env ? env.getBoundingClientRect() : null;
-
     const mx = state.pointer.x;
     const my = state.pointer.y;
 
-    shootingStars.forEach(s => {
-      s.update(width, height);
-      s.draw(ctx);
-    });
-
-    activeBirds.forEach(b => {
-      b.update(width, height);
-      b.draw(ctx);
-    });
+    let needsLoop = false;
 
     if (state.castle.zoomingActive) {
+      needsLoop = true;
       const towerX = width * (300 / 800) + (mx - width/2) * -0.03;
       const towerY = height - (height * 0.15 * 1.65) + (40 / 400 * height * 0.15 * 1.65) - 32 + (my - height/2) * -0.01;
       
@@ -168,9 +129,21 @@ export function initAmbientAtmosphere() {
         ctx.quadraticCurveTo(ox + 2, oy - 2, ox + 4, oy - wingY);
         ctx.stroke();
       });
+
+      if (Math.random() < 0.08) {
+        const castleX = width * (95 / 800);
+        const castleY = height - (height * 0.15) + (170 / 400 * (height * 0.15));
+        smokeParticles.push(new SmokeParticle(castleX, castleY));
+      }
+      if (Math.random() < 0.08) {
+        const castleX = width * (300 / 800);
+        const castleY = height - (height * 0.15) + (40 / 400 * (height * 0.15));
+        smokeParticles.push(new SmokeParticle(castleX, castleY));
+      }
     }
 
     if (state.environment.ceremonyConstellationActive) {
+      needsLoop = true;
       const towerX = width / 2 + (mx - width/2) * -0.01;
       const towerY = height * 0.42 + (my - height/2) * -0.01;
       
@@ -244,49 +217,23 @@ export function initAmbientAtmosphere() {
       });
     }
 
-    if (Math.random() < 0.08) {
-      const castleX = width * (95 / 800);
-      const castleY = height - (height * 0.15) + (170 / 400 * (height * 0.15));
-      smokeParticles.push(new SmokeParticle(castleX, castleY));
-    }
-    if (Math.random() < 0.08) {
-      const castleX = width * (300 / 800);
-      const castleY = height - (height * 0.15) + (40 / 400 * (height * 0.15));
-      smokeParticles.push(new SmokeParticle(castleX, castleY));
-    }
-
-    for (let i = smokeParticles.length - 1; i >= 0; i--) {
-      const p = smokeParticles[i];
-      p.update();
-      p.draw(ctx);
-      if (p.life <= 0 || p.y < 0) {
-        smokeParticles.splice(i, 1);
+    if (smokeParticles.length > 0) {
+      needsLoop = true;
+      for (let i = smokeParticles.length - 1; i >= 0; i--) {
+        const p = smokeParticles[i];
+        p.update();
+        p.draw(ctx);
+        if (p.life <= 0 || p.y < 0) {
+          smokeParticles.splice(i, 1);
+        }
       }
     }
 
-    whiteStag.update(width, height);
-    whiteStag.draw(ctx);
-
-    curiousOwl.update(mx, my, width, height);
-    curiousOwl.draw(ctx);
-
-    butterflies.forEach(b => {
-      b.update(mx, my, width, height);
-      b.draw(ctx);
-    });
-
-    ambientParticles.forEach(p => {
-      p.update(mx, my, avoidRect, width, height);
-      p.draw(ctx);
-    });
-
-    feathers.forEach(f => {
-      f.update(width, height);
-      f.draw(ctx);
-    });
+    if (!needsLoop) {
+      _ambientLoopRunning = false;
+      return;
+    }
 
     requestAnimationFrame(loop);
   }
-
-  requestAnimationFrame(loop);
 }

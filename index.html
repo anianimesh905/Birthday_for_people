@@ -534,14 +534,7 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <button id="spell-modal-close" aria-label="Close text dialog">✕</button>
       <h3 id="spell-modal-title">✦ Cast Your Spell ✦</h3>
-      <p class="spell-modal-subtitle">Type a spell or tap one below to cast magic</p>
-      <div class="spell-input-group">
-        <label for="spell-input-field" class="sr-only">Enter spell name</label>
-        <input type="text" id="spell-input-field" placeholder="e.g. Expecto Patronum"
-               autocomplete="off" spellcheck="false"
-               inputmode="text" enterkeyhint="done" />
-        <button id="spell-cast-action" aria-label="Cast spell">Cast 🪄</button>
-      </div>
+      <p class="spell-modal-subtitle">Select a spell below to cast magic</p>
       <div class="spell-help-container">
         <div class="spell-help-grid">
 
@@ -549,10 +542,10 @@
           <div class="spell-help-col">
             <span class="spell-cat">🔑 Unlock:</span>
             <div class="spell-tags">
-              <span class="spell-tag" data-spell="Lumos" onclick="fillSpell(this)">Lumos</span>
-              <span class="spell-tag" data-spell="Nox" onclick="fillSpell(this)">Nox</span>
-              <span class="spell-tag" data-spell="Revelio" onclick="fillSpell(this)">Revelio</span>
-              <span class="spell-tag" data-spell="Alohomora" onclick="fillSpell(this)">Alohomora</span>
+              <button type="button" class="spell-tag" data-spell="Lumos" onclick="fillSpell(this)">Lumos</button>
+              <button type="button" class="spell-tag" data-spell="Nox" onclick="fillSpell(this)">Nox</button>
+              <button type="button" class="spell-tag" data-spell="Revelio" onclick="fillSpell(this)">Revelio</button>
+              <button type="button" class="spell-tag" data-spell="Alohomora" onclick="fillSpell(this)">Alohomora</button>
             </div>
           </div>
 
@@ -560,10 +553,10 @@
           <div class="spell-help-col">
             <span class="spell-cat">✨ Charms:</span>
             <div class="spell-tags">
-              <span class="spell-tag" data-spell="Expecto Patronum" onclick="fillSpell(this)">Expecto Patronum</span>
-              <span class="spell-tag" data-spell="Wingardium Leviosa" onclick="fillSpell(this)">Wingardium Leviosa</span>
-              <span class="spell-tag" data-spell="Accio" onclick="fillSpell(this)">Accio</span>
-              <span class="spell-tag love" data-spell="Amoris" onclick="fillSpell(this)">Amoris 💕</span>
+              <button type="button" class="spell-tag" data-spell="Expecto Patronum" onclick="fillSpell(this)">Expecto Patronum</button>
+              <button type="button" class="spell-tag" data-spell="Wingardium Leviosa" onclick="fillSpell(this)">Wingardium Leviosa</button>
+              <button type="button" class="spell-tag" data-spell="Accio" onclick="fillSpell(this)">Accio</button>
+              <button type="button" class="spell-tag love" data-spell="Amoris" onclick="fillSpell(this)">Amoris 💕</button>
             </div>
           </div>
 
@@ -571,12 +564,12 @@
           <div class="spell-help-col">
             <span class="spell-cat">🌿 Elemental:</span>
             <div class="spell-tags">
-              <span class="spell-tag elemental" data-spell="Incendio" onclick="fillSpell(this)">Incendio 🔥</span>
-              <span class="spell-tag elemental" data-spell="Aguamenti" onclick="fillSpell(this)">Aguamenti 💧</span>
-              <span class="spell-tag elemental" data-spell="Glacius" onclick="fillSpell(this)">Glacius ❄️</span>
-              <span class="spell-tag elemental" data-spell="Herbivicus" onclick="fillSpell(this)">Herbivicus 🌿</span>
-              <span class="spell-tag elemental" data-spell="Prisma" onclick="fillSpell(this)">Prisma 🌈</span>
-              <span class="spell-tag star" data-spell="Stellaris" onclick="fillSpell(this)">Stellaris ✨</span>
+              <button type="button" class="spell-tag elemental" data-spell="Incendio" onclick="fillSpell(this)">Incendio 🔥</button>
+              <button type="button" class="spell-tag elemental" data-spell="Aguamenti" onclick="fillSpell(this)">Aguamenti 💧</button>
+              <button type="button" class="spell-tag elemental" data-spell="Glacius" onclick="fillSpell(this)">Glacius ❄️</button>
+              <button type="button" class="spell-tag elemental" data-spell="Herbivicus" onclick="fillSpell(this)">Herbivicus 🌿</button>
+              <button type="button" class="spell-tag elemental" data-spell="Prisma" onclick="fillSpell(this)">Prisma 🌈</button>
+              <button type="button" class="spell-tag star" data-spell="Stellaris" onclick="fillSpell(this)">Stellaris ✨</button>
             </div>
           </div>
 
@@ -603,7 +596,7 @@
 
   <!-- Birthday Wish Ceremony Elements -->
   <div id="moon-beam" aria-hidden="true"></div>
-  <div id="ceremony-text-container" class="hidden" aria-live="polite">
+  <div id="ceremony-text-container" class="hidden" aria-live="polite" tabindex="0" role="button" aria-label="Birthday wish ceremony. Press Space or Enter to make a wish.">
     <div id="ceremony-text-content"></div>
   </div>
 

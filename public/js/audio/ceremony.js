@@ -1,9 +1,9 @@
-export function playWishChime() {
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContext) return;
+import { getAudioCtx } from './audioEngine.js';
 
+export function playWishChime() {
   try {
-    const ctx = new AudioContext();
+    const ctx = getAudioCtx();
+    if (!ctx) return;
     const filter = ctx.createBiquadFilter();
     filter.type = 'peaking';
     filter.frequency.value = 1200;

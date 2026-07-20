@@ -4,10 +4,19 @@ import { startPreloader } from './core/preloader.js';
 import { resetChestToEnvelope, initTreasureBox, castSpellText } from './effects/spells.js';
 
 window.fillSpell = function(el) {
-  const field = document.getElementById('spell-input-field');
-  if (field && el) {
-    field.value = (el.dataset && el.dataset.spell) || el.textContent.trim().replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim();
-    field.focus();
+  if (el) {
+    const spellName = (el.dataset && el.dataset.spell) || el.textContent.trim().replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim();
+    castSpellText(spellName);
+    
+    const spellModal = document.getElementById("spell-modal");
+    if (spellModal && spellModal.classList.contains("open")) {
+      spellModal.classList.remove("open");
+      if (window.location.hash === "#spell-modal") {
+        history.back();
+      }
+      const spellBtn = document.getElementById("spell-btn");
+      if (spellBtn) spellBtn.focus();
+    }
   }
 };
 
@@ -19,8 +28,6 @@ function init() {
   const spellBtn = document.getElementById("spell-btn");
   const spellModal = document.getElementById("spell-modal");
   const spellClose = document.getElementById("spell-modal-close");
-  const spellInput = document.getElementById("spell-input-field");
-  const spellCast = document.getElementById("spell-cast-action");
   const spellBg = document.getElementById("spell-modal-bg");
 
   if (spellBtn && spellModal) {
@@ -30,10 +37,6 @@ function init() {
       spellModal.classList.add("open");
       if (window.location.hash !== "#spell-modal") {
         history.pushState({ modalOpen: true }, "", "#spell-modal");
-      }
-      if (spellInput) {
-        spellInput.value = "";
-        setTimeout(() => spellInput.focus(), 150);
       }
     };
 
@@ -69,31 +72,6 @@ function init() {
         closeSpellModal();
       }
     });
-
-    const executeSpell = () => {
-      if (spellInput) {
-        const val = spellInput.value;
-        castSpellText(val);
-        closeSpellModal();
-      }
-    };
-
-    if (spellCast) {
-      spellCast.addEventListener("click", executeSpell);
-      spellCast.addEventListener("touchend", (e) => {
-        e.preventDefault();
-        executeSpell();
-      });
-    }
-
-    if (spellInput) {
-      spellInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          executeSpell();
-        }
-      });
-    }
   }
 
   document.addEventListener("contextmenu", (e) => {

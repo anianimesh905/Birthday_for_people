@@ -5,6 +5,7 @@ export function initParallax() {
   let targetMy = 0;
   let currentMx = 0;
   let currentMy = 0;
+  let _parallaxRunning = false;
 
   window.addEventListener("deviceorientation", (e) => {
     let gamma = e.gamma;
@@ -19,26 +20,35 @@ export function initParallax() {
 
     targetMx = normGamma * 100;
     targetMy = normBeta * 100;
+    triggerParallaxUpdate();
+  }, { passive: true });
+
+  window.addEventListener("mousemove", () => {
+    targetMx = 0; targetMy = 0; // Clear device orientation override if mouse moves
+    triggerParallaxUpdate();
+  }, { passive: true });
+
+  window.addEventListener("touchmove", () => {
+    targetMx = 0; targetMy = 0;
+    triggerParallaxUpdate();
   }, { passive: true });
 
   function updateParallax() {
-    if (document.hidden) {
-      requestAnimationFrame(updateParallax);
+    if (document.hidden || !state.system.isVisible) {
+      _parallaxRunning = false;
       return;
     }
     
     if (state.system.reducedMotion || state.system.isLowPowerDevice) {
-      requestAnimationFrame(updateParallax);
+      _parallaxRunning = false;
       return;
     }
     
-    // Read smoothed central pointer coordinates instead of registering a duplicate mousemove listener
     const cx = state.system.width / 2;
     const cy = state.system.height / 2;
     const dx = state.pointer.x - cx;
     const dy = state.pointer.y - cy;
     
-    // If device orientation hasn't taken over, use pointer coordinates
     if (targetMx === 0 && targetMy === 0) {
       targetMx = (dx / cx) * 100;
       targetMy = (dy / cy) * 100;
@@ -46,15 +56,33 @@ export function initParallax() {
 
     const diffX = targetMx - currentMx;
     const diffY = targetMy - currentMy;
-    if (Math.abs(diffX) > 0.01 || Math.abs(diffY) > 0.01) {
-      currentMx += diffX * 0.08;
-      currentMy += diffY * 0.08;
+
+    // Stop if differences are negligible
+    if (Math.abs(diffX) < 0.05 && Math.abs(diffY) < 0.05) {
+      currentMx = targetMx;
+      currentMy = targetMy;
       document.documentElement.style.setProperty("--mx", currentMx.toFixed(2));
       document.documentElement.style.setProperty("--my", currentMy.toFixed(2));
+      _parallaxRunning = false;
+      return;
     }
+    
+    currentMx += diffX * 0.08;
+    currentMy += diffY * 0.08;
+    document.documentElement.style.setProperty("--mx", currentMx.toFixed(2));
+    document.documentElement.style.setProperty("--my", currentMy.toFixed(2));
+    
     requestAnimationFrame(updateParallax);
   }
-  requestAnimationFrame(updateParallax);
+
+  function triggerParallaxUpdate() {
+    if (!_parallaxRunning) {
+      _parallaxRunning = true;
+      requestAnimationFrame(updateParallax);
+    }
+  }
+
+  triggerParallaxUpdate();
 }
 
 export function initMagneticButtons() {
