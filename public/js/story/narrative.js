@@ -71,6 +71,7 @@ export function _injectDropCapAndRender(el, text) {
     }
 
     if (isSignatureBlock) {
+      // Keep signature as a rendered SVG path animation (it's elegant and fast)
       const cleanName = para.trim().toLowerCase();
       if (cleanName.includes("mcgonagall") || cleanName.includes("minerva")) {
         pEl.innerHTML = `
@@ -83,139 +84,82 @@ export function _injectDropCapAndRender(el, text) {
             <path class="sig-path" d="M 12 32 C 22 8, 30 22, 38 28 T 54 18 T 72 26 Q 84 20, 92 34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
           </svg>`;
       } else {
+        // Render short plain-text signature with Dancing Script
         pEl.style.fontFamily = "'Dancing Script', cursive";
         pEl.style.fontSize = "1.5rem";
         pEl.style.fontWeight = "bold";
-        
-        para.split('').forEach(ch => {
-          const span = document.createElement('span');
-          span.className = 'magic-char';
-          span.textContent = ch;
-          pEl.appendChild(span);
-        });
+        pEl.textContent = para;
+      }
+    } else if (pIdx === dropCapParaIdx) {
+      // Drop-cap paragraph: first letter gets a styled span, rest is plain text
+      const words = para.split(/\s+/).filter(Boolean);
+      if (words[0] && words[0].length > 0) {
+        const capEl = document.createElement('span');
+        capEl.className = 'drop-cap';
+        capEl.textContent = words[0][0];
+        pEl.appendChild(capEl);
+        // Append the rest of the paragraph as a plain text node
+        const restText = (words[0].slice(1) + (words.length > 1 ? ' ' + words.slice(1).join(' ') : ''));
+        pEl.appendChild(document.createTextNode(restText));
+      } else {
+        pEl.textContent = para;
       }
     } else {
-      if (pIdx === dropCapParaIdx) {
-        const words = para.split(/\s+/).filter(Boolean);
-        if (words[0] && words[0].length > 0) {
-          const capEl = document.createElement('span');
-          capEl.className = 'drop-cap magic-char';
-          capEl.textContent = words[0][0];
-          pEl.appendChild(capEl);
-
-          const restOfFirst = words[0].slice(1);
-          if (restOfFirst) {
-            restOfFirst.split('').forEach(ch => {
-              const span = document.createElement('span');
-              span.className = 'magic-char';
-              span.textContent = ch;
-              pEl.appendChild(span);
-            });
-          }
-
-          if (words.length > 1) {
-            const spaceSpan = document.createElement('span');
-            spaceSpan.className = 'magic-char';
-            spaceSpan.textContent = ' ';
-            pEl.appendChild(spaceSpan);
-          }
-
-          for (let i = 1; i < words.length; i++) {
-            words[i].split('').forEach(ch => {
-              const span = document.createElement('span');
-              span.className = 'magic-char';
-              span.textContent = ch;
-              pEl.appendChild(span);
-            });
-            if (i < words.length - 1) {
-              const spaceSpan = document.createElement('span');
-              spaceSpan.className = 'magic-char';
-              spaceSpan.textContent = ' ';
-              pEl.appendChild(spaceSpan);
-            }
-          }
-        }
-      } else {
-        para.split('').forEach(ch => {
-          const span = document.createElement('span');
-          span.className = 'magic-char';
-          span.textContent = ch;
-          pEl.appendChild(span);
-        });
-      }
+      // All other paragraphs: plain text — renders instantly, no per-char loop
+      pEl.textContent = para;
     }
 
     el.appendChild(pEl);
     pElements.push(pEl);
   });
 
-  let currentPIdx = 0;
-  
-  function writeParagraph() {
-    if (currentPIdx >= pElements.length) {
-      const paper = document.getElementById("scroll-paper");
-      if (paper) {
-        paper.classList.add("magic-glow-pulse");
-        setTimeout(() => paper.classList.remove("magic-glow-pulse"), 1200);
+  // Staggered paragraph fade-in: each paragraph appears ~120ms after the previous.
+  // Total reveal time: ~120ms × paragraph count ≈ 0.5–1.0s for a full letter.
+  const STAGGER_MS   = 120;   // delay between each paragraph appearing
+  const FIRST_DELAY  = 80;    // initial pause after overlay opens
+
+  pElements.forEach((pEl, idx) => {
+    const delay = FIRST_DELAY + idx * STAGGER_MS;
+    setTimeout(() => {
+      pEl.classList.remove('fade-phantom');
+      pEl.classList.add('writing');
+
+      // Signature SVG: trigger stroke-dashoffset animation after fade-in starts
+      const sigPath = pEl.querySelector('.sig-path');
+      if (sigPath) {
+        setTimeout(() => {
+          sigPath.style.animation = 'writeSignature 1.6s cubic-bezier(0.42, 0, 0.58, 1) forwards';
+        }, 120);
       }
-      return;
-    }
 
-    const pEl = pElements[currentPIdx];
-    pEl.classList.remove('fade-phantom');
-    pEl.classList.add('writing');
+      // Emit a small spark cluster on the drop-cap letter for magic feel
+      if (pEl.querySelector('.drop-cap') && idx === 0) {
+        const capEl = pEl.querySelector('.drop-cap');
+        requestAnimationFrame(() => {
+          const rect = capEl.getBoundingClientRect();
+          if (rect.width > 0) {
+            spawnSparkCluster(rect.left + rect.width / 2, rect.top + rect.height / 2, 2, false);
+          }
+        });
+      }
 
-    const chars = pEl.querySelectorAll('.magic-char');
-    const sigPath = pEl.querySelector('.sig-path');
-
-    if (sigPath) {
       setTimeout(() => {
-        sigPath.style.animation = 'writeSignature 2.2s cubic-bezier(0.42, 0, 0.58, 1) forwards';
         pEl.classList.remove('writing');
         pEl.classList.add('finished');
-        currentPIdx++;
-        setTimeout(writeParagraph, 1200);
-      }, 350);
-      return;
+      }, 500); // matches the CSS fade-in transition duration
+
+    }, delay);
+  });
+
+  // After all paragraphs are shown, fire the subtle warmth pulse on the paper
+  const totalRevealTime = FIRST_DELAY + pElements.length * STAGGER_MS + 520;
+  setTimeout(() => {
+    const paper = document.getElementById("scroll-paper");
+    if (paper) {
+      paper.classList.add("magic-glow-pulse");
+      setTimeout(() => paper.classList.remove("magic-glow-pulse"), 1200);
     }
-
-    if (chars.length === 0) {
-      pEl.classList.remove('writing');
-      pEl.classList.add('finished');
-      currentPIdx++;
-      setTimeout(writeParagraph, 350);
-      return;
-    }
-
-    let charIdx = 0;
-    const isMobile = window.innerWidth < 768;
-    const writeSpeed = isMobile ? 22 : 18;
-
-    function writeChar() {
-      if (charIdx >= chars.length) {
-        pEl.classList.remove('writing');
-        pEl.classList.add('finished');
-        currentPIdx++;
-        setTimeout(writeParagraph, 450);
-        return;
-      }
-
-      const span = chars[charIdx];
-      span.classList.add('written');
-
-      if (Math.random() < 0.05) {
-        const rect = span.getBoundingClientRect();
-        spawnSparkCluster(rect.left + rect.width / 2, rect.top + rect.height / 2, 1, false);
-      }
-
-      charIdx++;
-      setTimeout(writeChar, writeSpeed);
-    }
-
-    writeChar();
-  }
-
-  setTimeout(writeParagraph, 400);
+  }, totalRevealTime);
 }
 
 export function revealHogwartsLetter(msgEl, text, sigEl) {

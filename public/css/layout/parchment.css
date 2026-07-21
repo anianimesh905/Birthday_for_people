@@ -61,8 +61,9 @@
   background-size: auto, cover;
   
   border        : 1px solid rgba(139, 101, 55, 0.35);
-  box-shadow    : 0 2px 18px rgba(80, 50, 10, 0.25),
-                  inset 0 0 40px rgba(200, 160, 90, 0.10);
+  /* Natural cast shadow — paper resting on a wooden table, no glow */
+  box-shadow    : 0 4px 24px rgba(50, 30, 8, 0.30),
+                  0 1px 6px  rgba(50, 30, 8, 0.18);
   border-radius : 3px;
   
   transform: perspective(1000px) rotateX(25deg) scale(0.65) translateY(120px) translate3d(0, 0, 0);
@@ -126,7 +127,9 @@
   border: 1.5px solid rgba(139, 101, 55, 0.35);
   outline: 4px solid rgba(139, 101, 55, 0.08);
   outline-offset: -6px;
-  box-shadow: 0 35px 80px rgba(0,0,0,0.6);
+  /* Soft natural elevation shadow — not glowing */
+  box-shadow: 0 10px 32px rgba(40, 22, 5, 0.32),
+              0 2px  8px  rgba(40, 22, 5, 0.16);
   will-change     : transform;
   transform       : translate3d(0, 0, 0);
   backface-visibility: hidden;
@@ -489,38 +492,32 @@
 }
 
 #scroll-paper.magic-glow-pulse {
-  box-shadow: 0 0 35px rgba(212, 175, 55, 0.82), 
-              0 2px 18px rgba(80, 50, 10, 0.25),
-              inset 0 0 45px rgba(200, 160, 90, 0.2) !important;
-  transition: box-shadow 0.4s ease-in-out !important;
+  /* Subtle warmth pulse — barely perceptible, not a neon ring */
+  box-shadow: 0 10px 32px rgba(40, 22, 5, 0.32),
+              0 0 14px rgba(212, 175, 55, 0.22),
+              0 2px 8px  rgba(40, 22, 5, 0.16) !important;
+  transition: box-shadow 0.5s ease-in-out !important;
 }
 
-/* Paragraph phantom fade states */
+/* Paragraph phantom fade states — whole-paragraph reveal */
 .magic-paragraph {
   opacity: 0;
-  transition: opacity 1.5s ease-in-out;
+  transform: translateY(6px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .magic-paragraph.fade-phantom {
-  opacity: 0.26 !important;
+  opacity: 0 !important;
+  transform: translateY(6px) !important;
 }
 .magic-paragraph.writing, .magic-paragraph.finished {
   opacity: 1 !important;
+  transform: translateY(0) !important;
 }
 
-/* Flowing wet-to-dry quill ink characters */
+/* magic-char is now only used for the drop-cap letter; plain text uses textContent */
 .magic-char {
   display: inline-block;
-  opacity: 0;
-  filter: blur(1.4px) sepia(0.85);
-  transform: scale(0.82) translate(-0.4px, 0.4px);
-  color: #8b5a2b; /* wet light-brown ink */
-  transition: opacity 0.35s ease-out, filter 0.35s ease-out, transform 0.35s ease-out, color 0.65s ease-in-out;
-}
-.magic-char.written {
-  opacity: 1;
-  filter: blur(0) sepia(0);
-  transform: scale(1) translate(0, 0);
-  color: var(--house-text); /* dry dark-brown house text */
 }
 
 /* Cursive vector signature stroke animations */
