@@ -1,88 +1,181 @@
-# Antigravity Developer Guide: Golden Summer Sunset Birthday Scrapbook
+# Developer Guide — Hogwarts Birthday
 
-This document provides a complete technical guide to the architecture, subsystems, and code patterns of the birthday website. It is designed to give the Antigravity coding agent (or any developer) immediate, comprehensive understanding of the project.
+This document provides a complete technical guide to the architecture, subsystems, and code patterns of the birthday website. It is designed to give any developer or AI agent immediate, comprehensive understanding of the project.
 
 ---
 
 ## 📂 File Architecture Overview
 
-The codebase is a high-performance, vanilla front-end application with no external dependencies (no bundlers, frameworks, or npm modules). It relies purely on native HTML5, CSS3, and ES6+ JavaScript.
+A high-performance, vanilla front-end application with no build tools, bundlers, frameworks, or npm runtime dependencies. Purely HTML5, CSS3, and ES6+ JavaScript modules.
 
-1. **[index.html](file:///c:/Users/anian/Downloads/IMP_2/New_birthday/index.html)**: Defines the semantic structure of the document. Contains the preloader screen overlays, background video nodes (active & buffer), envelope structure, 3D scroll container, audio EQ button, and theme switcher.
-2. **[content.js](file:///c:/Users/anian/Downloads/IMP_2/New_birthday/content.js)**: Configures user-facing variables (friend's name, message scroll text, background video filenames, theme colors, and audio path) as a single global configuration object `BIRTHDAY_CONTENT`.
-3. **[style.css](file:///c:/Users/anian/Downloads/IMP_2/New_birthday/style.css)**: Implements the premium design system, including layout structures, glassmorphism filters, deckle-edge SVGs, transitions, device orientation responsive media queries, and keyframe animations.
-4. **[script.js](file:///c:/Users/anian/Downloads/IMP_2/New_birthday/script.js)**: Orchestrates the parallel asset preloader, local memory media caching, theme cross-fading, mouse/accelerometer parallax math, interactive event handlers, and synthesized procedural audio.
+```
+/
+├── index.html              Main document — semantic structure, DOM shell
+├── content.js              User-facing configuration (name, message, house, videos, audio)
+├── vercel.json             Vercel static hosting config (passthrough routes)
+├── public/
+│   ├── css/
+│   │   ├── main.css        CSS entry point (@import cascade)
+│   │   ├── base/
+│   │   │   ├── variables.css    Theme tokens, CSS custom properties, background asset slots
+│   │   │   ├── fonts.css
+│   │   │   └── reset.css
+│   │   └── layout/
+│   │       ├── app.css          Main layout, hero block, typography (mobile-first)
+│   │       ├── responsive.css   3-tier mobile breakpoints (primary design target)
+│   │       ├── envelope.css     3D envelope construction
+│   │       ├── parchment.css    Scroll modal, letter text, paragraph reveal
+│   │       ├── landing.css      Video backgrounds, bottom control dock
+│   │       └── ...             (loader, spells, house-selector, etc.)
+│   ├── js/
+│   │   ├── main.js              ES module entry point
+│   │   ├── core/
+│   │   │   ├── state.js         Centralized state namespaces
+│   │   │   ├── events.js        Normalized event coordinator (resize, pointer, visibility)
+│   │   │   └── constants.js     DEFAULT_SIZES registry, magic constants
+│   │   ├── story/
+│   │   │   ├── narrative.js     Letter reveal — paragraph fade-in system
+│   │   │   ├── envelope.js      Envelope open/close sequence and timing
+│   │   │   └── parchment.js     Scroll modal open/close event listeners
+│   │   ├── audio/
+│   │   │   ├── music.js
+│   │   │   └── wind.js
+│   │   ├── animation/
+│   │   │   └── particles.js     Spark cluster engine
+│   │   └── ...
+│   └── assets/
+│       ├── audio/
+│       ├── video/               House background MP4 loops
+│       ├── textures/            wood-table.png, parchments.png, mobile slots
+│       └── ui/                  wax-seal.png, divider.png, envelope mobile slot
+└── CHANGELOG.md
+└── ASSETS.md
+└── FEATURES.md
+└── CODEBASE_GUIDE.md (this file)
+└── ARCHITECTURE_AUDIT.md
+```
 
 ---
 
 ## ⚙️ Core Subsystems
 
-### 1. Parallel Preloader & Blob URL Caching
-* **Purpose**: Since the background video files total **~54 MB** and the audio is **~4.8 MB**, on-demand loading would cause lag and stuttering. The preloader downloads all files concurrently at startup.
-* **Mechanism**:
-  - The script fetches the list of assets defined in `content.js` concurrently.
-  - Using the Fetch API's `ReadableStream` interface (`reader.read()`), the engine streams chunk-by-chunk and aggregates the total bytes loaded.
-  - Progress is displayed as a 0%–100% glowing progress bar with a floating "stardust" particle tip.
-  - **Asset Sizing**: To circumvent issues where web hosts omit the `Content-Length` header, a `DEFAULT_SIZES` lookup is defined with exact byte counts.
-  - **Caching**: Once fully downloaded, chunks are compiled into a `Blob` and converted to memory Object URLs (`URL.createObjectURL(blob)`), which are cached in the `PRELOADED_ASSETS` registry.
-  - **Timeout Safeguard**: If any download fails or the loader takes longer than **15 seconds** (e.g. on slow connections), the preloader initiates a fallback recovery, fading the loader out and sliding into on-demand loading so the user is never blocked.
+### 1. Parallel Preloader & Asset Loading
+- Fetches house videos and background music concurrently on startup.
+- Uses `ReadableStream` (`reader.read()`) to stream chunk-by-chunk and aggregate progress.
+- Progress displayed as a 0%–100% glowing bar with a stardust particle tip.
+- `DEFAULT_SIZES` lookup in `constants.js` prevents stalling when hosts omit `Content-Length`.
+- 15-second timeout fallback: if any download fails, the preloader fades out and experience starts on-demand.
 
-### 2. Time-Aware Cross-fading Themes
-* **Purpose**: The background video transitions smoothly between four local time-of-day phases: Morning, Afternoon, Sunset, and Night.
-* **Mechanism**:
-  - On first load, the script gets `new Date().getHours()` to set the initial theme.
-  - **Smooth Transitions**: To prevent video flickering or blank frames, the DOM includes two overlapping video elements: `#bg-video` (active) and a dynamically created sibling `bufferVideo`.
-  - When switching themes, the new video (using the preloaded Blob URL) loads into `bufferVideo`. Once it reaches the `oncanplay` state, `bufferVideo` plays and transitions its opacity from `0` to `1` over `1.5s`, while the active video fades to `0` and pauses.
+### 2. House Theme System
+- Four houses: Gryffindor, Slytherin, Ravenclaw, Hufflepuff.
+- CSS custom properties (`--house-primary`, `--house-accent`, `--house-overlay`, `--house-text`, `--house-glow`) defined in OKLCH color space in `variables.css`.
+- Theme class (e.g. `.theme-slytherin`) applied to `<body>`. Switching theme cross-fades the house background video.
+- Background video transitions: two overlapping `<video>` elements (`#bg-video` + buffer). Buffer fades in over 1.5s once `canplay` fires, then active fades out.
 
-### 3. Web Audio Procedural Synthesizers
-The project avoids static sound files for UI transitions, instead synthesizing realistic, high-quality audio events procedurally using the browser's Web Audio API.
+### 3. Letter Reveal — Paragraph Fade-In (`narrative.js`)
+Replaces the previous character-by-character typewriter loop.
 
-* **Wax Seal Cracking Sound (`playCrackSound`)**:
-  - Generates a short (0.15s) buffer of filtered noise.
-  - Applies a rapid exponential gain ramp to simulate a physical snap.
-  - Uses a `bandpass` filter centered at `1200Hz` with a high Q factor (`4`) to match wax fracturing.
-* **Scroll Paper Rustling Sound (`playScrollSound`)**:
-  - Blends Pink noise (deep fiber rustle) and Brown noise (integral of white noise) to form a thick paper texture.
-  - Spawns random high-frequency crackle events to simulate folding parchment fibers.
-  - Employs a dynamic `bandpass` filter that sweeps from `600Hz` down to `350Hz` in sync with the visual unfolding duration.
-* **Ambient Ocean Wave Loop (`startAmbientWaves`)**:
-  - Generates 4 seconds of deep looping Brown noise.
-  - Routes the signal through a lowpass filter modulated by an LFO (low-frequency oscillator) running at `0.12Hz` (~8.3-second wave cycle).
-  - An interval slowly updates the gain between `0.03` and `0.08` in sync with the LFO, matching the breathing swell of physical waves.
+**How it works:**
+1. `revealHogwartsLetter(msgEl, text)` calls `makeMsgLiving()` to inject time-of-day greeting and visit postscripts.
+2. `_injectDropCapAndRender(el, text)` splits text by `\n`, creates one `<p class="magic-paragraph fade-phantom">` per paragraph.
+3. Each paragraph is set via `pEl.textContent = para` — no span wrapping.
+4. A `setTimeout` loop stagers reveal: `delay = 80ms + (index × 120ms)`.
+5. On reveal: class `.fade-phantom` removed, `.writing` added → CSS transitions `opacity: 0 → 1` and `translateY(6px) → 0` in `0.5s`.
+6. Signature paragraphs render an SVG `<path class="sig-path">` with stroke-dashoffset animation.
+7. Drop-cap first letter gets a `<span class="drop-cap">` and a `spawnSparkCluster()` call.
 
-### 4. Parallax & Device Orientation Math
-* **Purpose**: Elements (the scroll and the background) tilt slightly in response to user movements to create a 3D glass depth effect.
-* **Mechanism**:
-  - Tracks client mouse positioning on desktops (`mousemove`) and gyroscope tilt coordinates on mobile (`deviceorientation`).
-  - Standardizes coordinates into normalized offsets and computes a linear interpolation (Lerp) algorithm running inside a `requestAnimationFrame` loop.
-  - Updates the CSS custom variables `--mx` and `--my` globally on the document root.
+**Total reveal time**: ~0.8s for a 4-paragraph letter.
 
-### 5. Sparkle Particle Trail (`initSparkleTrail`)
-* **Purpose**: Drags a trail of glowing, 4-pointed stars behind the user's cursor or touch point.
-* **Mechanism**:
-  - An overlay `<canvas id="sparkle-canvas">` spans the screen.
-  - Spawns `Sparkle` instances (storing position, angle, spin velocity, size decay, and alpha parameters) on pointer movements.
-  - The canvas render loop rotates and scales the coordinates of each particle to draw a custom 4-pointed star, cleaning up old instances once their life spans hit 0.
+### 4. Web Audio Procedural Synthesizers
+All audio events synthesized via the Web Audio API — no WAV/MP3 sound effects:
 
-### 6. Interactive 3D Scroll Modal
-* **Purpose**: Houses the main birthday text in an elegant unfolding container.
-* **Mechanism**:
-  - Uses CSS perspective (`perspective: 1000px`) and 3D transforms (`transform-style: preserve-3d`).
-  - Unrolls using top and bottom flaps (#`scroll-flap-top` and #`scroll-flap-bottom`) that rotate 115 degrees outwards (`rotateX(115deg)`) when the `.unfolded` class is added.
-  - Text is animated into view using a typewriter typing loop.
+| Synthesizer | Function | Technique |
+|---|---|---|
+| Wax seal crack | `playCrackSound` | Filtered white noise, 0.15s, bandpass 1200Hz |
+| Scroll unfolding | `playScrollSound` | Pink+Brown noise, bandpass sweep 600→350Hz, 0.8s |
+| Wind ambience | `wind.js` | White noise + LFO at 0.04–0.12Hz |
+| Crystal wish bell | `ceremony.js` | Detuned sine chord, 5s exponential decay |
+
+### 5. Parallax & Device Orientation
+- Desktop: tracks `mousemove` → normalizes to `--mx`, `--my` CSS custom properties.
+- Mobile: tracks `deviceorientation` (gyroscope) → same normalized offsets.
+- Single `requestAnimationFrame` LERP loop at 60fps. All consuming modules read from `state.pointer`.
+- Parallax disabled on the envelope scene on phones (`transform: none`) — gyro parallax feels erratic during portrait use.
+
+### 6. Sparkle Particle Trail
+- Overlay `<canvas id="sparkle-canvas">` spans the screen.
+- Spawns `Sparkle` instances (position, angle, spin velocity, size decay, alpha) on pointer movement.
+- Draws custom 4-pointed stars via canvas 2D context in a `requestAnimationFrame` loop.
+- `spawnSparkCluster(x, y, intensity, burst)` API used by letter reveal and spell effects.
+
+### 7. Interactive 3D Scroll Modal
+- CSS `perspective: 1000px` + `transform-style: preserve-3d`.
+- Flaps (`#scroll-flap-top`, `#scroll-flap-bottom`) rotate `115deg` outward on `.unfolded` class.
+- Tilt on mouse/gyro: `rotateX(calc(var(--my) * -0.02deg)) rotateY(calc(var(--mx) * 0.02deg))`.
+- Scroll paper uses deckle-edge SVG filter (`feTurbulence` + `feDisplacementMap`) for torn-paper border — disabled on `≤ 480px` for performance.
+- Letter text shadow: `0 10px 32px rgba(40,22,5,0.32)` — natural cast shadow. No glow effects.
 
 ---
 
-## 🎨 Styling Architecture (CSS Design System)
+## 📱 Mobile-First Architecture
 
-* **Theme Tokens**: Variable tokens are defined inside `:root` for text, wax seal reds, and envelope colors. Component theme variants (`.theme-morning`, `.theme-night`, etc.) re-assign background glass values dynamically.
-* **Deckle Edges**: The scroll background shape is distorted organically using an inline SVG fractal noise filter (`feTurbulence` and `feDisplacementMap` under filter ID `#deckle-edge`).
-* **Fluid Layouts & Safe Areas**: Layout sizes employ fluid scaling variables (`clamp()`) and standard mobile layout variables (`--sat`, `--sab`, `--sar`, `--sal`) to account for notched iOS/Android display bezels.
+### Primary Design Targets
+Android portrait phones: `360×640`, `393×851`, `412×915`, `430×932`.
+
+### Breakpoint Tiers (`responsive.css`)
+| Tier | Query | Role |
+|---|---|---|
+| Base (no query) | All | Desktop defaults |
+| Tier 1 | `≤ 768px` | All phones — dock, scroll, house grid |
+| Tier 2 | `≤ 480px` | Portrait primary — all component proportions |
+| Tier 3 | `≤ 360px` | Narrowest compact Android |
+| Landscape | `max-height: 500px + landscape` | Short landscape override |
+
+### Mobile Asset Slot System
+CSS variables in `variables.css` provide hot-swappable asset slots:
+```css
+/* Activate by updating these variables */
+--body-bg-image-mobile      /* wood-table-mobile.png */
+--parchment-bg-mobile       /* parchment-mobile.png */
+--envelope-bg-mobile        /* envelope-mobile.png */
+```
+All slots fire on `@media (max-width: 767px) and (orientation: portrait)`.
+
+---
+
+## 🎨 CSS Design System
+
+- **Theme tokens**: All house colors in OKLCH in `variables.css`. WCAG AA compliant.
+- **Mobile-first clamp typography**: Values start from phone widths and scale up — desktop gets the upper bound of `clamp()`.
+- **Deckle edges**: `feTurbulence + feDisplacementMap` inline SVG filter on scroll paper. Disabled on `≤ 480px` for GPU savings.
+- **Safe areas**: `--sat`, `--sab`, `--sar`, `--sal` (env safe-area-inset) used in all paddings.
+- **Dynamic height**: `100dvh` + `calc(var(--vh) * 100)` fallback for iOS Safari `dvh` timing bugs.
+- **No external CSS frameworks** — all styling is custom, no Tailwind, no Bootstrap.
 
 ---
 
 ## 🛠️ Code Maintenance & Extension Patterns
 
-* **Updating Assets**: Background videos and music files can be replaced by editing `content.js` and saving files locally.
-* **Content Customization**: The recipient's name, message body, date, and sender signatures can be tweaked directly in `content.js`.
-* **CSS Additions**: Loading styles reside at the bottom of `style.css` in a dedicated `PRELOADING SCREEN` section. Focus outlines and EQ visualizers are organized under `ACCESSIBILITY & INTERACTIVE UPGRADES`.
+### Updating content
+- Edit `content.js` to change the recipient's name, message, house, video paths, or music path.
+- No rebuild needed — the browser reads `content.js` as a global `BIRTHDAY_CONTENT` object.
+
+### Swapping mobile assets
+- Drop the PNG into `public/assets/textures/` or `public/assets/ui/`.
+- Update the corresponding CSS variable in `variables.css`. (See [ASSETS.md](./ASSETS.md).)
+
+### Adding a new spell
+1. Add the spell to the spell selector in `index.html`.
+2. Create a handler in `public/js/effects/spells.js`.
+3. Register cleanup in the deactivation routine (set canvas `width = 0; height = 0`).
+4. Follow the existing `fillSpell(name)` API pattern.
+
+### Adding a CSS rule
+- For mobile-specific: add to the appropriate tier in `responsive.css`.
+- For global: add to the relevant layout file under `public/css/layout/`.
+- Never add rules to `main.css` directly — it is an `@import` entry point only.
+
+### Deployment
+- Static host: drop the project folder (no build step).
+- Vercel: `vercel.json` is present and configures passthrough routes for `index.html`.
+- GitHub Pages, Netlify, or any CDN: works out of the box.
