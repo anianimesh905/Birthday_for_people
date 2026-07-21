@@ -479,72 +479,9 @@ export async function startPreloader() {
   const activeVideoId = houseVideoMap[activeHouse] || 'slytherinVideo';
   const activeVideoUrl = c[activeVideoId] || `videos/${activeHouse}.mp4`;
 
-  const assets = [
-    { id: 'musicFile',       url: c.musicFile       || 'birthday.mp3'         }
-  ].filter(asset => asset.url);
-
-  assets.forEach(asset => {
-    const basename = asset.url.split('/').pop();
-    asset.size = DEFAULT_SIZES[basename] || 15000000;
-  });
-
-  const totalBytes = assets.reduce((sum, asset) => sum + asset.size, 0);
-  let bytesLoaded = {};
-  assets.forEach(asset => bytesLoaded[asset.id] = 0);
-
-  const statusMessages = {
-    gryffindorVideo: "Summoning the Gryffindor common room\u2026",
-    slytherinVideo : "Descending to the Slytherin dungeons\u2026",
-    ravenclawVideo : "Climbing the stairs to Ravenclaw Tower\u2026",
-    hufflepuffVideo: "Finding the Hufflepuff burrow\u2026",
-    musicFile      : "Tuning the enchanted phonograph\u2026"
-  };
-
-  const abortCtrl = new AbortController();
-
-  const fallbackTimeout = setTimeout(() => {
-    if (!preloadCompleted) {
-      abortCtrl.abort();
-      completePreloading();
-    }
-  }, 15000);
-
-  function updateProgressUI() {
-    const currentTotal = Object.values(bytesLoaded).reduce((a, b) => a + b, 0);
-    const ratio = totalBytes > 0 ? (currentTotal / totalBytes) : 1;
-    const percent = Math.min(99, Math.floor(ratio * 100));
-    
-    const progressBar = document.getElementById("loading-progress-bar");
-    const percentageLabel = document.getElementById("loading-percentage");
-    
-    if (progressBar) progressBar.style.transform = `scaleX(${Math.min(0.99, ratio)})`;
-    if (percentageLabel) percentageLabel.textContent = `${percent}%`;
-
-    let currentLoadingAsset = null;
-    for (const asset of assets) {
-      if (bytesLoaded[asset.id] < asset.size) {
-        currentLoadingAsset = asset;
-        break;
-      }
-    }
-    
-    const statusLabel = document.getElementById("loading-status");
-    if (statusLabel && currentLoadingAsset) {
-      const msg = statusMessages[currentLoadingAsset.id] || "Summoning Hogwarts owl post\u2026";
-      if (statusLabel.textContent !== msg) {
-        statusLabel.style.opacity = "0";
-        setTimeout(() => {
-          statusLabel.textContent = msg;
-          statusLabel.style.opacity = "1";
-        }, 150);
-      }
-    }
-  }
-
   function completePreloading() {
     if (preloadCompleted) return;
     preloadCompleted = true;
-    clearTimeout(fallbackTimeout);
 
     if (footstepInterval) {
       clearInterval(footstepInterval);
@@ -558,37 +495,6 @@ export async function startPreloader() {
 
     if (progressBar) progressBar.style.transform = "scaleX(1)";
     if (percentageLabel) percentageLabel.textContent = "100%";
-    
-    if (statusLabel) {
-      statusLabel.style.opacity = "0";
-      setTimeout(() => {
-        statusLabel.textContent = "Sealing the envelope with wax\u2026";
-        statusLabel.style.opacity = "1";
-      }, 150);
-    }
-
-    if (subtitle) {
-      subtitle.style.transition = "opacity 0.3s ease";
-      subtitle.style.opacity = "0";
-      setTimeout(() => {
-        subtitle.textContent = "Mischief Managed.";
-        subtitle.style.opacity = "1";
-      }, 300);
-    }
-
-    if (solemnSwear) {
-      solemnSwear.style.transition = "opacity 0.4s ease";
-      solemnSwear.style.opacity = "0";
-    }
-    const progressContainer = document.getElementById("loading-progress-container");
-    if (progressContainer) {
-      progressContainer.style.transition = "opacity 0.4s ease";
-      progressContainer.style.opacity = "0";
-    }
-    if (percentageLabel) {
-      percentageLabel.style.transition = "opacity 0.4s ease";
-      percentageLabel.style.opacity = "0";
-    }
 
     setTimeout(() => {
       const loader = document.getElementById("loading-screen");
@@ -597,55 +503,18 @@ export async function startPreloader() {
         setTimeout(() => {
           loader.style.display = "none";
           initializeMainApp();
-        }, 400);
+        }, 300);
       } else {
         initializeMainApp();
       }
-    }, 200);
+    }, 150);
   }
 
-  assets.forEach(async (asset) => {
-    try {
-      const response = await fetch(asset.url, { signal: abortCtrl.signal });
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      
-      const reader = response.body.getReader();
-      const chunks = [];
-      let loaded = 0;
-      
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        chunks.push(value);
-        loaded += value.length;
-        bytesLoaded[asset.id] = loaded;
-        updateProgressUI();
-      }
-      
-      let contentType = response.headers.get("content-type");
-      if (!contentType) {
-        if (asset.url.endsWith(".mp4")) {
-          contentType = "video/mp4";
-        } else if (asset.url.endsWith(".mp3")) {
-          contentType = "audio/mp3";
-        }
-      }
-      const blob = new Blob(chunks, contentType ? { type: contentType } : {});
-      const objectUrl = URL.createObjectURL(blob);
-      PRELOADED_ASSETS[asset.id] = objectUrl;
-    } catch (err) {
-      bytesLoaded[asset.id] = asset.size;
-      updateProgressUI();
-    }
-    
-    loadedCount++;
-    if (loadedCount === assets.length) {
-      completePreloading();
-    }
-  });
+  // Instantly finish preloading — browser streams video & audio on demand natively
+  const progressBar = document.getElementById("loading-progress-bar");
+  const percentageLabel = document.getElementById("loading-percentage");
+  if (progressBar) progressBar.style.transform = "scaleX(1)";
+  if (percentageLabel) percentageLabel.textContent = "100%";
 
-  if (assets.length === 0) {
-    completePreloading();
-  }
+  setTimeout(completePreloading, 100);
 }
