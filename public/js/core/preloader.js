@@ -449,6 +449,7 @@ export async function startPreloader() {
   spawnPreloaderFootstep();
   footstepInterval = setInterval(spawnPreloaderFootstep, 580);
 
+  const c = window._bdContent || (typeof BIRTHDAY_CONTENT !== 'undefined' ? BIRTHDAY_CONTENT : {});
   const savedHouse = sessionStorage.getItem('selectedHouse');
   const defaultHouse = ((c && c.defaultHouse) || 'Slytherin').toLowerCase();
   const activeHouse = (savedHouse || defaultHouse).toLowerCase();
