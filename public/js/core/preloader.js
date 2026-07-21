@@ -80,7 +80,8 @@ export function startCinematicSequence() {
   const overlay = document.getElementById("cinematic-overlay");
   if (overlay) overlay.style.display = "none";
   endCinematic();
-}
+  return;
+
   setTimeout(() => {
     if (_cinematicActive) playOwlHoot();
   }, 2500);
@@ -369,7 +370,7 @@ export function startCinematicSequence() {
 }
 
 export async function startPreloader() {
-  const c = typeof BIRTHDAY_CONTENT !== "undefined" ? BIRTHDAY_CONTENT : {};
+  const c = window._bdContent || (typeof BIRTHDAY_CONTENT !== "undefined" ? BIRTHDAY_CONTENT : {});
 
   const friendName = c.friendName || "Sofia";
   document.title = `Happy Birthday, ${friendName}! ⚡ A Letter from Hogwarts`;
@@ -449,7 +450,6 @@ export async function startPreloader() {
   spawnPreloaderFootstep();
   footstepInterval = setInterval(spawnPreloaderFootstep, 580);
 
-  const c = window._bdContent || (typeof BIRTHDAY_CONTENT !== 'undefined' ? BIRTHDAY_CONTENT : {});
   const savedHouse = sessionStorage.getItem('selectedHouse');
   const defaultHouse = ((c && c.defaultHouse) || 'Slytherin').toLowerCase();
   const activeHouse = (savedHouse || defaultHouse).toLowerCase();
