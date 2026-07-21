@@ -42,13 +42,13 @@
 /* 3D Scroll Paper Frame */
 #scroll-paper {
   width: min(460px, 92vw);
-  max-height: calc(var(--vh) * 80);
-  max-height: 80dvh;
+  max-height: calc(var(--vh) * 84);
+  max-height: 84dvh;
   position: relative;
   display: flex;
   flex-direction: column;
   transform-style: preserve-3d;
-  background-color : #F5E6C8; /* warm parchment base */
+  background-color : #F5E6C8;
   will-change: transform, opacity;
   background-image :
     repeating-linear-gradient(
@@ -74,6 +74,33 @@
   z-index: 2;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+}
+
+/* ── Mobile asset slot: swap parchment texture for portrait-optimised version ──
+   Drop assets/textures/parchment-mobile.png to automatically use it on phones.  */
+@media (max-width: 767px) and (orientation: portrait) {
+  #scroll-paper {
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent          26px,
+        rgba(139,101,55,0.07) 27px
+      ),
+      var(
+        --parchment-bg-mobile,
+        url('../../assets/textures/parchments.png')
+      );
+    background-size: auto, cover;
+  }
+  #scroll-flap-top,
+  #scroll-flap-bottom {
+    background-image: var(
+      --parchment-bg-mobile,
+      url('../../assets/textures/parchments.png')
+    );
+    background-size: cover;
+  }
 }
 
 #scroll-overlay.open #scroll-paper {
@@ -253,9 +280,10 @@
 
 /* Scroll content container */
 #scroll-inner {
-  padding: 2.8rem 2.2rem 2.8rem 3.4rem;
-  max-height: calc(var(--vh) * 80 - 10px);
-  max-height: calc(80dvh - 10px);
+  /* Base padding optimised for mobile reading first */
+  padding: 2.2rem 1.4rem 2.2rem 2.2rem;
+  max-height: calc(var(--vh) * 82 - 10px);
+  max-height: calc(82dvh - 10px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;

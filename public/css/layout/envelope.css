@@ -43,11 +43,23 @@
 /* Outer envelope container */
 #envelope {
   position: relative;
-  width:  clamp(200px, 52vw, 280px);
-  height: clamp(138px, 36vw, 193px);
-  background-color: #E8D5A3; /* aged-parchment envelope base */
+  /* Mobile-first sizing: feels right in hand on a 390px phone */
+  width:  clamp(200px, 55vw, 280px);
+  height: clamp(138px, 38vw, 193px);
+  background-color: #E8D5A3;
   transition: transform 0.2s ease;
-  overflow: hidden; /* contain owls and vignette */
+  overflow: hidden;
+}
+
+/* ── Mobile asset slot: swap envelope face for portrait-optimised version ──
+   Drop assets/ui/envelope-mobile.png to automatically use it on phones.     */
+@media (max-width: 767px) and (orientation: portrait) {
+  #env-back {
+    /* Will show envelope-mobile.png background if available */
+    background-image: var(--envelope-bg-mobile, none);
+    background-size: cover;
+    background-position: center;
+  }
 }
 
 /* Soft shadows */

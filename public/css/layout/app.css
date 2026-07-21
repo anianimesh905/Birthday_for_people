@@ -36,12 +36,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-evenly; /* Even spacing for Android tall screens */
+  /* Mobile-first: space-between keeps hero and envelope balanced on tall phones */
+  justify-content: space-between;
   padding:
-    calc(1.8rem + var(--sat))
-    calc(1.4rem + var(--sar))
-    calc(5.8rem + var(--sab)) /* Guard bottom buttons overlap */
-    calc(1.4rem + var(--sal));
+    max(1.4rem, calc(1.2rem + var(--sat)))
+    max(1.2rem, calc(1rem + var(--sar)))
+    max(5.8rem, calc(5.4rem + var(--sab)))
+    max(1.2rem, calc(1rem + var(--sal)));
   overflow: hidden;
 }
 
@@ -56,7 +57,8 @@
 #hero::after {
   content: '';
   position: absolute;
-  width: min(360px, 82vw); height: min(360px, 82vw);
+  /* Desktop ring — hidden on mobile via responsive.css */
+  width: min(320px, 78vw); height: min(320px, 78vw);
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.05);
   top: 50%; left: 50%;
@@ -72,8 +74,9 @@
 #greeting-label {
   font-family: 'Jost', sans-serif;
   font-weight: 400;
-  font-size: clamp(0.56rem, 2.4vw, 0.8rem);
-  letter-spacing: 0.46em;
+  /* Mobile-first: starts at phone size, scales up for desktop */
+  font-size: clamp(0.55rem, 2.6vw, 0.80rem);
+  letter-spacing: 0.40em;
   text-transform: uppercase;
   color: var(--house-accent);
   text-shadow: 
@@ -81,14 +84,15 @@
     0 4px 10px rgba(0, 0, 0, 0.85),
     0 0 20px rgba(0, 0, 0, 0.95),
     0 0 10px var(--house-accent);
-  margin-bottom: clamp(0.35rem, 1.4vh, 0.75rem);
+  margin-bottom: clamp(0.3rem, 1.2vh, 0.75rem);
 }
 
 #hero-friend-name {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: clamp(2.5rem, 9.5vw, 5.0rem);
-  line-height: 1.05;
+  /* Mobile-first: large but fits 360px wide portrait screens */
+  font-size: clamp(2.2rem, 9vw, 4.5rem);
+  line-height: 1.06;
   letter-spacing: -0.01em;
   text-transform: uppercase;
   color: var(--house-accent);
@@ -98,37 +102,37 @@
     0 0 30px rgba(0, 0, 0, 0.95),
     0 0 15px var(--house-accent);
   text-align: center;
-  margin-top: 10px;
-  margin-bottom: clamp(0.5rem, 2vh, 1.5rem);
+  margin-top: 6px;
+  margin-bottom: clamp(0.3rem, 1.5vh, 1.4rem);
 }
 
 #birthday-date {
   font-family: 'Jost', sans-serif;
   font-weight: 400;
-  font-size: clamp(0.65rem, 2.6vw, 0.95rem);
-  letter-spacing: 0.34em;
+  font-size: clamp(0.60rem, 2.5vw, 0.92rem);
+  letter-spacing: 0.30em;
   text-transform: uppercase;
   color: var(--house-text);
   text-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.95),
     0 4px 10px rgba(0, 0, 0, 0.85),
     0 0 20px rgba(0, 0, 0, 0.95);
-  margin-top: clamp(0.35rem, 1.4vh, 0.75rem);
+  margin-top: clamp(0.25rem, 1vh, 0.65rem);
 }
 
 #tagline {
   font-family: 'Lora', serif;
   font-style: italic;
-  font-size: clamp(0.88rem, 3.8vw, 1.25rem);
+  font-size: clamp(0.85rem, 3.5vw, 1.20rem);
   color: var(--house-text);
   text-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.95),
     0 4px 12px rgba(0, 0, 0, 0.85),
     0 0 20px rgba(0, 0, 0, 0.95);
   text-align: center;
-  margin: 0 auto clamp(1rem, 3.5vh, 2rem);
-  max-width: 86vw;
-  line-height: 1.6;
+  margin: 0 auto clamp(0.6rem, 2.5vh, 1.8rem);
+  max-width: 88vw;
+  line-height: 1.58;
 }
 
 
