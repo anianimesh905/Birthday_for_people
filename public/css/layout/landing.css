@@ -270,7 +270,8 @@
     0 4px 10px rgba(62, 39, 20, 0.05),
     inset 0 0 35px rgba(255, 255, 255, 0.55);
   border-radius: 24px;
-  padding: 3.5rem 2.2rem;
+  /* Mobile-first padding: comfortable on 360px, generous on larger screens */
+  padding: clamp(2rem, 5vh, 3.5rem) clamp(1.4rem, 5vw, 2.2rem);
   width: min(390px, 88vw);
   text-align: center;
   transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);

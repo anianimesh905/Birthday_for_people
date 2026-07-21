@@ -11,10 +11,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Account for safe-area on all edges, especially bottom (home bar) */
   padding:
     calc(1.2rem + var(--sat))
     calc(1.2rem + var(--sar))
-    calc(1.2rem + var(--sab))
+    calc(1.4rem + var(--sab))
     calc(1.2rem + var(--sal));
   opacity: 0;
   pointer-events: none;
@@ -239,9 +240,9 @@
 }
 
 .hogwarts-divider {
-  height: 18px;
+  height: 16px;
   background: url('../../assets/ui/divider.png') no-repeat center/contain;
-  margin: 0.4rem auto 0.7rem;
+  margin: 0.35rem auto 0.55rem; /* base: slightly tighter than before */
   width: 80%;
   max-width: 260px;
   user-select: none;

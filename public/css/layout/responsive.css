@@ -1,15 +1,9 @@
 /* ============================================================
-   📱 MOBILE-FIRST RESPONSIVE SYSTEM
-   Primary targets: Android portrait 360×640 → 430×932
-   Desktop is secondary. All base values designed for mobile.
-   ============================================================ */
-
-/* ============================================================
    TIER 1 — All phones ≤ 768px (shared mobile base)
    ============================================================ */
 @media (max-width: 768px) {
 
-  /* ── Main layout: column, fill viewport, no overflow ── */
+  /* ── Main layout: space-evenly distributes hero/envelope evenly ── */
   #main-content {
     justify-content: space-evenly;
     align-items: center;
@@ -29,28 +23,45 @@
   #scroll-paper {
     width: min(96vw, 480px);
     max-height: min(88dvh, 92svh);
-    border-radius: 6px;
+    border-radius: 8px;  /* consistent with mobile-performance override */
   }
   #scroll-inner {
-    padding: 2rem 1.4rem 2rem 2rem;
+    padding: 2rem 1.6rem 2rem 2rem; /* symmetric side padding */
     max-height: min(80dvh, 84svh);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
   }
 
+  /* Left-align body text on tablets too — justified looks bad under 768px */
+  #scroll-message,
+  #scroll-message p {
+    text-align: left !important;
+    text-align-last: left !important;
+  }
+
   /* ── House modal grid ── */
   .house-grid { gap: 12px; }
   .house-badge { padding: clamp(8px, 2vh, 16px) 6px; }
+
+  /* Disable paperBreathe float on mobile — causes micro-jitter on scroll */
+  #scroll-container {
+    animation: none !important;
+  }
+
+  /* Corner decorations: hide on mobile to prevent overlap with content */
+  .scroll-corner {
+    display: none !important;
+  }
 
   /* ── Bottom control dock ── */
   .bottom-control-dock {
     padding: 5px 10px;
     gap: 8px;
-    bottom: max(0.8rem, calc(0.6rem + var(--sab)));
+    /* Increased bottom clearance so the pill doesn't clip the screen edge */
+    bottom: max(1.0rem, calc(0.75rem + var(--sab)));
     border-color: var(--house-accent);
     border-width: 1.5px;
-    /* Ensure backdrop is slightly more opaque on mobile */
     background: rgba(10, 7, 4, 0.50);
   }
   .bottom-control-dock button {
@@ -63,7 +74,6 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    /* Warm dark translucent — never pure black */
     background: rgba(30, 22, 12, 0.65) !important;
     border: 1.5px solid var(--house-accent) !important;
     color: var(--house-accent) !important;
@@ -107,21 +117,21 @@
    ============================================================ */
 @media (max-width: 480px) {
 
-  /* ── Main layout: portrait-optimised vertical rhythm ── */
+  /* ── Main layout: space-evenly distributes content cleanly on ALL portrait heights ── */
   #main-content {
-    justify-content: space-between;
-    padding-top:    max(1.4rem, calc(1rem + var(--sat)));
+    justify-content: space-evenly;
+    padding-top:    max(1.2rem, calc(0.9rem + var(--sat)));
     padding-bottom: max(5.8rem, calc(5.2rem + var(--sab)));
     padding-left:   max(1rem, calc(0.8rem + var(--sal)));
     padding-right:  max(1rem, calc(0.8rem + var(--sar)));
   }
 
-  /* ── Hero block: tighter, phone-native proportions ── */
+  /* ── Hero block: zero out redundant margins inside space-evenly ── */
   #hero {
-    margin-bottom: clamp(0.5rem, 1.8vh, 1.2rem);
+    margin-bottom: 0;
     margin-top: 0;
   }
-  /* Suppress decorative ring on small phones — it overflows and adds noise */
+  /* Ring hidden on phones — overflows and adds noise */
   #hero::after {
     display: none;
   }
@@ -130,14 +140,15 @@
   #greeting-label {
     font-size: clamp(0.55rem, 3vw, 0.70rem);
     letter-spacing: 0.35em;
-    margin-bottom: clamp(0.3rem, 1vh, 0.55rem);
+    margin-bottom: clamp(0.25rem, 0.8vh, 0.5rem);
   }
   #hero-friend-name {
     font-size: clamp(2.2rem, 10.5vw, 3.2rem);
     line-height: 1.08;
-    letter-spacing: 0;
+    /* Preserve subtle positive spacing — zero makes Cinzel look cramped */
+    letter-spacing: 0.02em;
     margin-top: 4px;
-    margin-bottom: clamp(0.3rem, 1.2vh, 0.8rem);
+    margin-bottom: 0;
   }
   #birthday-date {
     font-size: clamp(0.58rem, 2.8vw, 0.78rem);
@@ -147,7 +158,8 @@
   #tagline {
     font-size: clamp(0.84rem, 3.8vw, 1rem);
     line-height: 1.55;
-    margin: 0 auto clamp(0.6rem, 2vh, 1.2rem);
+    /* Zero out the bottom margin — space-evenly already provides the gap */
+    margin: 0 auto;
     max-width: 90vw;
   }
 
@@ -163,7 +175,6 @@
     transform: none; /* disable parallax on touch — feels laggy */
   }
   #envelope {
-    /* Mobile-first sizing: feels right in hand, not scaled-down desktop */
     width:  clamp(200px, 58vw, 260px);
     height: clamp(138px, 40vw, 179px);
   }
@@ -173,7 +184,7 @@
   #envelope-hint {
     font-size: clamp(0.58rem, 2.6vw, 0.68rem);
     letter-spacing: 0.22em;
-    margin-top: clamp(0.5rem, 1.6vh, 0.9rem);
+    margin-top: clamp(0.4rem, 1.4vh, 0.8rem);
   }
 
   /* ── Scroll paper: full portrait reading width ── */
@@ -183,10 +194,11 @@
   #scroll-paper {
     width: min(94vw, 420px);
     max-height: min(86dvh, 88svh);
-    border-radius: 4px;
+    border-radius: 8px; /* consistent with mobile-performance override */
   }
   #scroll-inner {
-    padding: 1.8rem 1.1rem 1.8rem 1.7rem;
+    /* Symmetric side padding for balanced letter reading */
+    padding: 1.8rem 1.4rem 1.8rem 1.8rem;
     max-height: min(78dvh, 82svh);
   }
 
@@ -199,7 +211,7 @@
     font-size: 0.96rem;
     line-height: 1.80;
     margin-bottom: 0.85em;
-    text-align: left; /* left-align is easier to read on narrow screens */
+    text-align: left;
     text-align-last: left;
   }
   #scroll-title {
@@ -218,38 +230,42 @@
   .hogwarts-motto-sub {
     font-size: 0.77rem !important;
   }
+  .hogwarts-divider {
+    margin: 0.25rem auto 0.45rem; /* tighter vertical rhythm on phone */
+    height: 14px;
+  }
   #scroll-signature {
     font-size: 0.90rem;
     margin-top: 1em;
   }
   #hogwarts-header {
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.45rem;
   }
 
-  /* ── Close button: always accessible ── */
+  /* ── Close button: 44px minimum touch target (HIG compliant) ── */
   #scroll-close {
     top: 10px;
     right: 10px;
-    width: 36px;
-    height: 36px;
-    font-size: 0.9rem;
+    width: 44px;
+    height: 44px;
+    font-size: 0.95rem;
   }
 
-  /* ── Toast: above the dock ── */
+  /* ── Toast: reliably above the dock on all portrait heights ── */
   #house-toast {
     bottom: -90px;
   }
   #house-toast.visible {
-    bottom: max(4.8rem, calc(4.4rem + var(--sab)));
+    bottom: max(5.2rem, calc(4.8rem + var(--sab)));
   }
 
-  /* ── SVG filter toggle: disable on ≤480px for performance ── */
+  /* ── SVG filter: disable on ≤480px for performance ── */
   #scroll-paper-bg,
   #scroll-flap-top,
   #scroll-flap-bottom {
     filter: none !important;
-    border: 1px solid rgba(139, 101, 55, 0.35) !important;
+    border: 1px solid rgba(139, 101, 55, 0.30) !important;
     border-radius: 8px;
   }
 
