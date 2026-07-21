@@ -15,7 +15,7 @@ import { state } from './state.js';
 let _cinematicActive = false;
 
 export function initializeMainApp() {
-  const c = window._bdContent || {};
+  const c = window._bdContent || (typeof BIRTHDAY_CONTENT !== 'undefined' ? BIRTHDAY_CONTENT : {});
 
   initCentralEvents();
 
@@ -81,23 +81,6 @@ export function startCinematicSequence() {
   if (overlay) overlay.style.display = "none";
   endCinematic();
 }
-  
-  overlay.style.display = "block";
-  overlay.style.opacity = "1";
-  
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-  
-  let w = canvas.width = window.innerWidth;
-  let h = canvas.height = window.innerHeight;
-  
-  window.addEventListener("resize", () => {
-    if (!_cinematicActive) return;
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-  }, { passive: true });
-
-  startWindAmbient();
   setTimeout(() => {
     if (_cinematicActive) playOwlHoot();
   }, 2500);
@@ -495,6 +478,7 @@ export async function startPreloader() {
 
     if (progressBar) progressBar.style.transform = "scaleX(1)";
     if (percentageLabel) percentageLabel.textContent = "100%";
+    if (statusLabel) statusLabel.textContent = "Mischief Managed.";
 
     setTimeout(() => {
       const loader = document.getElementById("loading-screen");
@@ -503,18 +487,44 @@ export async function startPreloader() {
         setTimeout(() => {
           loader.style.display = "none";
           initializeMainApp();
-        }, 300);
+        }, 400);
       } else {
         initializeMainApp();
       }
-    }, 150);
+    }, 250);
   }
 
-  // Instantly finish preloading — browser streams video & audio on demand natively
+  // Smooth, readable progress fill over 2.4 seconds
+  let progress = 0;
+  const startTime = Date.now();
+  const duration = 2400;
+
+  const statusLabel = document.getElementById("loading-status");
   const progressBar = document.getElementById("loading-progress-bar");
   const percentageLabel = document.getElementById("loading-percentage");
-  if (progressBar) progressBar.style.transform = "scaleX(1)";
-  if (percentageLabel) percentageLabel.textContent = "100%";
 
-  setTimeout(completePreloading, 100);
+  const progressInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    progress = Math.min(1, elapsed / duration);
+
+    if (progressBar) progressBar.style.transform = `scaleX(${progress})`;
+    if (percentageLabel) percentageLabel.textContent = `${Math.floor(progress * 100)}%`;
+
+    if (statusLabel) {
+      if (progress < 0.3) {
+        statusLabel.textContent = "Summoning Hogwarts owl post\u2026";
+      } else if (progress < 0.65) {
+        statusLabel.textContent = "Preparing the enchanted envelope\u2026";
+      } else if (progress < 0.95) {
+        statusLabel.textContent = "Sealing the letter with wax\u2026";
+      } else {
+        statusLabel.textContent = "Mischief Managed.";
+      }
+    }
+
+    if (progress >= 1) {
+      clearInterval(progressInterval);
+      setTimeout(completePreloading, 350);
+    }
+  }, 40);
 }
