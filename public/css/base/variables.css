@@ -64,24 +64,24 @@
 }
 
 /* ── Background board asset slots ──────────────────────────────
-   Desktop:  assets/textures/wood-table.png      (existing, in use)
-   Mobile:   assets/textures/wood-table-mobile.png  ← DROP IN TO ACTIVATE
-   When wood-table-mobile.png exists, just update --body-bg-image-mobile below.
+   Desktop:  assets/textures/wood-table.png       ✅ active
+   Mobile:   assets/textures/wood-table-mobile.png ✅ active
    ─────────────────────────────────────────────────────────────── */
 :root {
   --body-bg-image        : url('../../assets/textures/wood-table.png');
   --body-bg-size         : cover;
   --body-bg-position     : center center;
-  /* Mobile slot — swap this URL to activate wood-table-mobile.png */
-  --body-bg-image-mobile : url('../../assets/textures/wood-table.png');
-  --body-bg-size-mobile  : 200% auto;
-  --body-bg-pos-mobile   : center 20%;
 
-  /* Parchment texture slot */
-  /* --parchment-bg-mobile: url('../../assets/textures/parchment-mobile.png'); */
+  /* Mobile board — portrait-oriented wood-table-mobile.png ✅ */
+  --body-bg-image-mobile : url('../../assets/textures/wood-table-mobile.png');
+  --body-bg-size-mobile  : cover;
+  --body-bg-pos-mobile   : center center;
 
-  /* Envelope slot (applied via JS class or CSS variable) */
-  /* --envelope-bg-mobile: url('../../assets/ui/envelope-mobile.png'); */
+  /* Parchment texture — parchment-mobile.png ✅ */
+  --parchment-bg-mobile  : url('../../assets/textures/parchment-mobile.png');
+
+  /* Envelope face — envelope-mobile.png ✅ */
+  --envelope-bg-mobile   : url('../../assets/ui/envelope-mobile.png');
 }
 
 body {
