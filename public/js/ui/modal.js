@@ -159,8 +159,15 @@ export function initHouseSelector(siteContent) {
       selectHouse(house, { siteContent, silent: false });
       
       closeHouseSelector();
-      
       startMusic();
+
+      // Automatically open the envelope and letter for the selected house
+      const wrapper = document.getElementById('envelope-wrapper');
+      if (wrapper) {
+        setTimeout(() => {
+          wrapper.click();
+        }, 150);
+      }
     };
 
     badge.addEventListener('click', handleSelection);

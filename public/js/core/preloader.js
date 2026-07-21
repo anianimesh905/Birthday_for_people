@@ -59,50 +59,28 @@ export function initializeMainApp() {
   initMagicParticles({ canvasId: 'sparkle-canvas' });
   initAmbientAtmosphere();
 
-  if (!state.system.reducedMotion) {
-    const wrapper = document.getElementById("envelope-wrapper");
-    if (wrapper) wrapper.style.pointerEvents = "none";
-    const envArea = document.getElementById("envelope-area");
-    if (envArea) envArea.style.opacity = "0";
-  }
+  // Envelope is immediately visible and interactive
+  const wrapper = document.getElementById("envelope-wrapper");
+  if (wrapper) wrapper.style.pointerEvents = "auto";
+  const envArea = document.getElementById("envelope-area");
+  if (envArea) envArea.style.opacity = "1";
 }
 
 export function endCinematic() {
-  if (!_cinematicActive) return;
   _cinematicActive = false;
-
-  transitionWindToAmbient();
-
   const overlay = document.getElementById("cinematic-overlay");
-  const envArea = document.getElementById("envelope-area");
-  const wrapper = document.getElementById("envelope-wrapper");
-
   if (overlay) {
-    overlay.style.pointerEvents = "none";
-    overlay.style.opacity = "0";
-    setTimeout(() => {
-      overlay.style.display = "none";
-      overlay.remove();
-    }, 1800);
-  }
-
-  if (envArea) {
-    envArea.style.opacity = "1";
-    envArea.classList.add("envelope-pulse-highlight");
-  }
-  if (wrapper) {
-    wrapper.style.pointerEvents = "auto";
+    overlay.style.display = "none";
   }
 }
 
 export function startCinematicSequence() {
-  _cinematicActive = true;
-  
+  // Bypassed — no intro story/owl sequence
+  _cinematicActive = false;
   const overlay = document.getElementById("cinematic-overlay");
-  const canvas = document.getElementById("cinematic-canvas");
-  const skipBtn = document.getElementById("skip-cinematic-btn");
-  
-  if (!overlay || !canvas) return;
+  if (overlay) overlay.style.display = "none";
+  endCinematic();
+}
   
   overlay.style.display = "block";
   overlay.style.opacity = "1";
@@ -619,27 +597,11 @@ export async function startPreloader() {
         setTimeout(() => {
           loader.style.display = "none";
           initializeMainApp();
-          if (!state.system.reducedMotion) {
-            startCinematicSequence();
-          } else {
-            const wrapper = document.getElementById("envelope-wrapper");
-            if (wrapper) wrapper.style.pointerEvents = "auto";
-            const envArea = document.getElementById("envelope-area");
-            if (envArea) envArea.style.opacity = "1";
-          }
-        }, 800);
+        }, 400);
       } else {
         initializeMainApp();
-        if (!state.system.reducedMotion) {
-          startCinematicSequence();
-        } else {
-          const wrapper = document.getElementById("envelope-wrapper");
-          if (wrapper) wrapper.style.pointerEvents = "auto";
-          const envArea = document.getElementById("envelope-area");
-          if (envArea) envArea.style.opacity = "1";
-        }
       }
-    }, 950);
+    }, 200);
   }
 
   assets.forEach(async (asset) => {

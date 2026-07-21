@@ -188,6 +188,19 @@ export function initEnvelope() {
   }
 
   function openEnvelope(e) {
+    const savedHouse = sessionStorage.getItem('selectedHouse');
+    const houseOverlay = document.getElementById('house-selector-overlay');
+
+    if (!savedHouse && houseOverlay) {
+      houseOverlay.style.display = 'flex';
+      void houseOverlay.offsetWidth;
+      houseOverlay.classList.remove('hidden');
+      houseOverlay.style.opacity = '1';
+      houseOverlay.style.visibility = 'visible';
+      startMusic();
+      return;
+    }
+
     startMusic();
     
     const isPersonal = envelope.classList.contains("eyes-only");
@@ -212,7 +225,7 @@ export function initEnvelope() {
             }
           }));
         }
-      }, 300);
+      }, 200);
       return;
     }
     state.story.opened = true;
@@ -229,18 +242,15 @@ export function initEnvelope() {
 
     burstSealParticles(sealCx, sealCy);
     playCrackSound();
-    triggerCinematicUnseal();
 
     setTimeout(() => {
       envelope.classList.add("open");
     }, 40);
 
     if (hint) {
-      hint.style.transition = "opacity 0.5s ease";
+      hint.style.transition = "opacity 0.4s ease";
       hint.style.opacity = "0";
     }
-
-    triggerOwlDelivery();
 
     const wrapperRect = wrapper.getBoundingClientRect();
     window.dispatchEvent(new CustomEvent('envelopeTapped', {
@@ -257,7 +267,7 @@ export function initEnvelope() {
       startAmbientWaves();
       setTimeout(() => {
         if (closeBtn) closeBtn.focus();
-      }, 150);
+      }, 100);
 
       setTimeout(() => {
         if (paper) {
@@ -271,7 +281,7 @@ export function initEnvelope() {
             }
           }));
         }
-      }, 100);
+      }, 80);
 
       spawnConfetti();
 
@@ -297,18 +307,15 @@ export function initEnvelope() {
         if (dividerEl) dividerEl.textContent = "· · · ❤️ · · ·";
         if (mottoEl) mottoEl.innerHTML = "<em>Amor Vincit Omnia</em>";
       } else {
-        const houseCfg = HOUSES[state.ui.currentHouse] || HOUSES.gryffindor;
-        msg = c2[houseCfg.message] || c2.slytherinMessage || '';
+        const currentHouseKey = (state.ui.currentHouse || 'slytherin').toLowerCase();
+        const houseMsgKey = `${currentHouseKey}Message`;
+        msg = c2[houseMsgKey] || c2.slytherinMessage || '';
         overlay.classList.remove("eyes-only-modal");
       }
 
-      if (!state.system.reducedMotion && !state.story.castleAwakened) {
-        state.story.castleAwakened = true;
-        setTimeout(() => startCastleAwakeningSequence(msgEl, msg, sigEl), 200);
-      } else {
-        setTimeout(() => revealHogwartsLetter(msgEl, msg, sigEl), 200);
-      }
-    }, 450);
+      // Fast, immediate letter reveal — no long delays
+      revealHogwartsLetter(msgEl, msg, sigEl);
+    }, 250);
   }
 
   function closeModal() {
