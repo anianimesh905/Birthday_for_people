@@ -64,15 +64,15 @@
 }
 
 /* ── Background board asset slots ──────────────────────────────
-   Desktop:  assets/textures/wood-table.png       ✅ active
-   Mobile:   assets/textures/wood-table-mobile.png ✅ active
+   Board:    assets/textures/wood-table-mobile.png ✅ (unified texture)
+   Mobile:   portrait mode uses cover + centered positioning
    ─────────────────────────────────────────────────────────────── */
 :root {
-  --body-bg-image        : url('../../assets/textures/wood-table.png');
+  --body-bg-image        : url('../../assets/textures/wood-table-mobile.png');
   --body-bg-size         : cover;
   --body-bg-position     : center center;
 
-  /* Mobile board — portrait-oriented wood-table-mobile.png ✅ */
+  /* Mobile board — same texture, portrait-specific positioning ✅ */
   --body-bg-image-mobile : url('../../assets/textures/wood-table-mobile.png');
   --body-bg-size-mobile  : cover;
   --body-bg-pos-mobile   : center center;
@@ -83,6 +83,7 @@
   /* Envelope face — envelope-mobile.png ✅ */
   --envelope-bg-mobile   : url('../../assets/ui/envelope-mobile.png');
 }
+
 
 body {
   font-family: 'Jost', sans-serif;
