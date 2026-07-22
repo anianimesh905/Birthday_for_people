@@ -56,8 +56,9 @@ export function initializeMainApp() {
   initParallax();
   initMagneticButtons();
   initSwipeDismiss();
-  initMagicParticles({ canvasId: 'sparkle-canvas' });
-  initAmbientAtmosphere();
+  // Background video is the ONLY background — atmospheric JS disabled
+  // initMagicParticles({ canvasId: 'sparkle-canvas' });
+  // initAmbientAtmosphere();
 
   // Envelope is immediately visible and interactive
   const wrapper = document.getElementById("envelope-wrapper");

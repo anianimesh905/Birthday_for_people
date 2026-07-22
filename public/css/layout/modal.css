@@ -4,16 +4,22 @@
 #house-selector-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(11, 9, 7, 0.96); /* Fully opaque deep glass dark background to avoid laggy blurs */
-  display: none; /* Initially display none to avoid preloader layering conflict */
+  background: rgba(11, 9, 7, 0.94);
+  display: none;
   align-items: center;
   justify-content: center;
   z-index: 50000;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.6s;
-  overflow-y: auto; /* Scrollable backup for short screen dimensions */
-  padding: 24px 12px;
+  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.4s;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding:
+    max(1.2rem, calc(0.8rem + var(--sat)))
+    max(1rem, calc(0.8rem + var(--sar)))
+    max(1.2rem, calc(0.8rem + var(--sab)))
+    max(1rem, calc(0.8rem + var(--sal)));
+  box-sizing: border-box;
 }
 
 #house-selector-overlay.visible {
@@ -21,56 +27,60 @@
 }
 
 #theme-switcher-panel {
-  background: rgba(18, 14, 10, 0.75);
+  background: rgba(18, 14, 10, 0.85);
   border: 2px solid #D3A625;
-  border-radius: 24px;
-  padding: clamp(24px, 5vw, 40px);
-  width: min(680px, 94vw); /* Increased width to make space for larger badge icons */
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85), 
-              inset 0 0 24px rgba(211, 166, 37, 0.15);
+  border-radius: 20px;
+  padding: clamp(16px, 3.2vh, 32px) clamp(12px, 3.5vw, 24px);
+  width: min(480px, 92vw);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 
+              inset 0 0 20px rgba(211, 166, 37, 0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(20px, 4vh, 32px);
+  gap: clamp(12px, 2vh, 22px);
   text-align: center;
-  animation: panelReveal 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  margin: auto; /* Center cleanly when content causes overflow scrolling */
+  animation: panelReveal 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  margin: auto;
+  box-sizing: border-box;
 }
 
 @keyframes panelReveal {
   from {
-    transform: scale(0.9) translateY(24px);
+    transform: scale(0.95);
     opacity: 0;
   }
   to {
-    transform: scale(1) translateY(0);
+    transform: scale(1);
     opacity: 1;
   }
 }
 
 #selector-title {
   font-family: 'Cinzel', serif;
-  font-size: clamp(1.6rem, 5vw, 2.3rem);
+  font-size: clamp(1.25rem, 4.2vw, 1.9rem);
   color: #D3A625;
   text-shadow: 0 0 12px rgba(211, 166, 37, 0.5), 0 2px 4px rgba(0,0,0,0.8);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .house-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: clamp(12px, 3vw, 24px);
+  gap: clamp(10px, 2.5vw, 18px);
   width: 100%;
+  box-sizing: border-box;
 }
 
 .house-badge {
-  background: rgba(15, 12, 10, 0.5);
-  border: 2px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: clamp(16px, 3vh, 24px) 12px;
+  background: rgba(15, 12, 10, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: clamp(10px, 2vh, 18px) 6px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -78,10 +88,11 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(255, 255, 255, 0.02);
-  aspect-ratio: 1 / 1.15;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  aspect-ratio: 1 / 1.05;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .badge-shimmer-wrapper {
@@ -97,8 +108,8 @@
 }
 
 .badge-img {
-  width: clamp(90px, 20vw, 130px);
-  height: clamp(100px, 22vw, 140px);
+  width: clamp(64px, 16vw, 105px);
+  height: clamp(70px, 17vw, 115px);
   object-fit: contain;
   filter: drop-shadow(0 4px 10px rgba(0,0,0,0.7));
   transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -106,8 +117,8 @@
 
 .badge-name {
   font-family: 'Cinzel', serif;
-  font-size: clamp(0.65rem, 2vw, 0.8rem);
-  margin-top: 10px;
+  font-size: clamp(0.65rem, 2vw, 0.82rem);
+  margin-top: clamp(4px, 1vh, 8px);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: rgba(255, 255, 255, 0.7);

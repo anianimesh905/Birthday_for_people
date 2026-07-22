@@ -161,12 +161,16 @@ export function initHouseSelector(siteContent) {
       closeHouseSelector();
       startMusic();
 
-      // Automatically open the envelope and letter for the selected house
-      const wrapper = document.getElementById('envelope-wrapper');
-      if (wrapper) {
-        setTimeout(() => {
-          wrapper.click();
-        }, 150);
+      // Magically summon/reveal the existing envelope on the table with a subtle 400ms transition
+      const envArea = document.getElementById("envelope-area");
+      if (envArea) {
+        envArea.style.transition = "opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)";
+        envArea.style.opacity = "0";
+        envArea.style.transform = "scale(0.92)";
+        requestAnimationFrame(() => {
+          envArea.style.opacity = "1";
+          envArea.style.transform = "scale(1)";
+        });
       }
     };
 
