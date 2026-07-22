@@ -26,7 +26,7 @@
     border-radius: 8px;  /* consistent with mobile-performance override */
   }
   #scroll-inner {
-    padding: 2rem 1.6rem 2rem 2rem; /* symmetric side padding */
+    padding: clamp(2.8rem, 6vh, 3.4rem) 1.6rem 2rem 1.8rem;
     max-height: min(80dvh, 84svh);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
