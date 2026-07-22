@@ -125,6 +125,7 @@ export function initHouseSelector(siteContent) {
     void overlay.offsetWidth;
     overlay.style.opacity = '1';
     overlay.style.visibility = 'visible';
+    document.body.classList.add('modal-open');
     
     const defaultHouse = ((siteContent && siteContent.defaultHouse) || 'Slytherin').toLowerCase();
     selectHouse(defaultHouse, { siteContent, silent: true });
@@ -139,6 +140,7 @@ export function initHouseSelector(siteContent) {
     overlay.classList.add('hidden');
     overlay.style.opacity = '0';
     overlay.style.visibility = 'hidden';
+    document.body.classList.remove('modal-open');
     setTimeout(() => {
       overlay.style.display = 'none';
     }, 600);
@@ -188,6 +190,7 @@ export function initHouseSelector(siteContent) {
       overlay.classList.remove('hidden');
       overlay.style.opacity = '1';
       overlay.style.visibility = 'visible';
+      document.body.classList.add('modal-open');
       
       startMusic();
     };

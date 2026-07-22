@@ -4,6 +4,7 @@
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  background: #120e0a url('../../assets/textures/wood-table-mobile.png') center/cover no-repeat;
   transition: background-image 0.4s ease;
 }
 
@@ -27,14 +28,9 @@
 #video-overlay {
   position: absolute;
   inset: 0;
-  background : linear-gradient(
-    180deg,
-    transparent                      0%,
-    var(--house-overlay)             55%,
-    rgba(0, 0, 0, 0.93)            100%
-  );
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.20) 0%, rgba(0, 0, 0, 0.65) 100%);
   pointer-events: none;
-  transition  : background 0.6s ease;
+  transition: background 0.6s ease;
 }
 
 /* 🎬 House Gradient Fallbacks (when videos fail) */

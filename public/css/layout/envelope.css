@@ -87,13 +87,7 @@
   }
 }
 
-/* When the envelope is open on mobile, show CSS flaps again for the animation */
-@media (max-width: 767px) and (orientation: portrait) {
-  #envelope.open #env-flap-top {
-    display: block !important;
-    transform: rotateX(-180deg);
-  }
-}
+/* Flaps stay clean on mobile portrait illustration */
 
 
 /* Soft shadows */

@@ -208,7 +208,7 @@ export function initEnvelope() {
     
     if (state.story.opened) {
       overlay.classList.add("open");
-      document.body.classList.add("letter-open");
+      document.body.classList.add("letter-open", "modal-open");
       startAmbientWaves();
       setTimeout(() => {
         if (closeBtn) closeBtn.focus();
@@ -320,7 +320,7 @@ export function initEnvelope() {
 
   function closeModal() {
     overlay.classList.remove("open");
-    document.body.classList.remove("letter-open");
+    document.body.classList.remove("letter-open", "modal-open");
     stopAmbientWaves();
     if (paper) paper.classList.remove("unfolded");
     

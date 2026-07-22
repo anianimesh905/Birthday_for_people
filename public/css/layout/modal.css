@@ -8,7 +8,7 @@
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 50000;
+  z-index: 100000;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.4s;
@@ -417,7 +417,7 @@ body.revelio-active #main-content {
 #spell-modal {
   position: fixed;
   inset: 0;
-  z-index: 60000;
+  z-index: 100000;
   display: none;
   align-items: flex-end;   /* Bottom sheet: anchored to bottom */
   justify-content: center;

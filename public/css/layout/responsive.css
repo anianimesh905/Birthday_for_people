@@ -54,8 +54,20 @@
     display: none !important;
   }
 
+  /* Hide bottom control dock when any modal is open to prevent overlapping text/cards */
+  body:has(#scroll-overlay.open) .bottom-control-dock,
+  body:has(#house-selector-overlay.visible) .bottom-control-dock,
+  body:has(#spell-modal.open) .bottom-control-dock,
+  body.modal-open .bottom-control-dock {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
   /* ── Bottom control dock ── */
   .bottom-control-dock {
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
     padding: 5px 10px;
     gap: 8px;
     /* Increased bottom clearance so the pill doesn't clip the screen edge */
