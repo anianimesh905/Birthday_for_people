@@ -282,7 +282,7 @@
 /* Scroll content container */
 #scroll-inner {
   /* Base padding optimised for mobile reading first */
-  padding: 2.2rem 1.4rem 2.2rem 2.2rem;
+  padding: clamp(2.8rem, 6vh, 3.4rem) clamp(1.4rem, 4vw, 2.2rem) clamp(2rem, 5vh, 2.8rem);
   max-height: calc(var(--vh) * 82 - 10px);
   max-height: calc(82dvh - 10px);
   overflow-y: auto;
