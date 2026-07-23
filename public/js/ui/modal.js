@@ -98,6 +98,17 @@ export function selectHouse(houseName, opts = {}) {
 
   updateSealForHouse(key);
 
+  const houseLocations = {
+    gryffindor: 'A Letter from the Gryffindor Common Room',
+    slytherin:  'A Letter from the Slytherin Dungeons',
+    ravenclaw:  'A Letter from Ravenclaw Tower',
+    hufflepuff: 'A Letter from the Hufflepuff Burrow'
+  };
+  const locationEl = document.getElementById('hogwarts-house-location');
+  if (locationEl) {
+    locationEl.textContent = houseLocations[key] || 'A Letter from Hogwarts';
+  }
+
   window.dispatchEvent(new CustomEvent('houseChanged', { 
     detail: { house: key, primary: cfg.primary, accent: cfg.accent } 
   }));
